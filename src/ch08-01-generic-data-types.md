@@ -66,7 +66,7 @@ Kode di atas menghasilkan trait `Drop` untuk tipe `Wallet` secara otomatis. Ini 
 
 Kita menghindari menggunakan macro `derive` untuk implementasi `Drop` dari `Wallet` dan sebaliknya menentukan implementasi `WalletDrop` kita sendiri. Perhatikan bahwa kita harus mendefinisikan, seperti fungsi, jenis generik tambahan untuk `WalletDrop` yang menyatakan bahwa `T` juga mengimplementasikan trait `Drop`. Kita basically mengatakan bahwa struct `Wallet<T>` dapat dihapus selama `T` juga dapat dihapus.
 
-Terakhir, jika kita ingin menambahkan field ke `Wallet` yang mewakili alamatnya dan kita ingin field tersebut berbeda dari `T` tetapi juga generik, kita dapat dengan mudah menambahkan jenis generik lain di antara `<>`:
+Terakhir, jika kita ingin menambahkan field ke `Wallet` yang mewakili Addressnya dan kita ingin field tersebut berbeda dari `T` tetapi juga generik, kita dapat dengan mudah menambahkan jenis generik lain di antara `<>`:
 
 ```rust
 {{#include ../listings/ch08-generic-types-and-traits/no_listing_08_two_generics/src/lib.cairo}}
@@ -102,7 +102,7 @@ Kita dapat mengimplementasikan metode pada structs dan enums, dan menggunakan je
 
 Pertama, kita mendefinisikan trait `WalletTrait<T>` menggunakan jenis generik `T` yang mendefinisikan metode yang mengembalikan snapshot dari field `balance` dari `Wallet`. Kemudian kita memberikan implementasi untuk trait tersebut pada `WalletImpl<T>`. Perhatikan bahwa Anda perlu menyertakan jenis generik di kedua definisi trait dan implementasi.
 
-Kita juga dapat menentukan kendala pada jenis generik saat mendefinisikan metode pada jenis tersebut. Kita bisa, misalnya, mengimplementasikan metode hanya untuk instance `Wallet<u128>` daripada `Wallet<T>`. Pada contoh kode, kita mendefinisikan implementasi untuk dompet yang memiliki tipe konkret `u128` untuk field `balance`.
+Kita juga dapat menentukan kendala pada jenis generik saat mendefinisikan metode pada jenis tersebut. Kita bisa, misalnya, mengimplementasikan metode hanya untuk instance `Wallet<u128>` daripada `Wallet<T>`. Pada contoh kode, kita mendefinisikan implementasi untuk Wallet yang memiliki tipe konkret `u128` untuk field `balance`.
 
 ```rust
 {{#include ../listings/ch08-generic-types-and-traits/no_listing_12_constrained_generics/src/lib.cairo}}
@@ -110,7 +110,7 @@ Kita juga dapat menentukan kendala pada jenis generik saat mendefinisikan metode
 
 Metode baru `receive` menambah ukuran saldo dari setiap instance `Wallet<u128>`. Perhatikan bahwa kita mengubah fungsi `main` membuat `w` menjadi variabel yang dapat diubah agar dapat memperbarui saldo. Jika kita mengubah inisialisasi `w` dengan mengubah tipe `balance`, kode sebelumnya tidak akan dikompilasi.
 
-Cairo memungkinkan kita mendefinisikan metode generik di dalam trait generik juga. Menggunakan implementasi sebelumnya dari `Wallet<U, V>`, kita akan mendefinisikan sebuah trait yang memilih dua dompet dari jenis generik yang berbeda dan membuat yang baru dengan jenis generik masing-masing. Pertama, mari kita menulis ulang definisi struct:
+Cairo memungkinkan kita mendefinisikan metode generik di dalam trait generik juga. Menggunakan implementasi sebelumnya dari `Wallet<U, V>`, kita akan mendefinisikan sebuah trait yang memilih dua Wallet dari jenis generik yang berbeda dan membuat yang baru dengan jenis generik masing-masing. Pertama, mari kita menulis ulang definisi struct:
 
 ```rust,noplayground
 {{#include ../listings/ch08-generic-types-and-traits/no_listing_13_not_compiling/src/lib.cairo:struct}}

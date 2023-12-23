@@ -1,1 +1,1 @@
-# Component dependencies
+# Komponen dependencies

@@ -1,35 +1,35 @@
-## Storage Optimization with `StorePacking`
+## Optimisasi Penyimpanan dengan `StorePacking`
 
-Bit-packing is a simple concept: Use as few bits as possible to store a piece of data. When done well, it can significantly reduce the size of the data you need to store. This is especially important in smart contracts, where storage is expensive.
+Bit-packing adalah konsep sederhana: Gunakan sebanyak mungkin bit untuk menyimpan sebuah data. Ketika dilakukan dengan baik, ini dapat secara signifikan mengurangi ukuran data yang perlu Anda simpan. Hal ini terutama penting dalam kontrak pintar, di mana penyimpanan memiliki biaya yang mahal.
 
-When writing Cairo smart contracts, it is important to optimize storage usage to reduce gas costs. Indeed, most of the cost associated with a transaction is related to storage updates; and each storage slot costs gas to write to.
-This means that by packing multiple values into fewer slots, you can decrease the gas cost incurred by the users of your smart contract.
+Ketika menulis kontrak pintar Cairo, penting untuk mengoptimalkan penggunaan penyimpanan untuk mengurangi biaya gas. Memang, sebagian besar biaya yang terkait dengan sebuah transaksi berhubungan dengan pembaruan penyimpanan; dan setiap slot penyimpanan membutuhkan biaya gas untuk ditulis.
+Ini berarti dengan mem-packing beberapa nilai ke dalam slot yang lebih sedikit, Anda dapat mengurangi biaya gas yang dikeluarkan oleh pengguna kontrak pintar Anda.
 
-Cairo provides the `StorePacking` trait to enable packing struct fields into fewer storage slots. For example, consider a `Sizes` struct with 3 fields of different types. The total size is 8 + 32 + 64 = 104 bits. This is less than the 128 bits of a single `u128`. This means we can pack all 3 fields into a single `u128` variable. Since a storage slot can hold up to 251 bits, our packed value will take only one storage slot instead of 3.
+Cairo menyediakan trait `StorePacking` untuk memungkinkan pem-packing bidang struct ke dalam slot penyimpanan yang lebih sedikit. Sebagai contoh, pertimbangkan sebuah struct `Sizes` dengan 3 bidang dari tipe yang berbeda. Ukuran totalnya adalah 8 + 32 + 64 = 104 bit. Ini kurang dari 128 bit dari sebuah `u128` tunggal. Artinya kita dapat mem-packing semua 3 bidang ke dalam sebuah variabel `u128` tunggal. Karena sebuah slot penyimpanan dapat menampung hingga 251 bit, nilai yang ter-packing kita akan hanya membutuhkan satu slot penyimpanan daripada 3.
 
 ```rust
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_13_storage_packing/src/lib.cairo:here}}
 ```
 
-<span class="caption">Optimizing storage by implementing the `StorePacking` trait</span>
+<span class="caption">Mengoptimalkan penyimpanan dengan mengimplementasikan trait `StorePacking`</span>
 
-The `pack` function combines all three fields into a single `u128` value by performing bitshift and additions. The `unpack` reverses this process to extract the original fields back into a struct.
+Fungsi `pack` menggabungkan ketiga bidang ke dalam sebuah nilai `u128` tunggal dengan melakukan bitshift dan penambahan. Fungsi `unpack` membalikkan proses ini untuk mengekstrak kembali bidang-bidang asli ke dalam sebuah struct.
 
-If you're not familiar with bit operations, here's an explanation of the operations performed in the example:
-The goal is to pack the `tiny`, `small`, and `medium` fields into a single `u128` value.
-First, when packing:
+Jika Anda tidak familiar dengan operasi bit, berikut penjelasan dari operasi-operasi yang dilakukan dalam contoh ini:
+Tujuannya adalah mem-packing bidang `tiny`, `small`, dan `medium` ke dalam sebuah nilai `u128` tunggal.
+Pertama, saat mem-packing:
 
-- `tiny` is a `u8` so we just convert it directly to a `u128` with `.into()`. This creates a `u128` value with the low 8 bits set to `tiny`'s value.
-- `small` is a `u32` so we first shift it left by 8 bits (add 8 bits with the value 0 to the left) to create room for the 8 bites taken by `tiny`. Then we add `tiny` to `small` to combine them into a single `u128` value. The value of `tiny` now takes bits 0-7 and the value of small takes bits 8-39.
-- Similarly `medium` is a `u64` so we shift it left by 40 (8 + 32) bits (`TWO_POW_40`) to make space for the previous fields. This takes bits 40-103.
+- `tiny` adalah `u8` sehingga kita hanya mengonversinya secara langsung ke `u128` dengan `.into()`. Ini menciptakan sebuah nilai `u128` dengan 8 bit rendah diatur ke nilai dari `tiny`.
+- `small` adalah `u32` sehingga pertama-tama kita menggesernya ke kiri sebanyak 8 bit (menambahkan 8 bit dengan nilai 0 ke kiri) untuk membuat ruang untuk 8 bit yang diambil oleh `tiny`. Lalu kita tambahkan `tiny` ke `small` untuk menggabungkannya menjadi sebuah nilai `u128` tunggal. Nilai dari `tiny` sekarang mengambil bit 0-7 dan nilai dari `small` mengambil bit 8-39.
+- Demikian pula, `medium` adalah `u64` sehingga kita menggesernya ke kiri sebanyak 40 bit (8 + 32) (`TWO_POW_40`) untuk membuat ruang bagi bidang-bidang sebelumnya. Ini mengambil bit 40-103.
 
-When unpacking:
+Ketika melakukan pem-unpacking:
 
-- First we extract `tiny` by bitwise ANDing (&) with a bitmask of 8 ones (`& MASK_8`). This isolates the lowest 8 bits of the packed value, which is `tiny`'s value.
-- For `small`, we right shift by 8 bits (`/ TWO_POW_8`) to align it with the bitmask, then use bitwise AND with the 32 ones bitmask.
-- For `medium` we right shift by 40 bits. Since it is the last value packed, we don't need to apply a bitmask as the higher bits are already 0.
+- Pertama, kita ekstrak `tiny` dengan melakukan bitwise AND (&) dengan sebuah bitmask dari 8 satu (`& MASK_8`). Ini mengisolasi 8 bit terendah dari nilai yang ter-pack, yang merupakan nilai `tiny`.
+- Untuk `small`, kita geser ke kanan sebanyak 8 bit (`/ TWO_POW_8`) untuk menyesuaikannya dengan bitmask, lalu gunakan bitwise AND dengan bitmask 32 satu.
+- Untuk `medium`, kita geser ke kanan sebanyak 40 bit. Karena ini adalah nilai terakhir yang di-pack, kita tidak perlu menerapkan bitmask karena bit yang lebih tinggi sudah 0.
 
-This technique can be used for any group of fields that fit within the bit size of the packed storage type. For example, if you have a struct with multiple fields whose bit sizes add up to 256 bits, you can pack them into a single `u256` variable. If the bit sizes add up to 512 bits, you can pack them into a single `u512` variable, and so on. You can define your own structs and logic to pack and unpack them.
+Teknik ini dapat digunakan untuk setiap kelompok bidang yang cocok dalam ukuran bit dari tipe penyimpanan yang ter-pack. Sebagai contoh, jika Anda memiliki sebuah struct dengan beberapa bidang yang ukuran bit-nya totalnya adalah 256 bit, Anda dapat mem-pack mereka ke dalam variabel `u256` tunggal. Jika ukuran bit-nya totalnya adalah 512 bit, Anda dapat mem-pack mereka ke dalam variabel `u512` tunggal, dan seterusnya. Anda dapat mendefinisikan struct dan logika Anda sendiri untuk mem-pack dan mem-unpack mereka.
 
-The rest of the work is done magically by the compiler - if a type implements the `StorePacking` trait, then the compiler will know it can use the `StoreUsingPacking` implementation of the `Store` trait in order to pack before writing and unpack after reading from storage.
-One important detail, however, is that the type that `StorePacking::pack` spits out also has to implement `Store` for `StoreUsingPacking` to work. Most of the time, we will want to pack into a felt252 or u256 - but if you want to pack into a type of your own, make sure that this one implements the `Store` trait.
+Sisa pekerjaan dilakukan secara ajaib oleh compiler - jika sebuah tipe mengimplementasikan trait `StorePacking`, maka compiler akan tahu bahwa dapat menggunakan implementasi `StoreUsingPacking` dari trait `Store` untuk mem-pack sebelum menulis dan mem-unpack setelah membaca dari penyimpanan.
+Satu detail penting, namun, adalah bahwa tipe yang dihasilkan oleh `StorePacking::pack` juga harus mengimplementasikan `Store` agar `StoreUsingPacking` dapat berfungsi. Kebanyakan waktu, kita akan ingin mem-pack ke dalam felt252 atau u256 - namun jika Anda ingin mem-pack ke dalam tipe milik Anda sendiri, pastikan bahwa tipe tersebut mengimplementasikan trait `Store`.

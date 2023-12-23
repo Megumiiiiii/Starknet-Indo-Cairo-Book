@@ -25,7 +25,7 @@ Sebagai contoh, kita dapat mendeklarasikan seorang pengguna tertentu seperti yan
 
 <span class="caption">Listing 5-2: Membuat sebuah instance dari struct `User`</span>
 
-Untuk mendapatkan nilai spesifik dari sebuah struct, kita menggunakan notasi titik (dot notation). Sebagai contoh, untuk mengakses alamat email pengguna ini, kita menggunakan `user1.email`. Jika instance bersifat mutable, kita dapat mengubah nilai dengan menggunakan notasi titik dan mengassign ke field tertentu. Listing 5-3 menunjukkan bagaimana cara mengubah nilai pada field `email` dari sebuah instance `User` yang mutable.
+Untuk mendapatkan nilai spesifik dari sebuah struct, kita menggunakan notasi titik (dot notation). Sebagai contoh, untuk mengakses Address email pengguna ini, kita menggunakan `user1.email`. Jika instance bersifat mutable, kita dapat mengubah nilai dengan menggunakan notasi titik dan mengassign ke field tertentu. Listing 5-3 menunjukkan bagaimana cara mengubah nilai pada field `email` dari sebuah instance `User` yang mutable.
 
 <span class="filename">Nama File: src/lib.cairo</span>
 

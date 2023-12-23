@@ -1,34 +1,34 @@
-# ABIs and Contract Interfaces
+# ABIs dan Antarmuka Kontrak
 
-Cross-contract interactions between smart contracts on a blockchain is a common practice which enables us to build flexible contracts that can speak with each other.
+Interaksi lintas kontrak antara kontrak pintar pada blockchain adalah praktik umum yang memungkinkan kita membangun kontrak yang fleksibel sehingga dapat berkomunikasi satu sama lain.
 
-Achieving this on Starknet requires something we call an interface.
+Untuk mencapai hal ini di Starknet, diperlukan sesuatu yang disebut antarmuka.
 
-## ABI - Application Binary Interface
+## ABI - Antarmuka Biner Aplikasi
 
-On Starknet, the ABI of a contract is a JSON representation of the contract's functions and structures, giving anyone (or any other contract) the ability to form encoded calls to it. It is a blueprint that instructs how functions should be called, what input parameters they expect, and in what format.
+Di Starknet, ABI dari suatu kontrak adalah representasi JSON dari fungsi-fungsi dan struktur kontrak, memberikan kemampuan kepada siapa pun (atau kontrak lainnya) untuk membentuk panggilan yang terenkripsi kepadanya. Ini adalah sebuah cetak biru yang memberi petunjuk bagaimana fungsi-fungsi seharusnya dipanggil, parameter masukan yang diharapkan, dan dalam format apa.
 
-While we write our smart contract logics in high-level Cairo, they are stored on the VM as executable bytecodes which are in binary formats. Since this bytecode is not human readable, it requires interpretation to be understood. This is where ABIs come into play, defining specific methods which can be called to a smart contract for execution. Without an ABI, it becomes practically impossible for external actors to understand how to interact with a contract.
+Meskipun kita menulis logika kontrak pintar kita dalam bahasa Cairo tingkat tinggi, mereka disimpan pada VM sebagai bytecode yang dapat dieksekusi dalam format biner. Karena bytecode ini tidak dapat dibaca oleh manusia, diperlukan interpretasi untuk dipahami. Di sinilah ABIs berperan, mendefinisikan metode-metode khusus yang dapat dipanggil ke suatu kontrak pintar untuk dieksekusi. Tanpa ABI, menjadi praktis tidak mungkin bagi aktor eksternal untuk memahami bagaimana berinteraksi dengan sebuah kontrak.
 
-ABIs are typically used in dApps frontends, allowing it to format data correctly, making it understandable by the smart contract and vice versa. When you interact with a smart contract through a block explorer like [Voyager](https://voyager.online/) or [Starkscan](https://starkscan.co/), they use the contract's ABI to format the data you send to the contract and the data it returns.
+ABIs biasanya digunakan dalam antarmuka pengguna aplikasi terdesentralisasi (dApps), memungkinkan untuk memformat data dengan benar, sehingga dapat dimengerti oleh kontrak pintar dan sebaliknya. Ketika Anda berinteraksi dengan kontrak pintar melalui penjelajah blok seperti [Voyager](https://voyager.online/) atau [Starkscan](https://starkscan.co/), mereka menggunakan ABI kontrak untuk memformat data yang Anda kirim ke kontrak dan data yang dikembalikannya.
 
 ## Interface
 
-The interface of a contract is a list of the functions it exposes publicly.
-It specifies the function signatures (name, parameters, visibility and return value) contained in a smart contract without including the function body.
+Antarmuka dari sebuah kontrak adalah daftar fungsi yang diekspos secara publik oleh kontrak tersebut.
+Antarmuka ini menentukan tanda tangan fungsi (nama, parameter, visibilitas, dan nilai kembalian) yang terdapat dalam kontrak pintar tanpa menyertakan badan fungsi.
 
-Contract interfaces in Cairo are traits annotated with the `#[starknet::interface]` attribute. If you are new to traits, check out the dedicated chapter on [traits](./ch08-02-traits-in-cairo.md).
+Antarmuka kontrak dalam Cairo adalah traits yang diberi anotasi dengan atribut `#[starknet::interface]`. Jika Anda baru mengenal traits, lihat bab khusus tentang [traits](./ch08-02-traits-in-cairo.md).
 
-One important specification is that this trait must be generic over the `TContractState` type. This is required for functions to access the contract's storage, so that they can read and write to it.
+Spesifikasi penting adalah bahwa trait ini harus generik terhadap tipe `TContractState`. Hal ini diperlukan agar fungsi-fungsi dapat mengakses penyimpanan kontrak, sehingga mereka dapat membaca dan menulis ke dalamnya.
 
-> Note: The contract constructor is not part of the interface. Nor are internal functions part of the interface.
+> Catatan: Konstruktor kontrak tidak termasuk dalam antarmuka. Begitu pula fungsi internal tidak termasuk dalam antarmuka.
 
-Here's a sample interface for an ERC20 token contract. As you can see, it's a generic trait over the `TContractState` type. `view` functions have a self parameter of type `@TContractState`, while `external` functions have a self parameter of type passed by reference `ref self: TContractState`.
+Berikut adalah contoh antarmuka untuk kontrak token ERC20. Seperti yang dapat Anda lihat, ini adalah trait generik terhadap tipe `TContractState`. Fungsi-fungsi `view` memiliki parameter self dengan tipe `@TContractState`, sedangkan fungsi-fungsi `external` memiliki parameter self dengan tipe yang dilewatkan dengan referensi `ref self: TContractState`.
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_04_interface/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 99-4: A simple ERC20 Interface</span>
+<span class="caption">Daftar 99-4: Antarmuka ERC20 sederhana</span>
 
-In the next chapter, we will see how we can call contracts from other smart contracts using _dispatchers_ and _syscalls_ .
+Pada bab selanjutnya, kita akan melihat bagaimana kita dapat memanggil kontrak dari kontrak pintar lain menggunakan _dispatchers_ dan _syscalls_.

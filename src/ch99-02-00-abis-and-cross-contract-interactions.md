@@ -1,5 +1,5 @@
-# Starknet contracts: ABIs and cross-contract interactions
+# Kontrak Starknet: ABIs dan Interaksi Antar-Kontrak
 
-Interactions between smart contracts are an important feature when creating complex decentralized applications, as it allows for composability and separation of concerns. This chapter sheds light on how to make contracts interact with each other.
+Interaksi antara kontrak pintar adalah fitur penting saat membuat aplikasi terdesentralisasi yang kompleks, karena ini memungkinkan untuk komposabilitas dan pemisahan kepentingan. Bab ini memberikan wawasan tentang bagaimana membuat kontrak berinteraksi satu sama lain.
 
-Specifically, you'll learn about ABIs, contract interfaces, the contract and library dispatchers and their low-level system call equivalents!
+Secara khusus, Anda akan mempelajari tentang ABIs, antarmuka kontrak, dispatcher kontrak dan pustaka, serta setara panggilan sistem tingkat rendah mereka!

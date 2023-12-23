@@ -1,45 +1,45 @@
-# Deploying and Interacting with a Voting contract
+# Penyebaran dan Interaksi dengan Kontrak Voting
 
-The **`Vote`** contract in Starknet begins by registering voters through the contract's constructor. Three voters are initialized at this stage, and their addresses are passed to an internal function **`_register_voters`**. This function adds the voters to the contract's state, marking them as registered and eligible to vote.
+Kontrak **`Vote`** dalam Starknet dimulai dengan mendaftarkan pemilih melalui konstruktor kontrak. Tiga pemilih diinisialisasi pada tahap ini, dan Address mereka diteruskan ke dalam fungsi internal **`_register_voters`**. Fungsi ini menambahkan pemilih ke dalam status kontrak, menandai mereka sebagai terdaftar dan memenuhi syarat untuk memberikan suara.
 
-Within the contract, the constants **`YES`** and **`NO`** are defined to represent the voting options (1 and 0, respectively). These constants facilitate the voting process by standardizing the input values.
+Dalam kontrak ini, konstanta **`YES`** dan **`NO`** didefinisikan untuk mewakili opsi-opsi Voting (1 dan 0, secara berturut-turut). Konstanta-konstanta ini memfasilitasi proses Voting dengan standarisasi nilai-nilai input.
 
-Once registered, a voter is able to cast a vote using the **`vote`** function, selecting either the 1 (YES) or 0 (NO) as their vote. When voting, the state of the contract is updated, recording the vote and marking the voter as having voted. This ensures that the voter is not able to cast a vote again within the same proposal. The casting of a vote triggers the **`VoteCast`** event, logging the action.
+Setelah terdaftar, seorang pemilih dapat memberikan suara menggunakan fungsi **`vote`**, memilih antara 1 (YES) atau 0 (NO) sebagai suara mereka. Ketika memberikan suara, status kontrak diperbarui, mencatat suara dan menandai pemilih telah memberikan suara. Ini memastikan bahwa pemilih tidak dapat memberikan suara lagi dalam proposal yang sama. Pemberian suara memicu peristiwa **`VoteCast`**, mencatat tindakan tersebut.
 
-The contract also monitors unauthorized voting attempts. If an unauthorized action is detected, such as a non-registered user attempting to vote or a user trying to vote again, the **`UnauthorizedAttempt`** event is emitted.
+Kontrak juga memantau upaya Voting yang tidak sah. Jika tindakan yang tidak sah terdeteksi, seperti pengguna yang tidak terdaftar mencoba memberikan suara atau pengguna mencoba memberikan suara lagi, peristiwa **`UnauthorizedAttempt`** akan dipancarkan.
 
-Together, these functions, states, constants, and events create a structured voting system, managing the lifecycle of a vote from registration to casting, event logging, and result retrieval within the Starknet environment. Constants like **`YES`** and **`NO`** help streamline the voting process, while events play a vital role in ensuring transparency and traceability.
+Secara keseluruhan, fungsi-fungsi, status, konstanta-konstanta, dan peristiwa-peristiwa ini menciptakan sistem Voting terstruktur, mengelola siklus hidup suara dari pendaftaran hingga pemungutan, pencatatan peristiwa, dan pengambilan hasil dalam lingkungan Starknet. Konstanta-konstanta seperti **`YES`** dan **`NO`** membantu memperlancar proses Voting, sementara peristiwa-peristiwa memainkan peran penting dalam memastikan transparansi dan penelusuran.
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_12_vote_contract/src/lib.cairo}}
 ```
 
-<span class="caption">Voting smart contract</span>
+<span class="caption">Kontrak pintar Voting</span>
 
-## Deploying, calling and invoking the Voting Contract
+## Penyebaran, Pemanggilan, dan Memanggil Kontrak Voting
 
-Part of the Starknet experience is deploying and interacting with smart contracts.
+Bagian dari pengalaman Starknet adalah penyebaran dan interaksi dengan kontrak pintar.
 
-Once the contract is deployed, we can interact with it by calling and invoking its functions:
+Setelah kontrak dideploy, kita dapat berinteraksi dengannya dengan memanggil dan memicu fungsi-fungsi kontrak:
 
-- Calling contracts: Interacting with external functions that only read from the state. These functions do not alter the state of the network, so they don't require fees or signing.
-- Invoking contracts: Interacting with external functions that can write to the state. These functions do alter the state of the network and require fees and signing.
+- Memanggil kontrak: Berinteraksi dengan fungsi eksternal yang hanya membaca dari status. Fungsi-fungsi ini tidak mengubah status jaringan, sehingga tidak memerlukan biaya atau tanda tangan.
+- Memicu kontrak: Berinteraksi dengan fungsi-fungsi eksternal yang dapat menulis ke status. Fungsi-fungsi ini mengubah status jaringan dan memerlukan biaya serta tanda tangan.
 
-We will setup a local development node using `katana` to deploy the voting contract. Then, we'll interact with the contract by calling and invoking its functions. You can also use the Goerli Testnet instead of `katana`. However, we recommend using `katana` for local development and testing. You can find the complete tutorial for `katana` in the [Local Development with Katana](https://book.starknet.io/chapter_3/katana.html) chapter of the Starknet Book.
+Kita akan menyiapkan sebuah node pengembangan lokal menggunakan `katana` untuk melakukan penyebaran kontrak Voting. Selanjutnya, kita akan berinteraksi dengan kontrak tersebut dengan memanggil dan memicu fungsi-fungsinya. Anda juga dapat menggunakan Goerli Testnet sebagai alternatif dari `katana`. Namun, kami merekomendasikan penggunaan `katana` untuk pengembangan dan pengujian lokal. Anda dapat menemukan tutorial lengkap untuk `katana` di [Pengembangan Lokal dengan Katana](https://book.starknet.io/chapter_3/katana.html) dalam bab Buku Starknet.
 
-### The `katana` local Starknet node
+### Node lokal Starknet `katana`
 
-`katana` is designed to support local development by the [Dojo team](https://github.com/dojoengine/dojo/blob/main/crates/katana/README.md). It will allow you to do everything you need to do with Starknet, but locally. It is a great tool for development and testing.
+`katana` dirancang untuk mendukung pengembangan lokal oleh [tim Dojo](https://github.com/dojoengine/dojo/blob/main/crates/katana/README.md). Ini akan memungkinkan Anda melakukan semua hal yang diperlukan dengan Starknet, tetapi secara lokal. Ini adalah alat yang bagus untuk pengembangan dan pengujian.
 
-To install `katana` from the source code, please refer to the [Local Development with Katana](https://book.starknet.io/chapter_3/katana.html) chapter of the Starknet Book.
+Untuk menginstal `katana` dari kode sumber, silakan lihat [Pengembangan Lokal dengan Katana](https://book.starknet.io/chapter_3/katana.html) dalam bab Buku Starknet.
 
-Once you have `katana` installed, you can start the local Starknet node with:
+Setelah Anda menginstal `katana`, Anda dapat memulai node lokal Starknet dengan:
 
 ```bash
 katana --accounts 3 --seed 0 --gas-price 250
 ```
 
-This command will start a local Starknet node with 3 deployed accounts. We will use these accounts to deploy and interact with the voting contract:
+Perintah ini akan memulai node lokal Starknet dengan 3 akun yang telah dideploy. Kami akan menggunakan akun-akun ini untuk menyebar dan berinteraksi dengan kontrak Voting:
 
 ```bash
 ...
@@ -60,29 +60,29 @@ PREFUNDED ACCOUNTS
 ...
 ```
 
-Before we can interact with the voting contract, we need to prepare the voter and admin accounts on Starknet. Each voter account must be registered and sufficiently funded for voting. For a more detailed understanding of how accounts operate with Account Abstraction, refer to the [Account Abstraction](https://book.starknet.io/chapter_4/index.html) chapter of the Starknet Book.
+Sebelum kita dapat berinteraksi dengan kontrak Voting, kita perlu menyiapkan akun pemilih dan admin di Starknet. Setiap akun pemilih harus didaftarkan dan memiliki dana yang cukup untuk memberikan suara. Untuk pemahaman yang lebih mendetail tentang bagaimana akun beroperasi dengan Abstraksi Akun, lihat bab [Abstraksi Akun](https://book.starknet.io/chapter_4/index.html) dalam Buku Starknet.
 
-### Smart wallets for voting
+### Smart Wallet untuk Voting
 
-Aside from Scarb you will need to have Starkli installed. Starkli is a command line tool that allows you to interact with Starknet. You can find the installation instructions in the [Environment setup](https://book.starknet.io/chapter_1/environment_setup.html) chapter of the Starknet Book.
+Selain Scarb, Anda juga perlu menginstal Starkli. Starkli adalah alat baris perintah yang memungkinkan Anda berinteraksi dengan Starknet. Anda dapat menemukan petunjuk instalasinya dalam bab [Penyiapan Lingkungan](https://book.starknet.io/chapter_1/environment_setup.html) dalam Buku Starknet.
 
-For each smart wallet we'll use, we must create a Signer within the encrypted keystore and an Account Descriptor. This process is also detailed in the [Environment setup](https://book.starknet.io/chapter_1/environment_setup.html) chapter of the Starknet Book.
+Untuk setiap Smart Wallet yang akan kita gunakan, kita harus membuat Signer di dalam keystore terenkripsi dan Deskriptor Akun. Proses ini juga dijelaskan dalam bab [Penyiapan Lingkungan](https://book.starknet.io/chapter_1/environment_setup.html) dalam Buku Starknet.
 
-We can create Signers and Account Descriptors for the accounts we want to use for voting. Let's create a smart wallet for voting in our smart contract.
+Kita dapat membuat Signer dan Deskriptor Akun untuk akun-akun yang ingin kita gunakan untuk memberikan suara. Mari buat Smart Wallet untuk memberikan suara dalam kontrak pintar kita.
 
-Firstly, we create a signer from a private key:
+Pertama, kita buat seorang signer dari sebuah kunci privat:
 
 ```bash
 starkli signer keystore from-key ~/.starkli-wallets/deployer/account0_keystore.json
 ```
 
-Then, we create the Account Descriptor by fetching the katana account we want to use:
+Kemudian, kita buat Deskriptor Akun dengan mengambil akun katana yang ingin kita gunakan:
 
 ```bash
-starkli account fetch <KATANA ACCOUNT ADDRESS> --rpc http://0.0.0.0:5050 --output ~/.starkli-wallets/deployer/account0_account.json
+starkli account fetch <Address AKUN KATANA> --rpc http://0.0.0.0:5050 --output ~/.starkli-wallets/deployer/account0_account.json
 ```
 
-This command will create a new `account0_account.json` file containing the following details:
+Perintah ini akan membuat file `account0_account.json` yang berisi detail-detail berikut:
 
 ```bash
 {
@@ -90,107 +90,107 @@ This command will create a new `account0_account.json` file containing the follo
   "variant": {
         "type": "open_zeppelin",
         "version": 1,
-        "public_key": "<SMART_WALLET_PUBLIC_KEY>"
+        "public_key": "<KUNCI_PUBLIK_Wallet_CERDAS>"
   },
     "deployment": {
         "status": "deployed",
-        "class_hash": "<SMART_WALLET_CLASS_HASH>",
-        "address": "<SMART_WALLET_ADDRESS>"
+        "class_hash": "<HASH_KELAS_Wallet_CERDAS>",
+        "address": "<Address_Wallet_CERDAS>"
   }
 }
 ```
 
-You can retrieve the smart wallet class hash (it will be the same for all your smart wallets) with the following command. Notice the use of the `--rpc` flag and the RPC endpoint provided by `katana`:
+Anda dapat mengambil hash dari Smart Wallet (akan sama untuk semua Smart Wallet Anda) dengan perintah berikut. Perhatikan penggunaan flag `--rpc` dan ujung titik RPC yang disediakan oleh `katana`:
 
 ```
-starkli class-hash-at <SMART_WALLET_ADDRESS> --rpc http://0.0.0.0:5050
+starkli class-hash-at <Address_Wallet_CERDAS> --rpc http://0.0.0.0:5050
 ```
 
-For the public key, you can use the `starkli signer keystore inspect` command with the directory of the keystore json file:
+Untuk kunci publik, Anda dapat menggunakan perintah `starkli signer keystore inspect` dengan direktori file JSON keystore:
 
 ```bash
 starkli signer keystore inspect ~/.starkli-wallets/deployer/account0_keystore.json
 ```
 
-This process is identical for `account_1` and `account_2` in case you want to have a second and a third voter.
+Proses ini identik untuk `account_1` dan `account_2` jika Anda ingin memiliki pemilih kedua dan ketiga.
 
-### Contract Deployment
+### Penyebaran Kontrak
 
-Before deploying, we need to declare the contract. We can do this with the `starkli declare` command:
+Sebelum melakukan penyebaran, kita perlu mendeklarasikan kontrak. Kita bisa melakukannya dengan perintah `starkli declare`:
 
 ```bash
 starkli declare target/dev/starknetbook_chapter_2_Vote.sierra.json --rpc http://0.0.0.0:5050 --account ~/.starkli-wallets/deployer/account0_account.json --keystore ~/.starkli-wallets/deployer/account0_keystore.json
 ```
 
-If the compiler version you're using is older than the one used by Starkli and you encounter a `compiler-version` error while using the command above, you can specify a compiler version to use in the command by adding the `--compiler-version x.y.z` flag.
+Jika versi kompiler yang Anda gunakan lebih lama dari yang digunakan oleh Starkli dan Anda mengalami kesalahan `compiler-version` saat menggunakan perintah di atas, Anda dapat menentukan versi kompiler yang akan digunakan dalam perintah dengan menambahkan flag `--compiler-version x.y.z`.
 
-If you're still encountering issues with the compiler version, try upgrading Starkli using the command: `starkliup` to make sure you're using the latest version of starkli.
+Jika Anda masih mengalami masalah dengan versi kompiler, cobalah tingkatkan Starkli menggunakan perintah: `starkliup` untuk memastikan Anda menggunakan versi terbaru dari starkli.
 
-The class hash of the contract is: `0x06974677a079b7edfadcd70aa4d12aac0263a4cda379009fca125e0ab1a9ba52`. You can find it [on any block explorer](https://goerli.voyager.online/class/0x06974677a079b7edfadcd70aa4d12aac0263a4cda379009fca125e0ab1a9ba52).
+Hash kelas dari kontrak adalah: `0x06974677a079b7edfadcd70aa4d12aac0263a4cda379009fca125e0ab1a9ba52`. Anda dapat menemukannya [di eksplorasi blok apa pun](https://goerli.voyager.online/class/0x06974677a079b7edfadcd70aa4d12aac0263a4cda379009fca125e0ab1a9ba52).
 
-The `--rpc` flag specifies the RPC endpoint to use (the one provided by `katana`). The `--account` flag specifies the account to use for signing the transaction. The account we use here is the one we created in the previous step. The `--keystore` flag specifies the keystore file to use for signing the transaction.
+Flag `--rpc` menentukan ujung titik RPC yang akan digunakan (yang disediakan oleh `katana`). Flag `--account` menentukan akun yang akan digunakan untuk menandatangani transaksi. Akun yang kita gunakan di sini adalah yang kita buat pada langkah sebelumnya. Flag `--keystore` menentukan file keystore yang akan digunakan untuk menandatangani transaksi.
 
-Since we are using a local node, the transaction will achieve finality immediately. If you are using the Goerli Testnet, you will need to wait for the transaction to be final, which usually takes a few seconds.
+Karena kita menggunakan node lokal, transaksi akan segera mencapai finalitas. Jika Anda menggunakan Goerli Testnet, Anda perlu menunggu transaksi menjadi final, yang biasanya memerlukan beberapa detik.
 
-The following command deploys the voting contract and registers voter_0, voter_1, and voter_2 as eligible voters. These are the constructor arguments, so add a voter account that you can later vote with.
+Perintah berikut ini akan menyebar kontrak Voting dan mendaftarkan voter_0, voter_1, dan voter_2 sebagai pemilih yang memenuhi syarat. Ini adalah argumen konstruktor, jadi tambahkan akun pemilih yang nantinya bisa memberikan suara.
 
 ```bash
 starkli deploy <class_hash_of_the_contract_to_be_deployed> <voter_0_address> <voter_1_address> <voter_2_address> --rpc http://0.0.0.0:5050 --account ~/.starkli-wallets/deployer/account0_account.json --keystore ~/.starkli-wallets/deployer/account0_keystore.json
 ```
 
-An example command:
+Contoh command:
 
 ```bash
 starkli deploy 0x06974677a079b7edfadcd70aa4d12aac0263a4cda379009fca125e0ab1a9ba52 0x03ee9e18edc71a6df30ac3aca2e0b02a198fbce19b7480a63a0d71cbd76652e0 0x033c627a3e5213790e246a917770ce23d7e562baa5b4d2917c23b1be6d91961c 0x01d98d835e43b032254ffbef0f150c5606fa9c5c9310b1fae370ab956a7919f5 --rpc http://0.0.0.0:5050 --account ~/.starkli-wallets/deployer/account0_account.json --keystore ~/.starkli-wallets/deployer/account0_keystore.json
 ```
 
-In this case, the contract has been deployed at an specific address: `0x05ea3a690be71c7fcd83945517f82e8861a97d42fca8ec9a2c46831d11f33349`. This address will be different for you. We will use this address to interact with the contract.
+Pada kasus ini, kontrak telah dideploy di Address tertentu: `0x05ea3a690be71c7fcd83945517f82e8861a97d42fca8ec9a2c46831d11f33349`. Address ini akan berbeda untuk Anda. Kita akan menggunakan Address ini untuk berinteraksi dengan kontrak.
 
-### Voter Eligibility Verification
+### Verifikasi Kelayakan Pemilih
 
-In our voting contract, we have two functions to validate voter eligibility, `voter_can_vote` and `is_voter_registered`. These are external read functions, which mean they don't alter the state of the contract but only read the current state.
+Dalam kontrak Voting kita, ada dua fungsi untuk memvalidasi kelayakan pemilih, yaitu `voter_can_vote` dan `is_voter_registered`. Fungsi-fungsi ini adalah fungsi baca eksternal, yang berarti mereka tidak mengubah status kontrak tetapi hanya membaca status saat ini.
 
-The `is_voter_registered` function checks whether a particular address is registered as an eligible voter in the contract. The `voter_can_vote` function, on the other hand, checks whether the voter at a specific address is currently eligible to vote, i.e., they are registered and haven't voted already.
+Fungsi `is_voter_registered` memeriksa apakah Address tertentu terdaftar sebagai pemilih yang memenuhi syarat dalam kontrak. Sementara itu, fungsi `voter_can_vote` memeriksa apakah pemilih di Address tertentu saat ini berhak memberikan suara, yaitu mereka terdaftar dan belum memberikan suara.
 
-You can call these functions using the `starkli call` command. Note that the `call` command is used for read functions, while the `invoke` command is used for functions that can also write to storage. The `call` command does not require signing, while the `invoke` command does.
+Anda dapat memanggil fungsi-fungsi ini menggunakan perintah `starkli call`. Perhatikan bahwa perintah `call` digunakan untuk fungsi baca, sementara perintah `invoke` digunakan untuk fungsi yang juga dapat menulis ke penyimpanan. Perintah `call` tidak memerlukan tanda tangan, sedangkan perintah `invoke` memerlukannya.
 
 ```bash+
 starkli call 0x05ea3a690be71c7fcd83945517f82e8861a97d42fca8ec9a2c46831d11f33349 voter_can_vote 0x03ee9e18edc71a6df30ac3aca2e0b02a198fbce19b7480a63a0d71cbd76652e0 --rpc http://0.0.0.0:5050
 ```
 
-First we added the address of the contract, then the function we want to call, and finally the input for the function. In this case, we are checking whether the voter at the address `0x03ee9e18edc71a6df30ac3aca2e0b02a198fbce19b7480a63a0d71cbd76652e0` can vote.
+Pertama, kita tambahkan Address kontrak, kemudian fungsi yang ingin kita panggil, dan terakhir masukan untuk fungsi tersebut. Dalam kasus ini, kita sedang memeriksa apakah pemilih pada Address `0x03ee9e18edc71a6df30ac3aca2e0b02a198fbce19b7480a63a0d71cbd76652e0` bisa memberikan suara.
 
-Since we provided a registered voter address as an input, the result is 1 (boolean true), indicating the voter is eligible to vote.
+Karena kami memberikan Address pemilih yang terdaftar sebagai masukan, hasilnya adalah 1 (benar), yang menunjukkan bahwa pemilih berhak memberikan suara.
 
-Next, let's call the `is_voter_registered` function using an unregistered account address to observe the output:
+Selanjutnya, mari panggil fungsi `is_voter_registered` menggunakan Address akun yang tidak terdaftar untuk melihat keluarannya:
 
 ```bash
 starkli call 0x05ea3a690be71c7fcd83945517f82e8861a97d42fca8ec9a2c46831d11f33349 is_voter_registered 0x44444444444444444 --rpc http://0.0.0.0:5050
 ```
 
-With an unregistered account address, the terminal output is 0 (i.e., false), confirming that the account is not eligible to vote.
+Dengan Address akun yang tidak terdaftar, output terminalnya adalah 0 (yaitu, salah), yang mengkonfirmasi bahwa akun tersebut tidak memenuhi syarat untuk memberikan suara.
 
-### Casting a Vote
+### Memberikan Suara
 
-Now that we have established how to verify voter eligibility, we can vote! To vote, we interact with the `vote` function, which is flagged as external, necessitating the use of the `starknet invoke` command.
+Sekarang setelah kita memahami cara memverifikasi kelayakan pemilih, kita bisa memberikan suara! Untuk memberikan suara, kita berinteraksi dengan fungsi `vote`, yang ditandai sebagai eksternal, yang memerlukan penggunaan perintah `starknet invoke`.
 
-The `invoke` command syntax resembles the `call` command, but for voting, we submit either `1` (for Yes) or `0` (for No) as our input. When we invoke the `vote` function, we are charged a fee, and the transaction must be signed by the voter; we are writing to the contract's storage.
+Syntax perintah `invoke` mirip dengan perintah `call`, tetapi untuk memberikan suara, kita mengirimkan entah `1` (untuk Ya) atau `0` (untuk Tidak) sebagai masukan. Ketika kita memanggil fungsi `vote`, kita akan dikenai biaya, dan transaksi harus ditandatangani oleh pemilih; kita sedang menulis ke penyimpanan kontrak.
 
 ```bash
-//Voting Yes
+//Memberikan suara Ya
 starkli invoke 0x05ea3a690be71c7fcd83945517f82e8861a97d42fca8ec9a2c46831d11f33349 vote 1 --rpc http://0.0.0.0:5050 --account ~/.starkli-wallets/deployer/account0_account.json --keystore ~/.starkli-wallets/deployer/account0_keystore.json
 
-//Voting No
+//Memberikan suara Tidak
 starkli invoke 0x05ea3a690be71c7fcd83945517f82e8861a97d42fca8ec9a2c46831d11f33349 vote 0 --rpc http://0.0.0.0:5050 --account ~/.starkli-wallets/deployer/account0_account.json --keystore ~/.starkli-wallets/deployer/account0_keystore.json
 ```
 
-You will be prompted to enter the password for the signer. Once you enter the password, the transaction will be signed and submitted to the Starknet network. You will receive the transaction hash as output. With the starkli transaction command, you can get more details about the transaction:
+Anda akan diminta untuk memasukkan kata sandi untuk signer. Setelah Anda memasukkan kata sandi, transaksi akan ditandatangani dan dikirimkan ke jaringan Starknet. Anda akan menerima hash transaksi sebagai keluaran. Dengan perintah starkli transaction, Anda dapat mendapatkan lebih banyak detail tentang transaksi tersebut:
 
 ```bash
 starkli transaction <TRANSACTION_HASH> --rpc http://0.0.0.0:5050
 ```
 
-This returns:
+Ini akan menampilkan:
 
 ```bash
 {
@@ -216,13 +216,13 @@ This returns:
 }
 ```
 
-If you try to vote twice with the same signer you will get an error:
+Jika Anda mencoba memberikan suara dua kali dengan signer yang sama, Anda akan mendapatkan kesalahan:
 
 ```bash
 Error: code=ContractError, message="Contract error"
 ```
 
-The error is not very informative, but you can get more details when looking at the output in the terminal where you started `katana` (our local Starknet node):
+Kesalahan tersebut tidak memberikan informasi yang sangat informatif, tetapi Anda dapat memperoleh lebih banyak detail ketika melihat keluaran di terminal tempat Anda memulai `katana` (node Starknet lokal kita):
 
 ```bash
 ...
@@ -232,13 +232,13 @@ Transaction execution error: "Error in the called contract (0x03ee9e18edc71a6df3
     ...
 ```
 
-The key for the error is `USER_ALREADY_VOTED`.
+Kunci untuk kesalahan tersebut adalah `USER_ALREADY_VOTED`.
 
 ```bash
 assert(can_vote == true, 'USER_ALREADY_VOTED');
 ```
 
-We can repeat the process to create Signers and Account Descriptors for the accounts we want to use for voting. Remember that each Signer must be created from a private key, and each Account Descriptor must be created from a public key, a smart wallet address, and the smart wallet class hash (which is the same for each voter).
+Kita dapat mengulangi proses untuk membuat Signer dan Account Descriptor untuk akun yang ingin kita gunakan untuk memberikan suara. Ingatlah bahwa setiap Signer harus dibuat dari sebuah private key, dan setiap Account Descriptor harus dibuat dari public key, Address smart wallet, dan smart wallet class hash (yang sama untuk setiap pemilih).
 
 ```bash
 starkli invoke 0x05ea3a690be71c7fcd83945517f82e8861a97d42fca8ec9a2c46831d11f33349 vote 0 --rpc http://0.0.0.0:5050 --account ~/.starkli-wallets/deployer/account1_account.json --keystore ~/.starkli-wallets/deployer/account1_keystore.json
@@ -246,12 +246,12 @@ starkli invoke 0x05ea3a690be71c7fcd83945517f82e8861a97d42fca8ec9a2c46831d11f3334
 starkli invoke 0x05ea3a690be71c7fcd83945517f82e8861a97d42fca8ec9a2c46831d11f33349 vote 1 --rpc http://0.0.0.0:5050 --account ~/.starkli-wallets/deployer/account2_account.json --keystore ~/.starkli-wallets/deployer/account2_keystore.json
 ```
 
-### Visualizing Vote Outcomes
+### Visualisasi Hasil Voting
 
-To examine the voting results, we invoke the `get_vote_status` function, another view function, through the `starknet call` command.
+Untuk memeriksa hasil Voting, kita memanggil fungsi `get_vote_status`, fungsi tampilan lainnya, melalui perintah `starknet call`.
 
 ```bash
 starkli call 0x05ea3a690be71c7fcd83945517f82e8861a97d42fca8ec9a2c46831d11f33349 get_vote_status --rpc http://0.0.0.0:5050
 ```
 
-The output reveals the tally of "Yes" and "No" votes along with their relative percentages.
+Keluarannya menampilkan perolehan suara "Ya" dan "Tidak" beserta persentase relatifnya.

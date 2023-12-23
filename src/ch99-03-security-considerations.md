@@ -1,79 +1,79 @@
-# Security Considerations
+# Pertimbangan Keamanan
 
-When developing software, ensuring it functions as intended is usually straightforward. However, preventing unintended usage and vulnerabilities can be more challenging.
+Ketika mengembangkan perangkat lunak, memastikan bahwa perangkat lunak tersebut berfungsi sebagaimana yang dimaksud biasanya cukup mudah. Namun, mencegah penggunaan yang tidak diinginkan dan kerentanan bisa menjadi lebih menantang.
 
-In smart contract development, security is very important. A single error can result in the loss of valuable assets or the improper functioning of certain features.
+Dalam pengembangan kontrak pintar (smart contract), keamanan sangatlah penting. Sebuah kesalahan kecil saja dapat mengakibatkan kehilangan aset berharga atau berfungsinya fitur-fitur tertentu secara tidak benar.
 
-Smart contracts are executed in a public environment where anyone can examine the code and interact with it. Any errors or vulnerabilities in the code can be exploited by malicious actors.
+Kontrak pintar dijalankan dalam lingkungan publik di mana siapa pun dapat memeriksa kode dan berinteraksi dengannya. Setiap kesalahan atau kerentanan dalam kode dapat dieksploitasi oleh pihak yang jahat.
 
-This chapter presents general recommendations for writing secure smart contracts. By incorporating these concepts during development, you can create robust and reliable smart contracts. This reduces the chances of unexpected behavior or vulnerabilities.
+Bab ini menyajikan rekomendasi umum untuk menulis kontrak pintar yang aman. Dengan menggabungkan konsep-konsep ini selama pengembangan, Anda dapat membuat kontrak pintar yang kuat dan dapat diandalkan. Hal ini mengurangi kemungkinan perilaku atau kerentanan yang tidak terduga.
 
-## Disclaimer
+## Penyangkalan
 
-This chapter does not provide an exhaustive list of all possible security issues, and it does not guarantee that your contracts will be completely secure.
+Bab ini tidak memberikan daftar lengkap dari semua kemungkinan masalah keamanan, dan tidak menjamin bahwa kontrak Anda akan sepenuhnya aman.
 
-If you are developing smart contracts for production use, it is highly recommended to conduct external audits performed by security experts.
+Jika Anda sedang mengembangkan kontrak pintar untuk digunakan secara produksi, sangat disarankan untuk melakukan audit eksternal yang dilakukan oleh ahli keamanan.
 
-## Mindset
+## Pola Pikir
 
-Cairo is a highly safe language inspired by rust. It is designed in a way that force you to cover all possible cases. Security issues on Starknet mostly arise from the way smart contracts flows are designed, not much from the language itself.
+Cairo adalah bahasa yang sangat aman yang terinspirasi oleh Rust. Dirancang sedemikian rupa untuk memaksa Anda menutupi semua kemungkinan kasus. Masalah keamanan pada Starknet sebagian besar muncul dari cara alur kontrak pintar dirancang, bukan begitu banyak dari bahasa itu sendiri.
 
-Adopting a security mindset is the initial step in writing secure smart contracts. Try to always consider all possible scenarios when writing code.
+Mengadopsi pola pikir keamanan adalah langkah awal dalam menulis kontrak pintar yang aman. Cobalah untuk selalu mempertimbangkan semua skenario yang mungkin saat menulis kode.
 
-### Viewing smart contract as Finite State Machines
+### Melihat Kontrak Pintar sebagai Mesin Keadaan Terbatas
 
-Transactions in smart contracts are atomic, meaning they either succeed or fail without making any changes.
+Transaksi dalam kontrak pintar bersifat atomik, artinya mereka either berhasil atau gagal tanpa membuat perubahan apapun.
 
-Think of smart contracts as state machines: they have a set of initial states defined by the constructor constraints, and external function represents a set of possible state transitions. A transaction is nothing more than a state transition.
+Pikirkan kontrak pintar sebagai mesin keadaan: mereka memiliki kumpulan keadaan awal yang ditentukan oleh batasan konstruktor, dan fungsi eksternal mewakili kumpulan transisi keadaan yang mungkin. Sebuah transaksi hanyalah sebuah transisi keadaan.
 
-The `assert` or `panic` functions can be used to validate conditions before performing specific actions. You can learn more about these on the [Unrecoverable Errors with panic](./ch10-01-unrecoverable-errors-with-panic.md) page.
+Fungsi `assert` atau `panic` dapat digunakan untuk memvalidasi kondisi sebelum melakukan tindakan tertentu. Anda dapat mempelajari lebih lanjut mengenai hal ini di halaman [Unrecoverable Errors with panic](./ch10-01-unrecoverable-errors-with-panic.md).
 
-These validations can include:
+Validasi ini bisa mencakup:
 
-- Inputs provided by the caller
-- Execution requirements
-- Invariants (conditions that must always be true)
-- Return values from other function calls
+- Masukan yang diberikan oleh pemanggil
+- Persyaratan eksekusi
+- Invarian (kondisi yang harus selalu benar)
+- Nilai kembalian dari panggilan fungsi lainnya
 
-For example, you could use the `assert` function to validate that a user has enough funds to perform a withdraw transaction. If the condition is not met, the transaction will fail and the state of the contract will not change.
+Sebagai contoh, Anda dapat menggunakan fungsi `assert` untuk memvalidasi bahwa seorang pengguna memiliki cukup dana untuk melakukan transaksi penarikan. Jika kondisinya tidak terpenuhi, transaksi akan gagal dan keadaan kontrak tidak akan berubah.
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_10_assert_balance/src/lib.cairo:withdraw}}
 ```
 
-Using these functions to check conditions adds constraints that help clearly define the boundaries of possible state transitions for each function in your smart contract. These checks ensure that the behavior of the contract stays within the expected limits.
+Menggunakan fungsi-fungsi ini untuk memeriksa kondisi menambahkan batasan yang membantu menentukan dengan jelas batas-batas transisi keadaan yang mungkin untuk setiap fungsi dalam kontrak pintar Anda. Pemeriksaan ini memastikan bahwa perilaku kontrak tetap berada dalam batas yang diharapkan.
 
-## Recommendations
+## Rekomendasi
 
-### Checks Effects Interactions Pattern
+### Pola Checks Effects Interactions
 
-The Checks Effects Interactions pattern is a common design pattern used to prevent reentrancy attacks on Ethereum. While reentrancy is harder to achieve in Starknet, it is still recommended to use this pattern in your smart contracts.
+Pola Checks Effects Interactions adalah pola desain umum yang digunakan untuk mencegah serangan reentrancy pada Ethereum. Meskipun reentrancy lebih sulit dicapai di Starknet, masih disarankan untuk menggunakan pola ini dalam kontrak pintar Anda.
 
-<!-- TODO add reference to the reentrancy CairoByExample page -->
+<!-- TODO tambahkan referensi ke halaman CairoByExample mengenai reentrancy -->
 
-The pattern consists of following a specific order of operations in your functions:
+Pola ini terdiri dari mengikuti urutan operasi tertentu dalam fungsi-fungsi Anda:
 
-1. **Checks**: Validate all conditions and inputs before performing any state changes.
-2. **Effects**: Perform all state changes.
-3. **Interactions**: All external calls to other contracts should be made at the end of the function.
+1. **Pengecekan**: Memvalidasi semua kondisi dan masukan sebelum melakukan perubahan keadaan apapun.
+2. **Efek**: Melakukan semua perubahan keadaan.
+3. **Interaksi**: Semua panggilan eksternal ke kontrak lain sebaiknya dilakukan di akhir fungsi.
 
-### Access control
+### Kontrol Akses
 
-Access control is the process of restricting access to certain features or resources. It is a common security mechanism used to prevent unauthorized access to sensitive information or actions. In smart contracts, some functions may often be restricted to specific users or roles.
+Kontrol akses adalah proses membatasi akses ke fitur atau sumber daya tertentu. Ini adalah mekanisme keamanan umum yang digunakan untuk mencegah akses tidak sah ke informasi atau tindakan sensitif. Dalam kontrak pintar, beberapa fungsi mungkin sering dibatasi kepada pengguna atau peran tertentu.
 
-You can implement the access control pattern to easily manage permissions. This pattern consists of defining a set of roles and assigning them to specific users. Each function can then be restricted to specific roles.
+Anda dapat menerapkan pola kontrol akses untuk mengelola izin dengan mudah. Pola ini terdiri dari mendefinisikan kumpulan peran dan menetapkannya kepada pengguna tertentu. Setiap fungsi kemudian dapat dibatasi kepada peran-peran tertentu.
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_11_simple_access_control/src/lib.cairo}}
 ```
 
-### Static analysis tool
+### Alat Analisis Statis
 
-Static analysis refers to the process of examining code without its execution, focusing on its structure, syntax, and properties. It involves analyzing the source code to identify potential issues, vulnerabilities, or violations of specified rules.
+Analisis statis merujuk pada proses pemeriksaan kode tanpa eksekusinya, berfokus pada struktur, sintaksis, dan properti kode tersebut. Ini melibatkan analisis kode sumber untuk mengidentifikasi masalah potensial, kerentanan, atau pelanggaran aturan yang ditentukan.
 
-By defining rules, such as coding conventions or security guidelines, developers can utilize static analysis tools to automatically check the code against these standards.
+Dengan mendefinisikan aturan, seperti konvensi penulisan kode atau pedoman keamanan, pengembang dapat menggunakan alat analisis statis untuk secara otomatis memeriksa kode sesuai dengan standar-standar tersebut.
 
-Reference:
+Referensi:
 
-- [Semgrep Cairo 1.0 support](https://semgrep.dev/blog/2023/semgrep-now-supports-cairo-1-0)
-- [Caracal, a Starknet static analyzer](https://github.com/crytic/caracal)
+- [Dukungan Semgrep Cairo 1.0](https://semgrep.dev/blog/2023/semgrep-now-supports-cairo-1-0)
+- [Caracal, penganalisis statis Starknet](https://github.com/crytic/caracal)

@@ -14,7 +14,7 @@ Poseidon adalah keluarga fungsi hash yang dirancang untuk menjadi sangat efisien
 
 #### Kapan Menggunakan Mereka?
 
-Pedersen adalah fungsi hash pertama yang digunakan di Starknet, dan masih digunakan untuk menghitung alamat variabel dalam penyimpanan (misalnya, `LegacyMap` menggunakan Pedersen untuk menghash kunci dari pemetaan penyimpanan di Starknet). Namun, karena Poseidon lebih murah dan lebih cepat daripada Pedersen saat bekerja dengan sistem bukti STARK, sekarang ini adalah fungsi hash yang direkomendasikan untuk digunakan dalam program Cairo.
+Pedersen adalah fungsi hash pertama yang digunakan di Starknet, dan masih digunakan untuk menghitung Address variabel dalam penyimpanan (misalnya, `LegacyMap` menggunakan Pedersen untuk menghash kunci dari pemetaan penyimpanan di Starknet). Namun, karena Poseidon lebih murah dan lebih cepat daripada Pedersen saat bekerja dengan sistem bukti STARK, sekarang ini adalah fungsi hash yang direkomendasikan untuk digunakan dalam program Cairo.
 
 ### Bekerja dengan Hash
 

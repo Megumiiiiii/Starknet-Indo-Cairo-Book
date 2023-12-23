@@ -1,69 +1,69 @@
-# Testing components
+# Pengujian Komponen
 
-Testing components is a bit different than testing contracts.
-Contracts need to be tested against a specific state, which can be achieved by either deploying the contract in a test, or by simply getting the `ContractState` object and modifying it in the context of your tests.
+Pengujian komponen sedikit berbeda dibandingkan dengan pengujian kontrak.
+Kontrak perlu diuji terhadap keadaan tertentu, yang dapat dicapai dengan cara mendeploy kontrak dalam sebuah uji coba, atau dengan hanya mendapatkan objek `ContractState` dan memodifikasinya dalam konteks uji coba Anda.
 
-Components are a generic construct, meant to be integrated in contracts, that can't be deployed on their own and don't have a `ContractState` object that we could use. So how do we test them?
+Komponen adalah konstruk umum, yang dimaksudkan untuk diintegrasikan dalam kontrak, yang tidak dapat didedikasikan sendiri dan tidak memiliki objek `ContractState` yang dapat kita gunakan. Jadi, bagaimana kita mengujinya?
 
-Let's consider that we want to test a very simple component called "Counter", that will allow each contract to have a counter that can be incremented. The component is defined as follows:
+Mari kita pertimbangkan bahwa kita ingin menguji komponen yang sangat sederhana bernama "Counter", yang akan memungkinkan setiap kontrak memiliki penghitung yang dapat diinkrementasi. Komponen ini didefinisikan sebagai berikut:
 
 ```rust, noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/components/listing_03_test_component/src/counter.cairo:component}}
 ```
 
-## Testing the component by deploying a mock contract
+## Pengujian komponen dengan mendeploy kontrak tiruan
 
-The easiest way to test a component is to integrate it within a mock contract. This mock contract is only used for testing purposes, and only integrates the component you want to test. This allows you to test the component in the context of a contract, and to use a Dispatcher to call the component's entry points.
+Cara termudah untuk menguji komponen adalah dengan mengintegrasikannya dalam kontrak tiruan. Kontrak tiruan ini hanya digunakan untuk tujuan pengujian, dan hanya mengintegrasikan komponen yang ingin Anda uji. Ini memungkinkan Anda untuk menguji komponen dalam konteks sebuah kontrak, dan menggunakan Dispatcher untuk memanggil titik masuk komponen.
 
-We can define such a mock contract as follows:
+Kita dapat mendefinisikan kontrak tiruan tersebut sebagai berikut:
 
 ```rust, noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/components/listing_03_test_component/src/lib.cairo:mock_contract}}
 ```
 
-This contract is entirely dedicated to testing the `Counter` component. It embeds the component with the `component!` macro, exposes the component's entry points by annotating the impl aliases with `#[abi(embed_v0)]`.
+Kontrak ini sepenuhnya didedikasikan untuk pengujian komponen `Counter`. Ini menyematkan komponen dengan macro `component!`, mengekspos titik masuk komponen dengan memberikan anotasi alias impl dengan `#[abi(embed_v0)]`.
 
-We also need to define an interface that will be required to interact externally with this mock contract.
+Kita juga perlu mendefinisikan sebuah antarmuka yang akan diperlukan untuk berinteraksi secara eksternal dengan kontrak tiruan ini.
 
 ```rust, noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/components/listing_03_test_component/src/counter.cairo:interface}}
 ```
 
-We can now write tests for the component by deploying this mock contract and calling its entry points, as we would with a typical contract.
+Sekarang kita dapat menulis pengujian untuk komponen dengan mendeploy kontrak tiruan ini dan memanggil titik masuknya, seperti yang kita lakukan dengan kontrak biasa.
 
 ```rust, noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/components/listing_03_test_component/src/tests_deployed.cairo}}
 ```
 
-## Testing components without deploying a contract
+## Pengujian Komponen tanpa Mendeploy Kontrak
 
-In [Components under the hood](./ch99-01-05-01-components-under-the-hood.md), we saw that components leveraged genericity to define storage and logic that could be embedded in multiple contracts. If a contract embeds a component, a `HasComponent` trait is created in this contract, and the component methods are made available.
+Pada [Komponen di bawah Tampilan](./ch99-01-05-01-components-under-the-hood.md), kita melihat bahwa komponen memanfaatkan genericity untuk mendefinisikan penyimpanan dan logika yang dapat disematkan dalam beberapa kontrak. Jika sebuah kontrak menyematkan sebuah komponen, sebuah `HasComponent` trait dibuat dalam kontrak ini, dan metode-metode komponen dibuat tersedia.
 
-This informs us that if we can provide a concrete `TContractState` that implements the `HasComponent` trait to the `ComponentState` struct, should be able to directly invoke the methods of the component using this concrete `ComponentState` object, without having to deploy a mock.
+Hal ini memberi informasi kepada kita bahwa jika kita dapat menyediakan sebuah `TContractState` konkret yang mengimplementasikan trait `HasComponent` ke dalam struktur `ComponentState`, seharusnya kita dapat langsung memanggil metode-metode dari komponen menggunakan objek `ComponentState` konkret ini, tanpa harus mendeploy mock.
 
-Let's see how we can do that by using type aliases. We still need to define a mock contract - let's use the same as above - but this time, we won't need to deploy it.
+Mari kita lihat bagaimana kita dapat melakukannya dengan menggunakan type alias. Kita masih perlu mendefinisikan sebuah kontrak tiruan - mari gunakan yang sama seperti di atas - tetapi kali ini, kita tidak perlu mendeploynya.
 
-First, we need to define a concrete implementation of the generic `ComponentState` type using a type alias. We will use the `MockContract::ContractState` type to do so.
+Pertama, kita perlu mendefinisikan sebuah implementasi konkret dari tipe generic `ComponentState` menggunakan sebuah type alias. Kita akan menggunakan tipe `MockContract::ContractState` untuk melakukannya.
 
 ```rust, noplayground
 {{#rustdoc_include ../listings/ch99-starknet-smart-contracts/components/listing_03_test_component/src/tests_direct.cairo:type_alias}}
 ```
 
-We defined the `TestingState` type as an alias of the `CounterComponent::ComponentState<MockContract::ContractState>` type. By passing the `MockContract::ContractState` type as a concrete type for `ComponentState`, we aliased a concrete implementation of the `ComponentState` struct to `TestingState`.
+Kami mendefinisikan tipe `TestingState` sebagai alias dari tipe `CounterComponent::ComponentState<MockContract::ContractState>`. Dengan melewati tipe `MockContract::ContractState` sebagai tipe konkret untuk `ComponentState`, kami memberikan alias implementasi konkret dari struktur `ComponentState` menjadi `TestingState`.
 
-Because `MockContract` embeds `CounterComponent`, the methods of `CounterComponent` defined in the `CounterImpl` block can now be used on a `TestingState` object.
+Karena `MockContract` menyematkan `CounterComponent`, metode-metode dari `CounterComponent` yang didefinisikan dalam blok `CounterImpl` sekarang dapat digunakan pada objek `TestingState`.
 
-Now that we have made these methods available, we need to instantiate an object of type `TestingState`, that we will use to test the component. We can do so by calling the `component_state_for_testing` function, which automatically infers that it should return an object of type `TestingState`.
+Sekarang setelah kita telah membuat metode-metode ini tersedia, kita perlu menginisialisasi sebuah objek tipe `TestingState` yang akan kita gunakan untuk menguji komponen. Kita dapat melakukannya dengan memanggil fungsi `component_state_for_testing`, yang secara otomatis menyimpulkan bahwa itu harus mengembalikan objek tipe `TestingState`.
 
-We can even implement this as part of the `Default` trait, which allows us to return an empty `TestingState` with the `Default::default()` syntax.
+Kita bahkan dapat mengimplementasikannya sebagai bagian dari trait `Default`, yang memungkinkan kita untuk mengembalikan `TestingState` kosong dengan sintaks `Default::default()`.
 
-Let's summarize what we've done so far:
+Mari kita ringkas apa yang telah kita lakukan sejauh ini:
 
-- We defined a mock contract that embeds the component we want to test.
-- We defined a concrete implementation of `ComponentState<TContractState>` using a type alias with `MockContract::ContractState`, that we named `TestingState`.
-- We defined a function that uses `component_state_for_testing` to return a `TestingState` object.
+- Kita mendefinisikan sebuah kontrak tiruan yang menyematkan komponen yang ingin kita uji.
+- Kita mendefinisikan sebuah implementasi konkret dari `ComponentState<TContractState>` menggunakan type alias dengan `MockContract::ContractState`, yang kita beri nama `TestingState`.
+- Kita mendefinisikan sebuah fungsi yang menggunakan `component_state_for_testing` untuk mengembalikan objek `TestingState`.
 
-We can now write tests for the component by calling its functions directly, without having to deploy a mock contract. This approach is more lightweight than the previous one, and it allows testing internal functions of the component that are not exposed to the outside world trivially.
+Sekarang kita dapat menulis pengujian untuk komponen dengan memanggil fungsi-fungsi nya secara langsung, tanpa harus mendeploy kontrak tiruan. Pendekatan ini lebih ringan dibandingkan sebelumnya, dan memungkinkan pengujian fungsi internal dari komponen yang tidak mudah diekspos ke dunia luar.
 
 ```rust, noplayground
 {{#rustdoc_include ../listings/ch99-starknet-smart-contracts/components/listing_03_test_component/src/tests_direct.cairo:test}}

@@ -1,39 +1,35 @@
-## Events
+## Event
 
-Events are custom data structures that are emitted by smart contracts during execution.
-They provide a way for smart contracts to communicate with the external world by logging information
-about specific occurrences in a contract.
+Event adalah struktur data kustom yang dipancarkan oleh kontrak pintar selama eksekusi. Mereka memberikan cara bagi kontrak pintar untuk berkomunikasi dengan dunia luar dengan mencatat informasi tentang kejadian-kejadian tertentu dalam sebuah kontrak.
 
-Events play a crucial role in the creation of smart contracts. Take, for instance, the Non-Fungible Tokens (NFTs) minted on Starknet. All of these are indexed and stored in a database, then displayed to users through the use of these events. Neglecting to include an event within your NFT contract could lead to a bad user experience. This is because users may not see their NFTs appear in their wallets (wallets use these indexers to display a user's NFTs).
+Event memainkan peran penting dalam pembuatan kontrak pintar. Ambil contoh Token Non-Fungible (NFT) yang dibuat di Starknet. Semua ini diindeks dan disimpan dalam sebuah database, kemudian ditampilkan kepada pengguna melalui penggunaan Event-Event ini. Mengabaikan untuk menyertakan sebuah Event dalam kontrak NFT Anda dapat menyebabkan pengalaman pengguna yang buruk. Hal ini karena pengguna mungkin tidak melihat NFT mereka muncul di Wallet mereka (Wallet menggunakan indeks ini untuk menampilkan NFT pengguna).
 
-### Defining events
+### Mendefinisikan Event
 
-All the different events in the contract are defined under the `Event` enum, which implements the `starknet::Event` trait, as enum variants. This trait is defined in the core library as follows:
+Semua Event yang berbeda dalam kontrak didefinisikan di bawah `Event` enum, yang mengimplementasikan trait `starknet::Event`, sebagai variant enum. Trait ini didefinisikan dalam pustaka inti seperti berikut:
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/no_listing_event_trait/src/lib.cairo}}
 ```
 
-The `#[derive(starknet::Event)]` attribute causes the compiler to generate an implementation for the above trait,
-instantiated with the Event type, which in our example is the following enum:
+Atribut `#[derive(starknet::Event)]` menyebabkan kompiler untuk menghasilkan implementasi untuk trait di atas, diinstansiasi dengan tipe Event kita, yang dalam contoh kami adalah enum berikut:
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:event}}
 ```
 
-Each event variant has to be a struct of the same name as the variant, and each variant needs to implement the `starknet::Event` trait itself.
-Moreover, the members of these variants must implement the `Serde` trait (_c.f._ [Appendix C: Serializing with Serde](./appendix-03-derivable-traits.md)), as keys/data are added to the event using a serialization process.
+Setiap variant Event harus menjadi sebuah struct dengan nama yang sama dengan variant tersebut, dan setiap variant harus mengimplementasikan trait `starknet::Event` itu sendiri. Lebih lanjut, anggota-anggota dari variant-variant ini harus mengimplementasikan trait `Serde` (lihat [Lampiran C: Serializing with Serde](./appendix-03-derivable-traits.md)), karena kunci/data ditambahkan ke Event menggunakan proses serialisasi.
 
-The auto implementation of the `starknet::Event` trait will implement the `append_keys_and_data` function for each variant of our `Event` enum. The generated implementation will append a single key based on the variant name (`StoredName`), and then recursively call `append_keys_and_data` in the impl of the Event trait for the variant’s type .
+Implementasi otomatis dari trait `starknet::Event` akan mengimplementasikan fungsi `append_keys_and_data` untuk setiap variant dari enum `Event` kita. Implementasi yang dihasilkan akan menambahkan sebuah kunci tunggal berdasarkan nama variant (`StoredName`), dan kemudian secara rekursif memanggil `append_keys_and_data` dalam impl dari trait Event untuk tipe variant tersebut.
 
-In our contract, we define an event named `StoredName` that emits the contract address of the caller and the name stored within the contract, where the `user` field is serialized as a key and the `name` field is serialized as data.
-To index the key of an event, simply annotate it with the `#[key]` as demonstrated in the example for the `user` key.
+Dalam kontrak kami, kami mendefinisikan sebuah Event bernama `StoredName` yang memancarkan Address kontrak pemanggil dan nama yang disimpan dalam kontrak, di mana bidang `user` diserialisasikan sebagai kunci dan bidang `name` diserialisasikan sebagai data.
+Untuk mengindeks kunci dari sebuah Event, cukup beri anotasi dengan `#[key]` seperti yang ditunjukkan dalam contoh untuk kunci `user`.
 
-When emitting the event with `self.emit(StoredName { user: user, name: name })`, a key corresponding to the name ` StoredName`, specifically `sn_keccak(StoredName)`, is appended to the keys list. `user`is serialized as key, thanks to the `#[key]` attribute, while address is serialized as data. After everything is processed, we end up with the following keys and data: `keys = [sn_keccak("StoredName"),user]` and `data = [address]`.
+Saat memancarkan Event dengan `self.emit(StoredName { user: user, name: name })`, sebuah kunci yang sesuai dengan nama `StoredName`, khususnya `sn_keccak(StoredName)`, ditambahkan ke daftar kunci. `user` diserialisasikan sebagai kunci, berkat atribut `#[key]`, sementara Address diserialisasikan sebagai data. Setelah semuanya diproses, kita mendapatkan kunci dan data berikut: `keys = [sn_keccak("StoredName"), user]` dan `data = [address]`.
 
-### Emitting events
+### Memancarkan Event
 
-After defining events, we can emit them using `self.emit`, with the following syntax:
+Setelah mendefinisikan Event, kita dapat memancarkannya menggunakan `self.emit`, dengan sintaks berikut:
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:emit_event}}

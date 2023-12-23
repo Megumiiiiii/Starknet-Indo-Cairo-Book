@@ -14,5 +14,3 @@
 - Jalankan `mdbook serve` untuk memulai server lokal, kemudian buka [localhost:3000](http://localhost:3000) untuk melihatnya. Anda dapat menggunakan flag `--open` untuk secara otomatis membuka browser: `mdbook serve --open`
 - Lakukan perubahan pada buku dan perbarui browser untuk melihat perubahannya.
 - Buka permintaan tarik (pull request) dengan perubahan yang telah Anda buat.
-
-# WIP

@@ -92,7 +92,7 @@
   - [Kontrak sederhana](./ch99-01-02-a-simple-contract.md)
   - [Penjelajahan lebih dalam ke dalam kontrak](./ch99-01-03-00-a-deeper-dive-into-contracts.md)
 
-    - [Penyimpanan Kontrak](./ch99-01-03-01-contract-storage.md)
+    - [Storage Kontrak](./ch99-01-03-01-contract-storage.md)
     - [Fungsi Kontrak](./ch99-01-03-02-contract-functions.md)
     - [Acara Kontrak](./ch99-01-03-03-contract-events.md)
     - [Mengurangi ketidaklengkapan](./ch99-01-03-04-reducing-boilerplate.md)

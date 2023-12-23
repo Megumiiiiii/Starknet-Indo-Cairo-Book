@@ -1,56 +1,43 @@
-# Components under the hood
+# Komponen di dalam mesin
 
-Components provide powerful modularity to Starknet contracts. But how does this
-magic actually happen behind the scenes?
+Komponen memberikan modularitas yang kuat pada kontrak Starknet. Tetapi bagaimana sebenarnya sihir ini terjadi di balik layar?
 
-This chapter will dive deep into the compiler internals to explain the
-mechanisms that enable component composability.
+Bab ini akan menjelajahi secara mendalam tentang internal kompilator untuk menjelaskan mekanisme yang memungkinkan komposabilitas komponen.
 
-## A Primer on Embeddable Impls
+## Pengantar tentang Implementasi yang Dapat Ditanam
 
-Before digging into components, we need to understand _embeddable impls_.
+Sebelum mempelajari lebih dalam tentang komponen, kita perlu memahami _implementasi yang dapat ditanam_.
 
-An impl of a Starknet interface trait (marked with `#[starknet::interface]`) can
-be made embeddable. Embeddable impls can be injected into any contract, adding
-new entry points and modifying the ABI of the contract.
+Sebuah implementasi dari trait antarmuka Starknet (ditandai dengan `#[starknet::interface]`) dapat dibuat dapat ditanam. Implementasi yang dapat ditanam dapat disisipkan ke dalam kontrak apa pun, menambahkan titik masuk baru dan memodifikasi ABI dari kontrak tersebut.
 
-Let's look at an example to see this in action:
+Mari kita lihat contoh untuk melihat hal ini dalam aksi:
 
 ```rust
 {{#include ../listings/ch99-starknet-smart-contracts/components/no_listing_01_embeddable/src/lib.cairo}}
 ```
 
-By embedding `SimpleImpl`, we externally expose `ret4` in the contract's ABI.
+Dengan menyisipkan `SimpleImpl`, kita secara eksternal mengekspos `ret4` dalam ABI kontrak.
 
-Now that we’re more familiar with the embedding mechanism, we can now see how
-components build on this.
+Sekarang setelah kita lebih familiar dengan mekanisme penyisipan, kita dapat melihat bagaimana komponen membangun dari hal ini.
 
-## Inside Components: Generic Impls
+## Di Dalam Komponen: Implementasi Generik
 
-Recall the impl block syntax used in components:
+Ingatlah sintaks blok impl yang digunakan dalam komponen:
 
 ```rust
 {{#include ../listings/ch99-starknet-smart-contracts/components/listing_01_ownable/src/component.cairo:impl_signature}}
 ```
 
-The key points:
+Poin-poin kunci:
 
-- `OwnableImpl` requires the implementation of the
-  `HasComponent<TContractState>` trait by the underlying contract, which is
-  automatically generated with the `component!()` macro when using a component
-  inside a contract.
+- `OwnableImpl` membutuhkan implementasi dari trait `HasComponent<TContractState>` oleh kontrak yang mendasarinya, yang secara otomatis dihasilkan dengan macro `component!()` saat menggunakan sebuah komponen di dalam sebuah kontrak.
 
-  The compiler will generate an impl that wraps any function in `OwnableImpl`,
-  replacing the `self: ComponentState<TContractState>` argument with `self:
-TContractState`, where access to the component state is made via the
-  `get_component` function in the `HasComponent<TContractState>` trait.
+  Kompilator akan menghasilkan sebuah impl yang membungkus setiap fungsi di dalam `OwnableImpl`, mengganti argumen `self: ComponentState<TContractState>` dengan `self: TContractState`, di mana akses ke status komponen dilakukan melalui fungsi `get_component` dalam trait `HasComponent<TContractState>`.
 
-  For each component, the compiler generates a `HasComponent` trait. This trait
-  defines the interface to bridge between the actual `TContractState` of a
-  generic contract, and `ComponentState<TContractState>`.
+  Untuk setiap komponen, kompilator akan menghasilkan trait `HasComponent`. Trait ini mendefinisikan antarmuka untuk menjembatani antara `TContractState` sebenarnya dari kontrak generik, dan `ComponentState<TContractState>`.
 
   ```rust
-  // generated per component
+  // dihasilkan per komponen
   trait HasComponent<TContractState> {
       fn get_component(self: @TContractState) -> @ComponentState<TContractState>;
       fn get_component_mut(ref self: TContractState) -> ComponentState<TContractState>;
@@ -60,36 +47,19 @@ TContractState`, where access to the component state is made via the
   }
   ```
 
-  In our context `ComponentState<TContractState>` is a type specific to the
-  ownable component, i.e. it has members based on the storage variables defined
-  in `ownable_component::Storage`. Moving from the generic `TContractState` to
-  `ComponentState<TContractState>` will allow us to embed `Ownable` in any
-  contract that wants to use it. The opposite direction
-  (`ComponentState<TContractState>` to `ContractState`) is useful for
-  dependencies (see the `Upgradeable` component depending on an `IOwnable`
-  implementation example in the [Components dependencies ](./ch99-01-05-02-component-dependencies.md) section.
+  Dalam konteks kita, `ComponentState<TContractState>` adalah tipe yang khusus untuk komponen ownable, yaitu memiliki anggota berdasarkan variabel penyimpanan yang didefinisikan dalam `ownable_component::Storage`. Berpindah dari `TContractState` generik ke `ComponentState<TContractState>` akan memungkinkan kita untuk menyisipkan `Ownable` ke dalam kontrak apa pun yang ingin menggunakannya. Arah sebaliknya (`ComponentState<TContractState>` ke `ContractState`) berguna untuk dependensi (lihat contoh implementasi `Upgradeable` komponen yang bergantung pada implementasi `IOwnable` di bagian [Ketergantungan Komponen](./ch99-01-05-02-component-dependencies.md)).
 
-  To put it briefly, one should think of an implementation of the above
-  `HasComponent<T>` as saying: **“Contract whose state T has the upgradeable
-  component”.**
+  Singkatnya, seseorang harus memikirkan implementasi dari `HasComponent<T>` di atas sebagai mengatakan: **"Kontrak yang memiliki status T memiliki komponen yang dapat diupgrade".**
 
-- `Ownable` is annotated with the `embeddable_as(<name>)` attribute:
+- `Ownable` dianotasi dengan atribut `embeddable_as(<nama>)`:
 
-  `embeddable_as` is similar to `embeddable`; it only applies to `impls` of
-  `starknet::interface` traits and allows embedding this impl in a contract
-  module. That said, `embeddable_as(<name>)` has another role in the context of
-  components. Eventually, when embedding `OwnableImpl` in some contract, we
-  expect to get an impl with the following functions:
+  `embeddable_as` mirip dengan `embeddable`; ia hanya berlaku untuk `impls` dari trait `starknet::interface` dan memungkinkan penyisipan implementasi ini di dalam modul kontrak. Dengan demikian, `embeddable_as(<nama>)` memiliki peran lain dalam konteks komponen. Pada akhirnya, ketika menyisipkan `OwnableImpl` ke dalam suatu kontrak, kita berharap mendapatkan sebuah impl dengan fungsi-fungsi berikut:
 
   ```rust
   {{#include ../listings/ch99-starknet-smart-contracts/components/listing_01_ownable/src/component.cairo:trait_def}}
   ```
 
-  Note that while starting with a function receiving the generic type
-  `ComponentState<TContractState>`, we want to end up with a function receiving
-  `ContractState`. This is where `embeddable_as(<name>)` comes in. To see the
-  full picture, we need to see what is the impl generated by the compiler due to
-  the `embeddable_as(Ownable)` annotation:
+  Perhatikan bahwa meskipun dimulai dengan sebuah fungsi yang menerima tipe generik `ComponentState<TContractState>`, kita ingin berakhir dengan sebuah fungsi yang menerima `ContractState`. Di sinilah `embeddable_as(<nama>)` berperan. Untuk melihat gambaran keseluruhan, kita perlu melihat impl yang dihasilkan oleh kompilator karena adanya anotasi `embeddable_as(Ownable)`:
 
   ```rust
   #[starknet::embeddable]
@@ -116,48 +86,28 @@ TContractState`, where access to the component state is made via the
   }
   ```
 
-  Note that thanks to having an impl of `HasComponent<TContractState>`, the
-  compiler was able to wrap our functions in a new impl that doesn’t directly
-  know about the `ComponentState` type. `Ownable`, whose name we chose when
-  writing `embeddable_as(Ownable)`, is the impl that we will embed in a contract
-  that wants ownership.
+  Perhatikan bahwa berkat adanya impl dari `HasComponent<TContractState>`, kompilator dapat membungkus fungsi-fungsi kita dalam sebuah impl baru yang tidak secara langsung mengetahui tentang tipe `ComponentState`. `Ownable`, yang nama kita pilih saat menulis `embeddable_as(Ownable)`, adalah impl yang akan kita sisipkan di dalam sebuah kontrak yang menginginkan kepemilikan.
 
-## Contract Integration
+## Integrasi Kontrak
 
-We've seen how generic impls enable component reusability. Next let's see how a
-contract integrates a component.
+Kita telah melihat bagaimana implementasi generik memungkinkan kegunaan ulang komponen. Selanjutnya, mari kita lihat bagaimana sebuah kontrak mengintegrasikan sebuah komponen.
 
-The contract uses an **impl alias** to instantiate the component's generic impl
-with the concrete `ContractState` of the contract.
+Kontrak menggunakan **alias impl** untuk menginisialisasi implementasi generik komponen dengan tipe konkret `ContractState` dari kontrak.
 
 ```rust
 {{#include ../listings/ch99-starknet-smart-contracts/components/listing_01_ownable/src/contract.cairo:embedded_impl}}
 ```
 
-The above lines use the Cairo impl embedding mechanism alongside the impl alias
-syntax. We’re instantiating the generic `OwnableImpl<TContractState>` with the
-concrete type `ContractState`. Recall that `OwnableImpl<TContractState>` has the
-`HasComponent<TContractState>` generic impl parameter. An implementation of this
-trait is generated by the `component!` macro.
+Baris di atas menggunakan mekanisme penyisipan impl Cairo bersamaan dengan sintaks alias impl. Kita menginisialisasi `OwnableImpl<TContractState>` yang generik dengan tipe konkret `ContractState`. Ingatlah bahwa `OwnableImpl<TContractState>` memiliki parameter impl generik `HasComponent<TContractState>`. Implementasi dari trait ini dihasilkan oleh macro `component!`.
 
-Note that only the using contract
-could have implemented this trait since only it knows about both the contract
-state and the component state.
+Perhatikan bahwa hanya kontrak yang menggunakan yang dapat mengimplementasikan trait ini karena hanya kontrak yang mengetahui tentang kedua status kontrak dan status komponen.
 
-This glues everything together to inject the component logic into the contract.
+Ini menyatukan semua hal untuk menyisipkan logika komponen ke dalam kontrak.
 
-## Key Takeaways
+## Simpulan Penting
 
-- Embeddable impls allow injecting components logic into contracts by adding
-  entry points and modifying the contract ABI.
-- The compiler automatically generates a `HasComponent` trait implementation
-  when a component is used in a contract. This creates a bridge between the
-  contract's state and the component's state, enabling interaction between the
-  two.
-- Components encapsulate reusable logic in a generic, contract-agnostic way.
-  Contracts integrate components through impl aliases and access them via the
-  generated `HasComponent` trait.
-- Components build on embeddable impls by defining generic component logic that
-  can be integrated into any contract wanting to use that component. Impl
-  aliases instantiate these generic impls with the contract's concrete storage
-  types.
+- Impl yang dapat disisipkan memungkinkan penyisipan logika komponen ke dalam kontrak dengan menambahkan titik masuk dan memodifikasi ABI kontrak.
+- Kompilator secara otomatis menghasilkan implementasi trait `HasComponent` saat sebuah komponen digunakan dalam sebuah kontrak. Ini menciptakan jembatan antara status kontrak dan status komponen, memungkinkan interaksi di antara keduanya.
+- Komponen mengemas logika yang dapat digunakan kembali secara generik, tanpa tergantung pada kontrak tertentu.
+  Kontrak mengintegrasikan komponen melalui alias impl dan mengaksesnya melalui trait `HasComponent` yang dihasilkan.
+- Komponen membangun dari impl yang dapat disisipkan dengan mendefinisikan logika komponen yang generik yang dapat diintegrasikan ke dalam setiap kontrak yang ingin menggunakan komponen tersebut. Alias impl menginisialisasi impl generik ini dengan tipe penyimpanan konkret kontrak.
