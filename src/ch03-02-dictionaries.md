@@ -1,153 +1,152 @@
-## Dictionaries
+## Kamus
 
-Cairo provides in its core library a dictionary-like type. The `Felt252Dict<T>` data type represents a collection of key-value pairs where each key is unique and associated with a corresponding value. This type of data structure is known differently across different programming languages such as maps, hash tables, associative arrays and many others.
+Cairo menyediakan dalam perpustakaan intinya tipe data mirip kamus. Tipe data `Felt252Dict<T>` mewakili kumpulan pasangan kunci-nilai di mana setiap kunci bersifat unik dan terkait dengan nilai yang sesuai. Tipe struktur data ini dikenal dengan nama berbeda dalam berbagai bahasa pemrograman seperti peta, tabel hash, larik asosiatif, dan banyak lainnya.
 
-The `Felt252Dict<T>` type is useful when you want to organize your data in a certain way for which using an `Array<T>` and indexing doesn't suffice. Cairo dictionaries also allow the programmer to easily simulate the existence of mutable memory when there is none.
+Tipe `Felt252Dict<T>` berguna ketika Anda ingin mengorganisir data Anda dengan cara tertentu di mana menggunakan `Array<T>` dan pengindeksan tidak cukup. Kamus Cairo juga memungkinkan pemrogram untuk dengan mudah mensimulasikan keberadaan memori yang dapat diubah ketika tidak ada.
 
-### Basic Use of Dictionaries
+### Penggunaan Dasar Kamus
 
-It is normal in other languages when creating a new dictionary to define the data types of both key and value. In Cairo, the key type is restricted to `felt252` leaving only the possibility to specify the value data type, represented by `T` in `Felt252Dict<T>`.
+Biasanya dalam bahasa lain ketika membuat kamus baru, kita harus mendefinisikan tipe data baik untuk kunci maupun nilai. Di Cairo, tipe kunci dibatasi menjadi `felt252`, meninggalkan hanya kemungkinan untuk menentukan tipe data nilai, yang direpresentasikan oleh `T` dalam `Felt252Dict<T>`.
 
-The core functionality of a `Felt252Dict<T>` is implemented in the trait `Felt252DictTrait` which includes all basic operations. Among them we can find:
+Fungsionalitas inti dari `Felt252Dict<T>` diimplementasikan dalam trait `Felt252DictTrait` yang mencakup semua operasi dasar. Di antaranya, kita dapat menemukan:
 
-1. `insert(felt252, T) -> ()` to write values to a dictionary instance and
-2. `get(felt252) -> T` to read values from it.
+1. `insert(felt252, T) -> ()` untuk menulis nilai ke instance kamus dan
+2. `get(felt252) -> T` untuk membaca nilai darinya.
 
-These functions allow us to manipulate dictionaries like in any other language. In the following example, we create a dictionary to represent a mapping between individuals and their balance:
+Fungsi-fungsi ini memungkinkan kita untuk memanipulasi kamus seperti dalam bahasa pemrograman lain. Pada contoh berikut, kita membuat kamus untuk merepresentasikan pemetaan antara individu dan saldo mereka:
 
 ```rust
 {{#include ../listings/ch03-common-collections/no_listing_07_intro/src/lib.cairo}}
 ```
 
-We can create a new instance of `Felt252Dict<u64>` by using the `default` method of the `Default` trait and add two individuals, each one with their own balance, using the `insert` method. Finally, we check the balance of our users with the `get` method. These methods are defined in the `Felt252DictTrait` trait in the core library.
+Kita dapat membuat instance baru dari `Felt252Dict<u64>` dengan menggunakan metode `default` dari trait `Default` dan menambahkan dua individu, masing-masing dengan saldo mereka sendiri, menggunakan metode `insert`. Akhirnya, kita memeriksa saldo pengguna dengan metode `get`. Metode-metode ini didefinisikan dalam trait `Felt252DictTrait` dalam perpustakaan inti.
 
-Throughout the book we have talked about how Cairo's memory is immutable, meaning you can only write to a memory cell once but the `Felt252Dict<T>` type represents a way to overcome this obstacle. We will explain how this is implemented later on in [Dictionaries Underneath](#dictionaries-underneath).
+Sepanjang buku ini, kita telah membahas bagaimana memori Cairo bersifat tidak dapat diubah, yang berarti Anda hanya dapat menulis ke sel memori sekali, tetapi tipe `Felt252Dict<T>` mewakili cara untuk mengatasi hambatan ini. kita akan menjelaskan bagaimana hal ini diimplementasikan nanti pada bagian [Dictionaries Underneath](#dictionaries-underneath).
 
-Building upon our previous example, let us show a code example where the balance of the same user changes:
+Berlanjut dari contoh sebelumnya, mari tunjukkan contoh kode di mana saldo pengguna yang sama berubah:
 
 ```rust
 {{#include ../listings/ch03-common-collections/no_listing_08_intro_rewrite/src/lib.cairo}}
 ```
 
-Notice how in this example we added the _Alex_ individual twice, each time using a different balance and each time that we checked for its balance it had the last value inserted! `Felt252Dict<T>` effectively allows us to "rewrite" the stored value for any given key.
+Perhatikan bagaimana dalam contoh ini kita menambahkan individu _Alex_ dua kali, setiap kali menggunakan saldo yang berbeda dan setiap kali kita memeriksa saldo, itu memiliki nilai terakhir yang dimasukkan! `Felt252Dict<T>` efektif memungkinkan kita "menulis ulang" nilai yang disimpan untuk kunci apa pun.
 
-Before heading on and explaining how dictionaries are implemented it is worth mentioning that once you instantiate a `Felt252Dict<T>`, behind the scenes all keys have their associated values initialized as zero. This means that if for example, you tried to get the balance of an inexistent user you will get 0 instead of an error or an undefined value. This also means there is no way to delete data from a dictionary. Something to take into account when incorporating this structure into your code.
+Sebelum melanjutkan dan menjelaskan bagaimana kamus diimplementasikan, penting untuk dicatat bahwa begitu Anda menginisiasi `Felt252Dict<T>`, di belakang layar semua kunci memiliki nilai yang terkait diinisialisasi sebagai nol. Ini berarti bahwa jika misalnya Anda mencoba mendapatkan saldo pengguna yang tidak ada, Anda akan mendapatkan 0 daripada kesalahan atau nilai yang tidak terdefinisi. Ini juga berarti tidak ada cara untuk menghapus data dari kamus. Sesuatu yang perlu diperhatikan ketika menggabungkan struktur ini ke dalam kode Anda.
 
-Until this point, we have seen all the basic features of `Felt252Dict<T>` and how it mimics the same behavior as the corresponding data structures in any other language, that is, externally of course. Cairo is at its core a non-deterministic Turing-complete programming language, very different from any other popular language in existence, which as a consequence means that dictionaries are implemented very differently as well!
+Hingga saat ini, kita telah melihat semua fitur dasar dari `Felt252Dict<T>` dan bagaimana ia meniru perilaku yang sama seperti struktur data yang sesuai dalam bahasa pemrograman lainnya, yaitu, secara eksternal tentu saja. Cairo pada intinya adalah bahasa pemrograman yang non-deterministik dan dapat diselesaikan oleh Turing, sangat berbeda dari bahasa populer lainnya yang ada, yang sebagai konsekuensinya berarti bahwa kamus diimplementasikan dengan cara yang sangat berbeda juga!
 
-In the following sections, we are going to give some insights about `Felt252Dict<T>` inner mechanisms and the compromises that were taken to make them work. After that, we are going to take a look at how to use dictionaries with other data structures as well as use the `entry` method as another way to interact with them.
+Pada bagian-bagian berikutnya, kita akan memberikan beberapa wawasan tentang mekanisme internal `Felt252Dict<T>` dan kompromi yang diambil untuk membuatnya berfungsi. Setelah itu, kita akan melihat bagaimana menggunakan kamus dengan struktur data lain serta menggunakan metode `entry` sebagai cara lain untuk berinteraksi dengan mereka.
 
-### Dictionaries Underneath
+### Kamus di Dalamnya
 
-One of the constraints of Cairo's non-deterministic design is that its memory system is immutable, so in order to simulate mutability, the language implements `Felt252Dict<T>` as a list of entries. Each of the entries represents a time when a dictionary was accessed for reading/updating/writing purposes. An entry has three fields:
+Salah satu kendala dari desain non-deterministik Cairo adalah bahwa sistem memorinya bersifat tidak dapat diubah, sehingga untuk mensimulasikan mutabilitas, bahasa ini mengimplementasikan `Felt252Dict<T>` sebagai daftar entri. Setiap entri mewakili waktu ketika kamus diakses untuk tujuan membaca/memperbarui/menulis. Sebuah entri memiliki tiga bidang:
 
-1. A `key` field that identifies the value for this key-value pair of the dictionary.
-2. A `previous_value` field that indicates which previous value was held at `key`.
-3. A `new_value` field that indicates the new value that is held at `key`.
+1. Bidang `key` yang mengidentifikasi nilai untuk pasangan kunci-nilai kamus ini.
+2. Bidang `previous_value` yang menunjukkan nilai sebelumnya yang dipegang di `key`.
+3. Bidang `new_value` yang menunjukkan nilai baru yang dipegang di `key`.
 
-If we try implementing `Felt252Dict<T>` using high-level structures we would internally define it as `Array<Entry<T>>` where each `Entry<T>` has information about what key-value pair it represents and the previous and new values it holds. The definition of `Entry<T>` would be:
+Jika kita mencoba mengimplementasikan `Felt252Dict<T>` menggunakan struktur tingkat tinggi, kita akan mendefinisikannya secara internal sebagai `Array<Entry<T>>` di mana setiap `Entry<T>` memiliki informasi tentang pasangan kunci-nilai yang direpresentasikannya dan nilai-nilai sebelumnya dan baru yang dipegangnya. Definisi dari `Entry<T>` akan menjadi sebagai berikut:
 
 ```rust,noplayground
 {{#include ../listings/ch03-common-collections/no_listing_09_entries/src/lib.cairo:struct}}
 ```
 
-For each time we interact with a `Felt252Dict<T>` a new `Entry<T>` will be registered:
+Setiap kali kita berinteraksi dengan `Felt252Dict<T>`, entri baru `Entry<T>` akan terdaftar:
 
-- A `get` would register an entry where there is no change in state, and previous and new values are stored with the same value.
-- An `insert` would register a new `Entry<T>` where the `new_value` would be the element being inserted, and the `previous_value` the last element inserted before this. In case it is the first entry for a certain key, then the previous value will be zero.
+- Sebuah `get` akan mendaftarkan entri di mana tidak ada perubahan dalam status, dan nilai-nilai sebelumnya dan baru disimpan dengan nilai yang sama.
+- Sebuah `insert` akan mendaftarkan `Entry<T>` baru di mana `new_value` akan menjadi elemen yang dimasukkan, dan `previous_value` adalah elemen terakhir yang dimasukkan sebelumnya. Jika ini adalah entri pertama untuk kunci tertentu, maka nilai sebelumnya akan menjadi nol.
 
-The use of this entry list shows how there isn't any rewriting, just the creation of new memory cells per `Felt252Dict<T>` interaction. Let's show an example of this using the `balances` dictionary from the previous section and inserting the users 'Alex' and 'Maria':
+Penggunaan daftar entri ini menunjukkan bagaimana tidak ada penulisan ulang, hanya pembuatan sel memori baru per interaksi `Felt252Dict<T>`. Mari tunjukkan contoh penggunaan kamus `balances` dari bagian sebelumnya dan menyisipkan pengguna 'Alex' dan 'Maria':
 
 ```rust
 {{#rustdoc_include ../listings/ch03-common-collections/no_listing_09_entries/src/lib.cairo:inserts}}
 ```
 
-These instructions would then produce the following list of entries:
+Instruksi-instruksi ini kemudian akan menghasilkan daftar entri berikut:
 
-|  key  | previous | new |
-| :---: | -------- | --- |
-| Alex  | 0        | 100 |
-| Maria | 0        | 50  |
-| Alex  | 100      | 200 |
-| Maria | 50       | 50  |
+|  kunci | sebelumnya | baru |
+| :----: | --------- | --- |
+| Alex   | 0         | 100 |
+| Maria  | 0         | 50  |
+| Alex   | 100       | 200 |
+| Maria  | 50        | 50  |
 
-Notice that since 'Alex' was inserted twice, it appears twice and the `previous` and `current` values are set properly. Also reading from 'Maria' registered an entry with no change from previous to current values.
+Perhatikan bahwa karena 'Alex' dimasukkan dua kali, itu muncul dua kali dan nilai `sebelumnya` dan `saat ini` diatur dengan benar. Juga membaca dari 'Maria' mendaftarkan entri tanpa perubahan dari nilai sebelumnya ke nilai saat ini.
 
-This approach to implementing `Felt252Dict<T>` means that for each read/write operation, there is a scan for the whole entry list in search of the last entry with the same `key`. Once the entry has been found, its `new_value` is extracted and used on the new entry to be added as the `previous_value`. This means that interacting with `Felt252Dict<T>` has a worst-case time complexity of `O(n)` where `n` is the number of entries in the list.
+Pendekatan ini untuk mengimplementasikan `Felt252Dict<T>` berarti bahwa untuk setiap operasi baca/tulis, ada pemindaian seluruh daftar entri dalam pencarian entri terakhir dengan kunci yang sama. Begitu entri telah ditemukan, `new_value`-nya diekstrak dan digunakan pada entri baru yang akan ditambahkan sebagai `previous_value`. Ini berarti berinteraksi dengan `Felt252Dict<T>` memiliki kompleksitas waktu terburuk `O(n)` di mana `n` adalah jumlah entri dalam daftar.
 
-If you pour some thought into alternate ways of implementing `Felt252Dict<T>` you'd surely find them, probably even ditching completely the need for a `previous_value` field, nonetheless, since Cairo is not your normal language this won't work.
-One of the purposes of Cairo is, with the STARK proof system, to generate proofs of computational integrity. This means that you need to verify that program execution is correct and inside the boundaries of Cairo restrictions. One of those boundary checks consists of "dictionary squashing" and that requires information on both previous and new values for every entry.
+Jika Anda memikirkan cara alternatif untuk mengimplementasikan `Felt252Dict<T>`, Anda pasti akan menemukannya, mungkin bahkan meninggalkan sepenuhnya kebutuhan untuk bidang `previous_value`, meskipun, karena Cairo bukanlah bahasa normal Anda, hal ini tidak akan berfungsi. Salah satu tujuan Cairo adalah, dengan sistem bukti STARK, menghasilkan bukti integritas komputasional. Ini berarti Anda perlu memverifikasi bahwa eksekusi program benar dan berada dalam batas pembatasan Cairo. Salah satu pemeriksaan batas tersebut terdiri dari "penghancuran kamus" dan itu memerlukan informasi tentang nilai-nilai sebelumnya dan baru untuk setiap entri.
 
-### Squashing Dictionaries
+### Penghancuran Kamus
 
-To verify that the proof generated by a Cairo program execution that used a `Felt252Dict<T>` is correct we need to check that there wasn't any illegal tampering with the dictionary. This is done through a method called `squash_dict` that reviews each entry of the entry list and checks that access to the dictionary remains coherent throughout the execution.
+Untuk memverifikasi bahwa bukti yang dihasilkan oleh eksekusi program Cairo yang menggunakan `Felt252Dict<T>` benar, kita perlu memeriksa bahwa tidak ada manipulasi ilegal dengan kamus. Ini dilakukan melalui metode yang disebut `squash_dict` yang meninjau setiap entri dari daftar entri dan memeriksa bahwa akses ke kamus tetap konsisten sepanjang eksekusi.
 
-The process of squashing is as follows: given all entries with certain key `k`, taken in the same order as they were inserted, verify that the ith entry `new_value` is equal to the ith + 1 entry `previous_value`.
+Proses penghancuran dilakukan sebagai berikut: diberikan semua entri dengan kunci tertentu `k`, diambil dalam urutan yang sama dengan saat dimasukkan, verifikasi bahwa nilai `new_value` pada entri ke-i sama dengan nilai `previous_value` pada entri ke-i + 1.
 
-For example, given the following entry list:
+Sebagai contoh, diberikan daftar entri berikut:
 
-|   key   | previous | new |
-| :-----: | -------- | --- |
-|  Alex   | 0        | 150 |
-|  Maria  | 0        | 100 |
-| Charles | 0        | 70  |
-|  Maria  | 100      | 250 |
-|  Alex   | 150      | 40  |
-|  Alex   | 40       | 300 |
-|  Maria  | 250      | 190 |
-|  Alex   | 300      | 90  |
+|   kunci   | sebelumnya | baru |
+| :-------: | ---------- | --- |
+|   Alex    | 0          | 150 |
+|   Maria   | 0          | 100 |
+| Charles   | 0          | 70  |
+|   Maria   | 100        | 250 |
+|   Alex    | 150        | 40  |
+|   Alex    | 40         | 300 |
+|   Maria   | 250        | 190 |
+|   Alex    | 300        | 90  |
 
-After squashing, the entry list would be reduced to:
+Setelah penghancuran, daftar entri akan dikurangi menjadi:
 
-|   key   | previous | new |
-| :-----: | -------- | --- |
-|  Alex   | 0        | 90  |
-|  Maria  | 0        | 190 |
-| Charles | 0        | 70  |
+|   kunci   | sebelumnya | baru |
+| :-------: | ---------- | --- |
+|   Alex    | 0          | 90  |
+|   Maria   | 0          | 190 |
+| Charles   | 0          | 70  |
 
-In case of a change on any of the values of the first table, squashing would have failed during runtime.
+Jika terjadi perubahan pada salah satu nilai tabel pertama, penghancuran akan gagal selama runtime.
 
-### Dictionary Destruction
+### Penghancuran Kamus
 
-If you run the examples from [Basic Use of Dictionaries](#basic-use-of-dictionaries) you'd notice that there was never a call to squash dictionary, but the program compiled successfully nonetheless. What happened behind the scene was that squash was called automatically via the `Felt252Dict<T>` implementation of the `Destruct<T>` trait. This call occurred just before the `balance` dictionary went out of scope.
+Jika Anda menjalankan contoh dari [Penggunaan Dasar Kamus](#basic-use-of-dictionaries), Anda akan melihat bahwa tidak pernah ada panggilan untuk menyusun kamus, namun program berhasil dikompilasi. Apa yang terjadi di belakang layar adalah bahwa penyusunan secara otomatis dipanggil melalui implementasi `Felt252Dict<T>` dari trait `Destruct<T>`. Panggilan ini terjadi tepat sebelum kamus `balance` keluar dari cakupan.
 
-The `Destruct<T>` trait represents another way of removing instances out of scope apart from `Drop<T>`. The main difference between these two is that `Drop<T>` is treated as a no-op operation, meaning it does not generate new CASM while `Destruct<T>` does not have this restriction. The only type which actively uses the `Destruct<T>` trait is `Felt252Dict<T>`, for every other type `Destruct<T>` and `Drop<T>` are synonyms. You can read more about these traits in [Drop and Destruct](/appendix-03-derivable-traits.md#drop-and-destruct).
+Trait `Destruct<T>` mewakili cara lain untuk mengeluarkan instansi dari cakupan selain `Drop<T>`. Perbedaan utama antara keduanya adalah bahwa `Drop<T>` dianggap sebagai operasi no-op, yang berarti tidak menghasilkan CASM baru sementara `Destruct<T>` tidak memiliki batasan ini. Satu-satunya tipe yang secara aktif menggunakan trait `Destruct<T>` adalah `Felt252Dict<T>`, untuk setiap tipe lainnya, `Destruct<T>` dan `Drop<T>` adalah sinonim. Anda dapat membaca lebih lanjut tentang trait ini di [Drop and Destruct](/appendix-03-derivable-traits.md#drop-and-destruct).
 
-Later in [Dictionaries as Struct Members](#dictionaries-as-struct-members), we will have a hands-on example where we implement the `Destruct<T>` trait for a custom type.
+Nanti, pada bagian [Kamus sebagai Anggota Struktur](#dictionaries-as-struct-members), kita akan memiliki contoh praktis di mana kita mengimplementasikan trait `Destruct<T>` untuk tipe kustom.
 
-### More Dictionaries
+### Lebih Banyak Kamus
 
-Up to this point, we have given a comprehensive overview of the functionality of `Felt252Dict<T>` as well as how and why it is implemented in a certain way. If you haven't understood all of it, don't worry because in this section we will have some more examples using dictionaries.
+Hingga saat ini, kita telah memberikan gambaran menyeluruh tentang fungsionalitas `Felt252Dict<T>` serta bagaimana dan mengapa itu diimplementasikan dengan cara tertentu. Jika Anda belum memahami semuanya, jangan khawatir karena dalam bagian ini kita akan memberikan beberapa contoh lebih lanjut menggunakan kamus.
 
-We will start by explaining the `entry` method which is part of a dictionary basic functionality included in `Felt252DictTrait<T>` which we didn't mention at the beginning. Soon after, we will see examples of how `Felt252Dict<T>` [interacts](#dictionaries-of-complex-types) with other complex types such as `Array<T>` and how to [implement](#dictionaries-as-struct-members) a struct with a dictionary as a member.
+kita akan memulai dengan menjelaskan metode `entry` yang merupakan bagian dari fungsionalitas dasar kamus yang disertakan dalam `Felt252DictTrait<T>` yang tidak kita sebutkan di awal. Segera setelah itu, kita akan melihat contoh bagaimana `Felt252Dict<T>` [berinteraksi](#dictionaries-of-complex-types) dengan jenis kompleks lain seperti `Array<T>` dan bagaimana [mengimplementasikan](#dictionaries-as-struct-members) sebuah struktur dengan kamus sebagai anggota.
 
-### Entry and Finalize
+### Entry dan Finalisasi
 
-In the [Dictionaries Underneath](#dictionaries-underneath) section, we explained how `Felt252Dict<T>` internally worked. It was a list of entries for each time the dictionary was accessed in any manner. It would first find the last entry given a certain `key` and then update it accordingly to whatever operation it was executing. The Cairo language gives us the tools to replicate this ourselves through the `entry` and `finalize` methods.
+Pada bagian [Dictionaries Underneath](#dictionaries-underneath), kita menjelaskan bagaimana `Felt252Dict<T>` bekerja secara internal. Ini adalah daftar entri untuk setiap kali kamus diakses dengan cara apa pun. Pertama, ia akan menemukan entri terakhir dengan memberikan `key` tertentu, dan kemudian memperbarui sesuai dengan operasi apa pun yang sedang dijalankan. Bahasa Cairo memberi kita alat untuk mereplikasikan ini sendiri melalui metode `entry` dan `finalize`.
 
-The `entry` method comes as part of `Felt252DictTrait<T>` with the purpose of creating a new entry given a certain key. Once called, this method takes ownership of the dictionary and returns the entry to update. The method signature is as follows:
+Metode `entry` datang sebagai bagian dari `Felt252DictTrait<T>` dengan tujuan membuat entri baru dengan memberikan kunci tertentu. Begitu dipanggil, metode ini mengambil kepemilikan kamus dan mengembalikan entri untuk diperbarui. Tanda tangan metodenya adalah sebagai berikut:
 
 ```rust,noplayground
 fn entry(self: Felt252Dict<T>, key: felt252) -> (Felt252DictEntry<T>, T) nopanic
 ```
 
-The first input parameter takes ownership of the dictionary while the second one is used to create the appropriate entry. It returns a tuple containing a `Felt252DictEntry<T>`, which is the type used by Cairo to represent dictionary entries, and a `T` representing the value held previously.
+Parameter masukan pertama mengambil kepemilikan kamus sementara yang kedua digunakan untuk membuat entri yang sesuai. Ini mengembalikan tuple yang berisi `Felt252DictEntry<T>`, yang merupakan tipe yang digunakan oleh Cairo untuk mewakili entri kamus, dan `T` yang mewakili nilai yang dipegang sebelumnya.
 
-The next thing to do is to update the entry with the new value. For this, we use the `finalize` method which inserts the entry and returns ownership of the dictionary:
+Langkah berikutnya adalah memperbarui entri dengan nilai baru. Untuk ini, kita menggunakan metode `finalize` yang menyisipkan entri dan mengembalikan kepemilikan kamus:
 
 ```rust,noplayground
 fn finalize(self: Felt252DictEntry<T>, new_value: T) -> Felt252Dict<T> {
 ```
 
-This method receives the entry and the new value as a parameter and returns the updated dictionary.
+Metode ini menerima entri dan nilai baru sebagai parameter dan mengembalikan kamus yang diperbarui.
 
-Let us see an example using `entry` and `finalize`. Imagine we would like to implement our own version of the `get` method from a dictionary. We should then do the following:
+Mari kita lihat contoh penggunaan `entry` dan `finalize`. Bayangkan kita ingin mengimplementasikan versi kustom dari metode `get` dari kamus. Maka kita harus melakukan hal berikut:
 
-1. Create the new entry to add using the `entry` method
-2. Insert back the entry where the `new_value` equals the `previous_value`.
-3. Return the value.
+1. Buat entri baru untuk ditambahkan menggunakan metode `entry`.
+2. Sisipkan kembali entri di mana `new_value` sama dengan `previous_value`.
+3. Kembalikan nilai.
 
-Implementing our custom get would look like this:
+Implementasi `get` kustom kita akan terlihat seperti ini:
 
 ```rust,noplayground
 {{#include ../listings/ch03-common-collections/no_listing_10_custom_methods/src/lib.cairo:imports}}
@@ -155,7 +154,7 @@ Implementing our custom get would look like this:
 {{#include ../listings/ch03-common-collections/no_listing_10_custom_methods/src/lib.cairo:custom_get}}
 ```
 
-Implementing the `insert` method would follow a similar workflow, except for inserting a new value when finalizing. If we were to implement it, it would look like the following:
+Implementasi metode `insert` akan mengikuti alur kerja yang serupa, kecuali untuk menyisipkan nilai baru saat finalisasi. Jika kita hendak mengimplementasikannya, itu akan terlihat seperti berikut:
 
 ```rust,noplayground
 {{#include ../listings/ch03-common-collections/no_listing_10_custom_methods/src/lib.cairo:imports}}
@@ -163,23 +162,23 @@ Implementing the `insert` method would follow a similar workflow, except for ins
 {{#include ../listings/ch03-common-collections/no_listing_10_custom_methods/src/lib.cairo:custom_insert}}
 ```
 
-As a finalizing note, these two methods are implemented in a similar way to how `insert` and `get` are implemented for `Felt252Dict<T>`. This code shows some example usage:
+Sebagai catatan penutup, kedua metode ini diimplementasikan dengan cara yang mirip dengan bagaimana `insert` dan `get` diimplementasikan untuk `Felt252Dict<T>`. Kode ini menunjukkan beberapa penggunaan contoh:
 
 ```rust
 {{#rustdoc_include ../listings/ch03-common-collections/no_listing_10_custom_methods/src/lib.cairo:main}}
 ```
 
-### Dictionaries of types not supported natively
+### Kamus dari Jenis yang Tidak Didukung Secara Asli
 
-One restriction of `Felt252Dict<T>` that we haven't talked about is the trait `Felt252DictValue<T>`.
-This trait defines the `zero_default` method which is the one that gets called when a value does not exist in the dictionary.
-This is implemented by some common data types, such as most unsigned integers, `bool` and `felt252` - but it is not implemented for more complex ones types such as arrays, structs (including `u256`), and other types from the core library.
-This means that making a dictionary of types not natively supported is not a straightforward task, because you would need to write a couple of trait implementations in order to make the data type a valid dictionary value type.
-To compensate this, you can wrap your type inside a `Nullable<T>`.
+Salah satu pembatasan dari `Felt252Dict<T>` yang belum kita bahas adalah trait `Felt252DictValue<T>`.
+Trait ini mendefinisikan metode `zero_default` yang dipanggil ketika nilai tidak ada dalam kamus.
+Ini diimplementasikan oleh beberapa tipe data umum, seperti sebagian besar bilangan bulat tak bertanda, `bool`, dan `felt252`, tetapi tidak diimplementasikan untuk tipe yang lebih kompleks seperti larik, struktur (termasuk `u256`), dan tipe lain dari perpustakaan inti.
+Ini berarti membuat kamus dari jenis yang tidak didukung secara alami tidaklah tugas yang mudah, karena Anda perlu menulis beberapa implementasi trait untuk membuat tipe data menjadi tipe nilai kamus yang valid.
+Sebagai gantinya, Anda dapat melingkupi tipe Anda dalam `Nullable<T>`.
 
-`Nullable<T>` is a smart pointer type that can either point to a value or be `null` in the absence of value. It is usually used in Object Oriented Programming Languages when a reference doesn't point anywhere. The difference with `Option` is that the wrapped value is stored inside a `Box<T>` data type. The `Box<T>` type, inspired by Rust, allows us to allocate a new memory segment for our type, and access this segment using a pointer that can only be manipulated in one place at a time.
+`Nullable<T>` adalah tipe penunjuk pintar yang dapat menunjuk pada nilai atau menjadi `null` dalam ketiadaan nilai. Biasanya digunakan dalam Bahasa Pemrograman Berorientasi Objek ketika referensi tidak menunjuk ke mana-mana. Perbedaannya dengan `Option` adalah bahwa nilai yang dilingkupi disimpan di dalam tipe data `Box<T>`. Tipe `Box<T>`, terinspirasi oleh Rust, memungkinkan kita mengalokasikan segmen memori baru untuk tipe kita, dan mengakses segmen ini menggunakan penunjuk yang hanya dapat dimanipulasi di satu tempat pada satu waktu.
 
-Let's show using an example. We will try to store a `Span<felt252>` inside a dictionary. For that, we will use `Nullable<T>` and `Box<T>`. Also, we are storing a `Span<T>` and not an `Array<T>` because the latter does not implement the `Copy<T>` trait which is required for reading from a dictionary.
+Mari tunjukkan dengan contoh. kita akan mencoba menyimpan `Span<felt252>` di dalam kamus. Untuk itu, kita akan menggunakan `Nullable<T>` dan `Box<T>`. Juga, kita menyimpan `Span<T>` dan bukan `Array<T>` karena yang terakhir tidak mengimplementasikan trait `Copy<T>` yang diperlukan untuk membaca dari kamus.
 
 ```rust,noplayground
 {{#include ../listings/ch03-common-collections/no_listing_11_dict_of_complex/src/lib.cairo:imports}}
@@ -189,15 +188,15 @@ Let's show using an example. We will try to store a `Span<felt252>` inside a dic
 //...
 ```
 
-In this code snippet, the first thing we did was to create a new dictionary `d`. We want it to hold a `Nullable<Span>`. After that, we created an array and filled it with values.
+Dalam potongan kode ini, hal pertama yang kita lakukan adalah membuat kamus baru `d`. kita ingin kamus ini menyimpan `Nullable<Span>`. Setelah itu, kita membuat larik dan mengisinya dengan nilai.
 
-The last step is inserting the array as a span inside the dictionary. Notice that we didn't do that directly, but instead, we took some steps in between:
+Langkah terakhir adalah menyisipkan larik sebagai span ke dalam kamus. Perhatikan bahwa kita tidak melakukan itu secara langsung, tetapi sebaliknya, kita mengambil beberapa langkah di antaranya:
 
-1. We wrapped the array inside a `Box` using the `new` method from `BoxTrait`.
-2. We wrapped the `Box` inside a nullable using the `nullable_from_box` function.
-3. Finally, we inserted the result.
+1. kita melingkupi larik dalam `Box` menggunakan metode `new` dari `BoxTrait`.
+2. kita melingkupi `Box` dalam bentuk yang dapat dinyatakan nol menggunakan fungsi `nullable_from_box`.
+3. Akhirnya, kita menyisipkan hasilnya.
 
-Once the element is inside the dictionary, and we want to get it, we follow the same steps but in reverse order. The following code shows how to achieve that:
+Setelah elemen berada di dalam kamus, dan kita ingin mendapatkannya, kita ikuti langkah yang sama tetapi dalam urutan terbalik. Kode berikut menunjukkan bagaimana melakukannya:
 
 ```rust,noplayground
 //...
@@ -205,21 +204,21 @@ Once the element is inside the dictionary, and we want to get it, we follow the 
 {{#include ../listings/ch03-common-collections/no_listing_11_dict_of_complex/src/lib.cairo:footer}}
 ```
 
-Here we:
+Di sini kita:
 
-1. Read the value using `get`.
-2. Verified it is non-null using the `match_nullable` function.
-3. Unwrapped the value inside the box and asserted it was correct.
+1. Membaca nilai menggunakan `get`.
+2. Memverifikasi bahwa itu tidak null menggunakan fungsi `match_nullable`.
+3. Membuka nilai di dalam kotak dan memastikan bahwa itu benar.
 
-The complete script would look like this:
+Skrip lengkap akan terlihat seperti ini:
 
 ```rust
 {{#include ../listings/ch03-common-collections/no_listing_11_dict_of_complex/src/lib.cairo:all}}
 ```
 
-### Dictionaries as Struct Members
+### Kamus sebagai Anggota Struct
 
-Defining dictionaries as struct members is possible in Cairo but correctly interacting with them may not be entirely seamless. Let's try implementing a custom _user database_ that will allow us to add users and query them. We will need to define a struct to represent the new type and a trait to define its functionality:
+Menentukan kamus sebagai anggota struct memungkinkan di Cairo, tetapi berinteraksi dengan mereka mungkin tidak sepenuhnya lancar. Mari mencoba mengimplementasikan _database pengguna_ kustom yang akan memungkinkan kita menambahkan pengguna dan mengajukannya. Kita perlu menentukan struct untuk mewakili tipe baru dan trait untuk menentukan fungsinya:
 
 ```rust,noplayground
 {{#include ../listings/ch03-common-collections/no_listing_12_dict_struct_member/src/lib.cairo:struct}}
@@ -227,24 +226,24 @@ Defining dictionaries as struct members is possible in Cairo but correctly inter
 {{#include ../listings/ch03-common-collections/no_listing_12_dict_struct_member/src/lib.cairo:trait}}
 ```
 
-Our new type `UserDatabase<T>` represents a database of users. It is generic over the balances of the users, giving major flexibility to whoever uses our data type. Its two members are:
+Tipe baru kita `UserDatabase<T>` mewakili database pengguna. Ini generic terhadap saldo pengguna, memberikan fleksibilitas utama kepada siapa pun yang menggunakan tipe data kita. Dua anggotanya adalah:
 
-- `users_amount`, the number of users currently inserted and
-- `balances`, a mapping of each user to its balance.
+- `users_amount`, jumlah pengguna yang saat ini dimasukkan, dan
+- `balances`, pemetaan setiap pengguna ke saldo mereka.
 
-The database core functionality is defined by `UserDatabaseTrait`. The following methods are defined:
+Fungsionalitas inti database didefinisikan oleh `UserDatabaseTrait`. Metode-metode berikut didefinisikan:
 
-- `new` for easily creating new `UserDatabase` types.
-- `add_user` to insert users in the database.
-- `get_balance` to find user's balance in the database.
+- `new` untuk membuat tipe `UserDatabase` baru dengan mudah.
+- `add_user` untuk menyisipkan pengguna ke dalam database.
+- `get_balance` untuk menemukan saldo pengguna di dalam database.
 
-The only remaining step is to implement each of the methods in `UserDatabaseTrait`, but since we are working with [generic types](/src/ch08-00-generic-types-and-traits.md) we also need to correctly establish the requirements of `T` so it can be a valid `Felt252Dict<T>` value type:
+Langkah terakhir yang tersisa adalah mengimplementasikan masing-masing metode di `UserDatabaseTrait`, tetapi karena kita bekerja dengan [jenis generik](/src/ch08-00-generic-types-and-traits.md), kita juga perlu menetapkan persyaratan `T` dengan benar sehingga itu dapat menjadi nilai tipe `Felt252Dict<T>` yang valid:
 
-1. `T` should implement the `Copy<T>` since it's required for getting values from a `Felt252Dict<T>`.
-2. All value types of a dictionary implement the `Felt252DictValue<T>`, our generic type should do as well.
-3. To insert values, `Felt252DictTrait<T>` requires all value types to be destructible.
+1. `T` harus mengimplementasikan `Copy<T>` karena diperlukan untuk mendapatkan nilai dari `Felt252Dict<T>`.
+2. Semua jenis nilai dari kamus mengimplementasikan `Felt252DictValue<T>`, tipe generic kita juga harus melakukannya.
+3. Untuk menyisipkan nilai, `Felt252DictTrait<T>` mengharuskan semua jenis nilai untuk dapat dihancurkan.
 
-The implementation, with all restriction in place, would be as follow:
+Implementasinya, dengan semua pembatasan di tempat, akan sebagai berikut:
 
 ```rust,noplayground
 {{#include ../listings/ch03-common-collections/no_listing_12_dict_struct_member/src/lib.cairo:imports}}
@@ -252,22 +251,20 @@ The implementation, with all restriction in place, would be as follow:
 {{#include ../listings/ch03-common-collections/no_listing_12_dict_struct_member/src/lib.cairo:impl}}
 ```
 
-Our database implementation is almost complete, except for one thing: the compiler doesn't know how to make a `UserDatabase<T>` go out of scope, since it doesn't implement the `Drop<T>` trait, nor the `Destruct<T>` trait.
-Since it has a `Felt252Dict<T>` as a member, it cannot be dropped, so we are forced to implement the `Destruct<T>` trait manually (refer to the [Ownership](ch04-01-what-is-ownership.md#the-drop-trait) chapter for more information).
-Using `#[derive(Destruct)]` on top of the `UserDatabase<T>` definition won't work because of the use of [genericity](/src/ch08-00-generic-types-and-traits.md) in the struct definition. We need to code the `Destruct<T>` trait implementation by ourselves:
+Implementasi database kita hampir selesai, kecuali satu hal: kompiler tidak tahu bagaimana membuat `UserDatabase<T>` keluar dari cakupan, karena tidak mengimplementasikan trait `Drop<T>` atau trait `Destruct<T>`. Karena memiliki `Felt252Dict<T>` sebagai anggota, itu tidak dapat dihapus, jadi kita terpaksa mengimplementasikan trait `Destruct<T>` secara manual (lihat bab [Milik](ch04-01-what-is-ownership.md#the-drop-trait) untuk informasi lebih lanjut). Menggunakan `#[derive(Destruct)]` di atas definisi `UserDatabase<T>` tidak akan berhasil karena penggunaan [generik](/src/ch08-00-generic-types-and-traits.md) dalam definisi struct. Kita perlu menulis implementasi trait `Destruct<T>` sendiri:
 
 ```rust,noplayground
 {{#include ../listings/ch03-common-collections/no_listing_12_dict_struct_member/src/lib.cairo:destruct}}
 ```
 
-Implementing `Destruct<T>` for `UserDatabase` was our last step to get a fully functional database. We can now try it out:
+Mengimplementasikan `Destruct<T>` untuk `UserDatabase` adalah langkah terakhir kita untuk mendapatkan database yang sepenuhnya fungsional. Sekarang kita bisa mencobanya:
 
 ```rust
 {{#rustdoc_include ../listings/ch03-common-collections/no_listing_12_dict_struct_member/src/lib.cairo:main}}
 ```
 
-## Summary
+## Ringkasan
 
-Well done! You finished this chapter on arrays and dictionaries in Cairo. These data structures may be a bit challenging to grasp, but they are really useful.
+Selamat! Anda telah menyelesaikan bab ini tentang array dan kamus di Cairo. Struktur data ini mungkin sedikit sulit dipahami, tetapi mereka sangat berguna.
 
-When you’re ready to move on, we’ll talk about a concept that Cairo shares with Rust and that _doesn’t_ commonly exist in other programming languages: ownership.
+Ketika Anda siap untuk melanjutkan, kita akan membahas konsep yang Cairo bagikan dengan Rust dan _tidak biasa_ ada di bahasa pemrograman lain: kepemilikan.

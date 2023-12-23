@@ -58,3 +58,10 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
+
+      - uses: Ilshidur/action-discord@master
+        name: Discord Notification
+        env:
+            DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+            args: "The project {{ EVENT_PAYLOAD.repository.full_name }} has been deployed."

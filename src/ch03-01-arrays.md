@@ -1,19 +1,20 @@
-## Arrays
+## Array
 
-An array is a collection of elements of the same type. You can create and use array methods by using the `ArrayTrait` trait from the core library.
+Sebuah array adalah kumpulan elemen yang memiliki tipe yang sama. Anda dapat membuat dan menggunakan metode array dengan menggunakan `ArrayTrait` trait dari pustaka inti.
 
-An important thing to note is that arrays have limited modification options. Arrays are, in fact, queues whose values can't be modified.
-This has to do with the fact that once a memory slot is written to, it cannot be overwritten, but only read from it. You can only append items to the end of an array and remove items from the front using `pop_front`.
+Hal penting yang perlu dicatat adalah bahwa array memiliki opsi modifikasi yang terbatas. Array sebenarnya adalah antrian nilai yang tidak dapat diubah.
 
-### Creating an Array
+Ini terkait dengan fakta bahwa setelah suatu slot memori ditulis, itu tidak dapat ditimpa, tetapi hanya dapat dibaca. Anda hanya dapat menambahkan item ke ujung array dan menghapus item dari depan menggunakan `pop_front`.
 
-Creating an Array is done with the `ArrayTrait::new()` call. Here is an example of the creation of an array to which we append 3 elements:
+### Membuat Array
+
+Membuat array dilakukan dengan panggilan `ArrayTrait::new()`. Berikut adalah contoh pembuatan array yang kami tambahkan 3 elemen ke dalamnya:
 
 ```rust
 {{#include ../listings/ch03-common-collections/no_listing_00_array_new_append/src/lib.cairo}}
 ```
 
-When required, you can pass the expected type of items inside the array when instantiating the array like this, or explicitly define the type of the variable.
+Jika diperlukan, Anda dapat menyertakan tipe yang diharapkan dari item di dalam array saat menginstansiasi array seperti ini, atau secara eksplisit menentukan tipe variabelnya.
 
 ```rust, noplayground
 let mut arr = ArrayTrait::<u128>::new();
@@ -23,62 +24,59 @@ let mut arr = ArrayTrait::<u128>::new();
 let mut arr:Array<u128> = ArrayTrait::new();
 ```
 
-### Updating an Array
+### Memperbarui Array
 
-#### Adding Elements
+#### Menambahkan Elemen
 
-To add an element to the end of an array, you can use the `append()` method:
+Untuk menambahkan elemen ke ujung array, Anda dapat menggunakan metode `append()`:
 
 ```rust
 {{#rustdoc_include ../listings/ch03-common-collections/no_listing_00_array_new_append/src/lib.cairo:5}}
 ```
 
-#### Removing Elements
+#### Menghapus Elemen
 
-You can only remove elements from the front of an array by using the `pop_front()` method.
-This method returns an `Option` containing the removed element, or `Option::None` if the array is empty.
+Anda hanya dapat menghapus elemen dari depan array dengan menggunakan metode `pop_front()`. Metode ini mengembalikan `Option` yang berisi elemen yang dihapus, atau `Option::None` jika array kosong.
 
 ```rust
 {{#include ../listings/ch03-common-collections/no_listing_01_array_pop_front/src/lib.cairo}}
 ```
 
-The above code will print `10` as we remove the first element that was added.
+Kode di atas akan mencetak `10` karena kita menghapus elemen pertama yang ditambahkan.
 
-In Cairo, memory is immutable, which means that it is not possible to modify the elements of an array once they've been added. You can only add elements to the end of an array and remove elements from the front of an array. These operations do not require memory mutation, as they involve updating pointers rather than directly modifying the memory cells.
+Di Cairo, memori bersifat tidak dapat diubah, yang berarti tidak mungkin mengubah elemen-elemen array setelah ditambahkan. Anda hanya dapat menambahkan elemen ke ujung array dan menghapus elemen dari depan array. Operasi-operasi ini tidak memerlukan mutasi memori, karena melibatkan pembaruan pointer daripada langsung mengubah sel-sel memori.
 
-### Reading Elements from an Array
+### Membaca Elemen dari Array
 
-To access array elements, you can use `get()` or `at()` array methods that return different types. Using `arr.at(index)` is equivalent to using the subscripting operator `arr[index]`.
+Untuk mengakses elemen-elemen array, Anda dapat menggunakan metode array `get()` atau `at()` yang mengembalikan tipe yang berbeda. Menggunakan `arr.at(index)` setara dengan menggunakan operator subscripting `arr[index]`.
 
-The `get` function returns an `Option<Box<@T>>`, which means it returns an option to a Box type (Cairo's smart-pointer type) containing a snapshot to the element at the specified index if that element exists in the array. If the element doesn't exist, `get` returns `None`. This method is useful when you expect to access indices that may not be within the array's bounds and want to handle such cases gracefully without panics. Snapshots will be explained in more detail in the [References and Snapshots](ch04-02-references-and-snapshots.md) chapter.
+Fungsi `get` mengembalikan `Option<Box<@T>>`, yang berarti mengembalikan opsi untuk tipe Box (tipe smart-pointer Cairo) yang berisi snapshot elemen pada indeks yang ditentukan jika elemen tersebut ada dalam array. Jika elemen tidak ada, `get` mengembalikan `None`. Metode ini berguna ketika Anda berharap mengakses indeks yang mungkin tidak berada dalam batas array dan ingin menangani kasus tersebut dengan lembut tanpa panic. Snapshot akan dijelaskan lebih detail dalam bab [Referensi dan Snapshot](ch04-02-references-and-snapshots.md).
 
-The `at` function, on the other hand, directly returns a snapshot to the element at the specified index using the `unbox()` operator to extract the value stored in a box. If the index is out of bounds, a panic error occurs. You should only use `at` when you want the program to panic if the provided index is out of the array's bounds, which can prevent unexpected behavior.
+Fungsi `at`, di sisi lain, langsung mengembalikan snapshot elemen pada indeks yang ditentukan menggunakan operator `unbox()` untuk mengekstrak nilai yang disimpan dalam kotak. Jika indeks di luar batas, terjadi kesalahan panic. Anda sebaiknya hanya menggunakan `at` ketika Anda ingin program panic jika indeks yang diberikan berada di luar batas array, yang dapat mencegah perilaku yang tidak terduga.
 
-In summary, use `at` when you want to panic on out-of-bounds access attempts, and use `get` when you prefer to handle such cases gracefully without panicking.
+Secara ringkas, gunakan `at` ketika Anda ingin panic pada percobaan akses di luar batas, dan gunakan `get` ketika Anda lebih suka menangani kasus tersebut dengan lembut tanpa panic.
 
 ```rust
 {{#include ../listings/ch03-common-collections/no_listing_02_array_at/src/lib.cairo}}
 ```
 
-In this example, the variable named `first` will get the value `0` because that
-is the value at index `0` in the array. The variable named `second` will get
-the value `1` from index `1` in the array.
+Dalam contoh ini, variabel yang dinamai `first` akan mendapatkan nilai `0` karena itu adalah nilai pada indeks `0` dalam array. Variabel yang dinamai `second` akan mendapatkan nilai `1` dari indeks `1` dalam array.
 
-Here is an example with the `get()` method:
+Berikut adalah contoh dengan metode `get()`:
 
 ```rust
 {{#include ../listings/ch03-common-collections/no_listing_03_array_get/src/lib.cairo}}
 ```
 
-### Size related methods
+### Metode Terkait Ukuran
 
-To determine the number of elements in an array, use the `len()` method. The return is of type `usize`.
+Untuk menentukan jumlah elemen dalam sebuah array, gunakan metode `len()`. Hasilnya adalah tipe `usize`.
 
-If you want to check if an array is empty or not, you can use the `is_empty()` method, which returns `true` if the array is empty and `false` otherwise.
+Jika Anda ingin memeriksa apakah sebuah array kosong atau tidak, Anda dapat menggunakan metode `is_empty()`, yang mengembalikan `true` jika array kosong dan `false` sebaliknya.
 
-### Storing multiple types with Enums
+### Menyimpan Tipe-Tipe Berbeda dengan Enums
 
-If you want to store elements of different types in an array, you can use an `Enum` to define a custom data type that can hold multiple types. Enums will be explained in more detail in the [Enums and Pattern Matching](ch06-00-enums-and-pattern-matching.md) chapter.
+Jika Anda ingin menyimpan elemen-elemen dengan tipe yang berbeda dalam sebuah array, Anda dapat menggunakan `Enum` untuk mendefinisikan tipe data kustom yang dapat menyimpan tipe-tipe berbeda. Enums akan dijelaskan lebih detail dalam bab [Enums and Pattern Matching](ch06-00-enums-and-pattern-matching.md).
 
 ```rust
 {{#include ../listings/ch03-common-collections/no_listing_04_array_with_enums/src/lib.cairo}}
@@ -86,13 +84,13 @@ If you want to store elements of different types in an array, you can use an `En
 
 ### Span
 
-`Span` is a struct that represents a snapshot of an `Array`. It is designed to provide safe and controlled access to the elements of an array without modifying the original array. Span is particularly useful for ensuring data integrity and avoiding borrowing issues when passing arrays between functions or when performing read-only operations (cf. [References and Snapshots](ch04-02-references-and-snapshots.md))
+`Span` adalah struktur data yang mewakili snapshot dari sebuah `Array`. Dirancang untuk memberikan akses aman dan terkontrol ke elemen-elemen array tanpa memodifikasi array asli. Span sangat berguna untuk memastikan integritas data dan menghindari masalah peminjaman saat melewatkan array antar fungsi atau saat melakukan operasi hanya baca (lihat [References and Snapshots](ch04-02-references-and-snapshots.md)).
 
-All methods provided by `Array` can also be used with `Span`, with the exception of the `append()` method.
+Semua metode yang disediakan oleh `Array` juga dapat digunakan dengan `Span`, kecuali metode `append()`.
 
-#### Turning an Array into span
+#### Mengubah Array menjadi Span
 
-To create a `Span` of an `Array`, call the `span()` method:
+Untuk membuat `Span` dari sebuah `Array`, panggil metode `span()`:
 
 ```rust
 {{#rustdoc_include ../listings/ch03-common-collections/no_listing_05_array_span/src/lib.cairo:3}}
