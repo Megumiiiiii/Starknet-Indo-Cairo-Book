@@ -1,67 +1,44 @@
-## Defining Modules to Control Scope
+## Mendefinisikan Modul untuk Mengendalikan Cakupan
 
-In this section, we’ll talk about modules and other parts of the module system,
-namely _paths_ that allow you to name items and the `use` keyword that brings a
-path into scope.
+Pada bagian ini, kita akan membicarakan tentang modul dan bagian-bagian lain dari sistem modul, yaitu _paths_ yang memungkinkan Anda untuk memberi nama pada item-item dan kata kunci `use` yang membawa sebuah path ke dalam cakupan.
 
-First, we’re going to start with a list of rules for easy reference when you’re
-organizing your code in the future. Then we’ll explain each of the rules in
-detail.
+Pertama, kita akan memulai dengan daftar aturan sebagai referensi mudah saat Anda mengorganisir kode Anda di masa mendatang. Kemudian, kita akan menjelaskan setiap aturan tersebut secara rinci.
 
-### Modules Cheat Sheet
+### Cheet Sheet Modul
 
-Here we provide a quick reference on how modules, paths and the `use` keyword
-work in the compiler, and how most developers organize their
-code. We’ll be going through examples of each of these rules throughout this
-chapter, but this is a great place to refer to as a reminder of how modules
-work. You can create a new Scarb project with `scarb new backyard` to follow along.
+Di sini, kami memberikan referensi cepat tentang bagaimana modul, paths, dan kata kunci `use` bekerja dalam kompiler, serta bagaimana sebagian besar pengembang mengorganisir kode mereka. Kami akan melalui contoh-contoh dari setiap aturan ini sepanjang bab ini, namun ini adalah tempat yang bagus untuk merujuk sebagai pengingat tentang cara kerja modul. Anda dapat membuat proyek Scarb baru dengan `scarb new backyard` untuk mengikuti penjelasan ini.
 
-- **Start from the crate root**: When compiling a crate, the compiler first
-  looks in the crate root file (_src/lib.cairo_) for code to compile.
-- **Declaring modules**: In the crate root file, you can declare new modules;
-  say, you declare a “garden” module with `mod garden;`. The compiler will look
-  for the module’s code in these places:
+- **Mulai dari crate root**: Saat mengompilasi sebuah crate, kompiler pertama-tama melihat di file crate root (_src/lib.cairo_) untuk kode yang akan dikompilasi.
+- **Deklarasi modul**: Di file crate root, Anda dapat mendeklarasikan modul-modul baru; misalnya, Anda mendeklarasikan modul "garden" dengan `mod garden;`. Kompiler akan mencari kode modul tersebut di tempat-tempat berikut:
 
-  - Inline, within curly brackets that replace the semicolon following `mod garden;`.
+  - Secara inline, dalam kurung kurawal yang menggantikan titik koma setelah `mod garden;`.
 
     ```rust,noplayground
-      // crate root file (src/lib.cairo)
+      // file crate root (src/lib.cairo)
         mod garden {
-        // code defining the garden module goes here
+        // kode yang mendefinisikan modul garden ada di sini
         }
     ```
 
-  - In the file _src/garden.cairo_
+  - Di dalam file _src/garden.cairo_
 
-- **Declaring submodules**: In any file other than the crate root, you can
-  declare submodules. For example, you might declare `mod vegetables;` in
-  _src/garden.cairo_. The compiler will look for the submodule’s code within the
-  directory named for the parent module in these places:
+- **Deklarasi submodul**: Di file selain crate root, Anda dapat mendeklarasikan submodul. Sebagai contoh, Anda mungkin mendeklarasikan `mod vegetables;` di _src/garden.cairo_. Kompiler akan mencari kode submodul tersebut di dalam direktori yang dinamai sesuai dengan modul induk pada tempat-tempat berikut:
 
-  - Inline, directly following `mod vegetables`, within curly brackets instead
-    of the semicolon.
+  - Secara inline, langsung mengikuti `mod vegetables`, di dalam kurung kurawal sebagai pengganti titik koma.
 
     ```rust,noplayground
-    // src/garden.cairo file
+    // file src/garden.cairo
     mod vegetables {
-        // code defining the vegetables submodule goes here
+        // kode yang mendefinisikan submodul vegetables ada di sini
     }
     ```
 
-  - In the file _src/garden/vegetables.cairo_
+  - Di dalam file _src/garden/vegetables.cairo_
 
-- **Paths to code in modules**: Once a module is part of your crate, you can
-  refer to code in that module from anywhere else in that same crate, using the path
-  to the code. For example, an `Asparagus` type in the garden vegetables module would be found at
-  `backyard::garden::vegetables::Asparagus`.
-- **The `use` keyword**: Within a scope, the `use` keyword creates shortcuts to
-  items to reduce repetition of long paths. In any scope that can refer to
-  `backyard::garden::vegetables::Asparagus`, you can create a shortcut with
-  `use backyard::garden::vegetables::Asparagus;` and from then on you only need to
-  write `Asparagus` to make use of that type in the scope.
+- **Paths menuju kode dalam modul**: Setelah sebuah modul menjadi bagian dari crate Anda, Anda dapat merujuk pada kode dalam modul tersebut dari mana pun di dalam crate yang sama, menggunakan path ke kode tersebut. Sebagai contoh, sebuah tipe `Asparagus` dalam modul sayuran taman akan ditemukan pada `backyard::garden::vegetables::Asparagus`.
+- **Kata kunci `use`**: Dalam sebuah cakupan, kata kunci `use` menciptakan pintasan ke item untuk mengurangi pengulangan dari path yang panjang. Di dalam cakupan yang dapat merujuk ke `backyard::garden::vegetables::Asparagus`, Anda dapat membuat pintasan dengan `use backyard::garden::vegetables::Asparagus;` dan setelah itu Anda hanya perlu menulis `Asparagus` untuk menggunakan tipe tersebut dalam cakupan tersebut.
 
-Here we create a crate named `backyard` that illustrates these rules. The
-crate’s directory, also named `backyard`, contains these files and directories:
+Berikut ini kami membuat sebuah kardus yang diberi nama `backyard` yang menggambarkan aturan-aturan ini. Direktori kardus, juga bernama `backyard`, berisi file dan direktori-direktori berikut:
 
 ```text
 backyard/
@@ -73,80 +50,63 @@ backyard/
     └── lib.cairo
 ```
 
-The crate root file in this case is _src/lib.cairo_, and it contains:
+File root kardus dalam hal ini adalah _src/lib.cairo_, dan berisi:
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch07-managing-cairo-projects-with-packages-crates-and-modules/no_listing_01_lib/src/lib.cairo}}
 ```
 
-The `mod garden;` line tells the compiler to include the code it finds in _src/garden.cairo_, which is:
+Baris `mod garden;` memberi tahu kompiler untuk menyertakan kode yang ditemukan di _src/garden.cairo_, yang berisi:
 
-<span class="filename">Filename: src/garden.cairo</span>
+<span class="filename">Nama File: src/garden.cairo</span>
 
 ```rust,noplayground
 mod vegetables;
 ```
 
-Here, `mod vegetables;` means the code in _src/garden/vegetables.cairo_ is
-included too. That code is:
+Di sini, `mod vegetables;` berarti kode di _src/garden/vegetables.cairo_ juga disertakan. Kode itu adalah:
 
 ```rust,noplayground
 {{#include ../listings/ch07-managing-cairo-projects-with-packages-crates-and-modules/no_listing_02_garden/src/lib.cairo}}
 ```
 
-The line `use garden::vegetables::Asparagus;` lets us use bring the `Asparagus` type into scope,
-so we can use it in the `main` function.
+Baris `use garden::vegetables::Asparagus;` memungkinkan kita membawa tipe `Asparagus` ke dalam lingkup, sehingga kita dapat menggunakannya di dalam fungsi `main`.
 
-Now let’s get into the details of these rules and demonstrate them in action!
+Sekarang mari kita masuk ke dalam rincian aturan-aturan ini dan tunjukkan mereka dalam tindakan!
 
-### Grouping Related Code in Modules
+### Mengelompokkan Kode yang Berkaitan dalam Modul
 
-_Modules_ let us organize code within a crate for readability and easy reuse.
-As an example, let’s write a library crate that provides the functionality of a
-restaurant. We’ll define the signatures of functions but leave their bodies
-empty to concentrate on the organization of the code, rather than the
-implementation of a restaurant.
+_Modul_ memungkinkan kita mengorganisir kode dalam sebuah kardus untuk keterbacaan dan penggunaan ulang yang mudah. Sebagai contoh, mari kita tulis kardus pustaka yang menyediakan fungsionalitas sebuah restoran. Kita akan menentukan tanda tangan fungsi tetapi meninggalkan tubuhnya kosong untuk fokus pada organisasi kode, bukan implementasi restoran.
 
-In the restaurant industry, some parts of a restaurant are referred to as
-_front of house_ and others as _back of house_. Front of house is where
-customers are; this encompasses where the hosts seat customers, servers take
-orders and payment, and bartenders make drinks. Back of house is where the
-chefs and cooks work in the kitchen, dishwashers clean up, and managers do
-administrative work.
+Dalam industri restoran, beberapa bagian dari restoran disebut sebagai _front of house_ dan yang lain sebagai _back of house_. Front of house adalah tempat pelanggan berada; ini mencakup tempat tuan rumah duduk, pelayan mengambil pesanan dan pembayaran, dan barman membuat minuman. Back of house adalah tempat koki dan karyawan dapur bekerja, pencuci piring membersihkan, dan manajer melakukan pekerjaan administratif.
 
-To structure our crate in this way, we can organize its functions into nested
-modules. Create a new package named `restaurant` by running `scarb new restaurant`; then enter the code in Listing 7-1 into _src/lib.cairo_ to
-define some modules and function signatures. Here’s the front of house section:
+Untuk mengorganisir kardus kita dengan cara ini, kita dapat mengatur fungsinya ke dalam modul-modul bertingkat. Buat paket baru dengan nama `restaurant` dengan menjalankan `scarb new restaurant`; kemudian masukkan kode pada Listing 7-1 ke dalam _src/lib.cairo_ untuk mendefinisikan beberapa modul dan tanda tangan fungsi. Berikut adalah bagian front of house:
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 ```rust,noplayground
 {{#include ../listings/ch07-managing-cairo-projects-with-packages-crates-and-modules/listing_06_01/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 7-1: A `front_of_house` module containing other
-modules that then contain functions</span>
+<span class="caption">Listing 7-1: Modul `front_of_house` yang berisi modul-modul lain yang kemudian berisi fungsi-fungsi</span>
 
-We define a module with the `mod` keyword followed by the name of the module
-(in this case, `front_of_house`). The body of the module then goes inside curly
-brackets. Inside modules, we can place other modules, as in this case with the
-modules `hosting` and `serving`. Modules can also hold definitions for other
-items, such as structs, enums, constants, traits, and—as in Listing
-6-1—functions.
+Kita mendefinisikan modul dengan kata kunci `mod` diikuti oleh nama modul
+(dalam hal ini, `front_of_house`). Tubuh modul kemudian ditempatkan di dalam kurung kurawal. Di dalam modul, kita dapat menempatkan modul-modul lain, seperti dalam hal ini dengan modul-modul `hosting` dan `serving`. Modul juga dapat berisi definisi untuk item lain, seperti struktur, enumerasi, konstan, trait, dan—seperti pada Listing
+6-1—fungsi.
 
-By using modules, we can group related definitions together and name why
-they’re related. Programmers using this code can navigate the code based on the
-groups rather than having to read through all the definitions, making it easier
-to find the definitions relevant to them. Programmers adding new functionality
-to this code would know where to place the code to keep the program organized.
+Dengan menggunakan modul, kita dapat mengelompokkan definisi yang berkaitan bersama dan memberi nama mengapa
+mereka berkaitan. Programer yang menggunakan kode ini dapat menavigasi kode berdasarkan
+kelompok daripada harus membaca semua definisi, membuatnya lebih mudah
+untuk menemukan definisi yang relevan bagi mereka. Programer yang menambahkan fungsionalitas baru
+ke dalam kode ini akan tahu di mana menempatkan kode untuk menjaga agar program terorganisir.
 
-Earlier, we mentioned that _src/lib.cairo_ is called the crate
-root. The reason for this name is that the content of this file form a module named after the crate name at the root of the crate’s module structure,
-known as the _module tree_.
+Sebelumnya, kami menyebutkan bahwa _src/lib.cairo_ disebut sebagai root kardus.
+Nama ini diberikan karena isi file ini membentuk modul yang dinamai sesuai nama kardus di root struktur modul kardus tersebut,
+dikenal sebagai _pohon modul_.
 
-Listing 7-2 shows the module tree for the structure in Listing 7-1.
+Listing 7-2 menunjukkan pohon modul untuk struktur pada Listing 7-1.
 
 ```text
 restaurant
@@ -160,18 +120,17 @@ restaurant
          └── take_payment
 ```
 
-<span class="caption">Listing 7-2: The module tree for the code in Listing
+<span class="caption">Listing 7-2: Pohon modul untuk kode pada Listing
 6-1</span>
 
-This tree shows how some of the modules nest inside one another; for example,
-`hosting` nests inside `front_of_house`. The tree also shows that some modules
-are _siblings_ to each other, meaning they’re defined in the same module;
-`hosting` and `serving` are siblings defined within `front_of_house`. If module
-A is contained inside module B, we say that module A is the _child_ of module B
-and that module B is the _parent_ of module A. Notice that the entire module
-tree is rooted under the explicit name of the crate `restaurant`.
+Pohon ini menunjukkan bagaimana beberapa modul bersarang di dalam yang lain; misalnya,
+`hosting` bersarang di dalam `front_of_house`. Pohon ini juga menunjukkan bahwa beberapa modul
+adalah _sibling_ satu sama lain, yang berarti mereka didefinisikan di dalam modul yang sama;
+`hosting` dan `serving` adalah sibling yang didefinisikan di dalam `front_of_house`. Jika modul
+A berada di dalam modul B, kita katakan bahwa modul A adalah _child_ dari modul B
+dan bahwa modul B adalah _parent_ dari modul A. Perhatikan bahwa seluruh pohon modul berakar di bawah nama eksplisit kardus `restaurant`.
 
-The module tree might remind you of the filesystem’s directory tree on your
-computer; this is a very apt comparison! Just like directories in a filesystem,
-you use modules to organize your code. And just like files in a directory, we
-need a way to find our modules.
+Pohon modul mungkin mengingatkan Anda pada pohon direktori sistem file di komputer Anda;
+ini adalah perbandingan yang sangat tepat! Sama seperti direktori dalam sistem file,
+Anda menggunakan modul untuk mengorganisir kode Anda. Dan sama seperti file dalam sebuah direktori,
+kita membutuhkan cara untuk menemukan modul-modul kita.

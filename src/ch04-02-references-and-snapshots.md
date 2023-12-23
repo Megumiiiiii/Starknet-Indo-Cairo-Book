@@ -1,94 +1,80 @@
-## References and Snapshots
+## Referensi dan Cuplikan
 
-The issue with the tuple code in Listing 4-5 is that we have to return the
-`Array` to the calling function so we can still use the `Array` after the
-call to `calculate_length`, because the `Array` was moved into
-`calculate_length`.
+Permasalahan pada kode tuple dalam Listing 4-5 adalah kita harus mengembalikan `Array` ke fungsi pemanggil sehingga kita masih bisa menggunakan `Array` setelah pemanggilan ke `calculate_length`, karena `Array` telah dipindahkan ke dalam `calculate_length`.
 
-### Snapshots
+### Cuplikan
 
-In the previous chapter, we talked about how Cairo's ownership system prevents
-us from using a variable after we've moved it, protecting us from potentially
-writing twice to the same memory cell. However, it's not very convenient.
-Let's see how we can retain ownership of the variable in the calling function using snapshots.
+Pada bab sebelumnya, kita membahas bagaimana sistem kepemilikan Cairo mencegah kita menggunakan variabel setelah kita telah memindahkannya, melindungi kita dari potensi menulis dua kali ke sel memori yang sama. Namun, ini tidak begitu nyaman. Mari kita lihat bagaimana kita dapat mempertahankan kepemilikan variabel dalam fungsi pemanggil dengan menggunakan snapshot.
 
-In Cairo, a snapshot is an immutable view of a value at a certain point in time.
-Recall that memory is immutable, so modifying a value actually creates a new memory cell.
-The old memory cell still exists, and snapshots are variables that refer to that "old" value.
-In this sense, snapshots are a view "into the past".
+Di Cairo, snapshot adalah tampilan tidak berubah dari suatu nilai pada titik waktu tertentu. Ingatlah bahwa memori tidak berubah, sehingga memodifikasi nilai sebenarnya membuat sel memori baru. Sel memori lama masih ada, dan snapshot adalah variabel yang merujuk pada nilai "lama" tersebut. Dalam hal ini, snapshot adalah tampilan "ke masa lalu".
 
-Here is how you would define and use a `calculate_length` function that takes a
-snapshot to an array as a parameter instead of taking ownership of the underlying value. In this example,
-the `calculate_length` function returns the length of the array passed as parameter.
-As we're passing it as a snapshot, which is an immutable view of the array, we can be sure that
-the `calculate_length` function will not mutate the array, and ownership of the array is kept in the main function.
+Berikut adalah bagaimana Anda akan mendefinisikan dan menggunakan fungsi `calculate_length` yang mengambil snapshot ke array sebagai parameter daripada mengambil kepemilikan dari nilai yang mendasarinya. Pada contoh ini, fungsi `calculate_length` mengembalikan panjang array yang dilewatkan sebagai parameter. Karena kita melewatinya sebagai snapshot, yang merupakan tampilan tidak berubah dari array, kita dapat yakin bahwa fungsi `calculate_length` tidak akan mengubah array, dan kepemilikan array tetap ada di dalam fungsi utama.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama file: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch04-understanding-ownership/no_listing_09_snapshots/src/lib.cairo}}
 ```
 
-> Note: It is only possible to call the `len()` method on an array snapshot because it is defined as such in the `ArrayTrait` trait. If you try to call a method that is not defined for snapshots on a snapshot, you will get a compilation error. However, you can call methods expecting a snapshot on non-snapshot types.
+> Catatan: Hanya mungkin untuk memanggil metode `len()` pada snapshot array karena itu didefinisikan seperti itu dalam trait `ArrayTrait`. Jika Anda mencoba memanggil metode yang tidak didefinisikan untuk snapshot pada snapshot, Anda akan mendapatkan kesalahan kompilasi. Namun, Anda dapat memanggil metode yang mengharapkan snapshot pada tipe non-snapshot.
 
-The output of this program is:
+Keluaran dari program ini adalah:
 
 ```shell
 [DEBUG]	                               	(raw: 0)
 
 [DEBUG]	                              	(raw: 1)
 
-Run completed successfully, returning []
+Pengembalian berhasil, mengembalikan []
 ```
 
-First, notice that all the tuple code in the variable declaration and the function return value is gone. Second, note
-that we pass `@arr1` into `calculate_length` and, in its definition, we take `@Array<u128>` rather than `Array<u128>`.
+Pertama, perhatikan bahwa semua kode tuple dalam deklarasi variabel dan nilai kembalian fungsi telah hilang. Kedua, perhatikan bahwa kita melewatkan `@arr1` ke `calculate_length` dan, dalam definisinya, kita menggunakan `@Array<u128>` daripada `Array<u128>`.
 
-Let’s take a closer look at the function call here:
+Mari kita perhatikan lebih dekat panggilan fungsi di sini:
 
 ```rust
 {{#rustdoc_include ../listings/ch04-understanding-ownership/no_listing_09_snapshots/src/lib.cairo:function_call}}
 ```
 
-The `@arr1` syntax lets us create a snapshot of the value in `arr1`. Because a snapshot is an immutable view of a value at a specific point in time, the usual rules of the linear type system are not enforced. In particular, snapshot variables are always `Drop`, never `Destruct`, even dictionary snapshots.
+Sintaks `@arr1` memungkinkan kita membuat snapshot dari nilai dalam `arr1`. Karena snapshot adalah tampilan tidak berubah dari nilai pada titik waktu tertentu, aturan biasa dari sistem tipe linear tidak diberlakukan. Khususnya, variabel snapshot selalu `Drop`, tidak pernah `Destruct`, bahkan snapshot kamus.
 
-Similarly, the signature of the function uses `@` to indicate that the type of the parameter `arr` is a snapshot. Let’s add some explanatory annotations:
+Sama halnya, tanda fungsi menggunakan `@` untuk menunjukkan bahwa tipe dari parameter `arr` adalah snapshot. Mari tambahkan beberapa anotasi penjelas:
 
 ```rust, noplayground
 fn calculate_length(
     array_snapshot: @Array<u128>
-) -> usize { // array_snapshot is a snapshot of an Array
+) -> usize { // array_snapshot adalah snapshot dari Array
     array_snapshot.len()
-} // Here, array_snapshot goes out of scope and is dropped.
-// However, because it is only a view of what the original array `arr` contains, the original `arr` can still be used.
+} // Di sini, array_snapshot keluar dari cakupan dan di-drop.
+// Namun, karena ini hanya merupakan tampilan dari apa yang asli array `arr` berisi, `arr` asli masih bisa digunakan.
 ```
 
-The scope in which the variable `array_snapshot` is valid is the same as any function parameter’s scope, but the underlying value of the snapshot is not dropped when `array_snapshot` stops being used. When functions have snapshots as parameters instead of the actual values, we won’t need to return the values in order to give back ownership of the original value, because we never had it.
+Cakupan di mana variabel `array_snapshot` valid adalah sama dengan cakupan parameter fungsi apa pun, tetapi nilai mendasar dari snapshot tidak di-drop saat `array_snapshot` berhenti digunakan. Ketika fungsi memiliki snapshot sebagai parameter alih-alih nilai sebenarnya, kita tidak perlu mengembalikan nilai tersebut untuk memberikan kepemilikan kembali dari nilai asli, karena kita tidak pernah memiliki kepemilikannya.
 
-#### Desnap Operator
+#### Operator Desnap
 
-To convert a snapshot back into a regular variable, you can use the `desnap` operator `*`, which serves as the opposite of the `@` operator.
+Untuk mengonversi snapshot kembali ke variabel reguler, Anda dapat menggunakan operator `desnap` `*`, yang berfungsi sebagai kebalikan dari operator `@`.
 
-Only `Copy` types can be desnapped. However, in the general case, because the value is not modified, the new variable created by the `desnap` operator reuses the old value, and so desnapping is a completely free operation, just like `Copy`.
+Hanya tipe `Copy` yang dapat didesnap. Namun, dalam kasus umum, karena nilai tidak dimodifikasi, variabel baru yang dibuat oleh operator `desnap` menggunakan kembali nilai lama, sehingga proses desnapping adalah operasi yang sepenuhnya gratis, sama seperti `Copy`.
 
-In the following example, we want to calculate the area of a rectangle, but we don't want to take ownership of the rectangle in the `calculate_area` function, because we might want to use the rectangle again after the function call. Since our function doesn't mutate the rectangle instance, we can pass the snapshot of the rectangle to the function, and then transform the snapshots back into values using the `desnap` operator `*`.
+Pada contoh berikut, kita ingin menghitung luas persegi panjang, tetapi kita tidak ingin mengambil kepemilikan persegi panjang dalam fungsi `calculate_area`, karena kita mungkin ingin menggunakan persegi panjang tersebut lagi setelah pemanggilan fungsi. Karena fungsi kita tidak mengubah instance persegi panjang, kita dapat melewatkan snapshot dari persegi panjang ke fungsi, dan kemudian mengubah snapshot kembali menjadi nilai menggunakan operator `desnap` `*`.
 
 ```rust
 {{#include ../listings/ch04-understanding-ownership/no_listing_10_desnap/src/lib.cairo}}
 ```
 
-But, what happens if we try to modify something we’re passing as snapshot? Try the code in
-Listing 4-6. Spoiler alert: it doesn’t work!
+Namun, apa yang terjadi jika kita mencoba memodifikasi sesuatu yang kita lewati sebagai snapshot? Cobalah kode pada
+Listing 4-6. SPOILER: Ini tidak berhasil!
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama file: src/lib.cairo</span>
 
 ```rust,does_not_compile
 {{#include ../listings/ch04-understanding-ownership/listing_03_06/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 4-6: Attempting to modify a snapshot value</span>
+<span class="caption">Listing 4-6: Mencoba memodifikasi nilai snapshot</span>
 
-Here’s the error:
+Berikut adalah kesalahannya:
 
 ```shell
 error: Invalid left-hand side of assignment.
@@ -97,26 +83,26 @@ error: Invalid left-hand side of assignment.
     ^********^
 ```
 
-The compiler prevents us from modifying values associated to snapshots.
+Kompilator mencegah kita untuk memodifikasi nilai yang terkait dengan snapshot.
 
-### Mutable References
+### Referensi Mutable
 
-We can achieve the behavior we want in Listing 4-6 by using a _mutable reference_ instead of a snapshot. Mutable references are actually mutable values passed to a function that are implicitly returned at the end of the function, returning ownership to the calling context. By doing so, they allow you to mutate the value passed while keeping ownership of it by returning it automatically at the end of the execution.
-In Cairo, a parameter can be passed as _mutable reference_ using the `ref` modifier.
+Kita bisa mencapai perilaku yang kita inginkan pada Listing 4-6 dengan menggunakan _referensi mutable_ alih-alih snapshot. Referensi mutable sebenarnya adalah nilai yang dapat diubah yang dilewatkan ke fungsi yang secara implisit dikembalikan pada akhir fungsi, mengembalikan kepemilikan ke konteks pemanggil. Dengan cara ini, mereka memungkinkan Anda untuk mengubah nilai yang dilewatkan sambil tetap memegang kepemilikannya dengan mengembalikannya secara otomatis pada akhir eksekusi.
+Di Cairo, sebuah parameter dapat dilewati sebagai _referensi mutable_ menggunakan modifier `ref`.
 
-> **Note**: In Cairo, a parameter can only be passed as _mutable reference_ using the `ref` modifier if the variable is declared as mutable with `mut`.
+> **Catatan**: Di Cairo, sebuah parameter hanya dapat dilewati sebagai _referensi mutable_ menggunakan modifier `ref` jika variabel dideklarasikan sebagai mutable dengan `mut`.
 
-In Listing 4-7, we use a mutable reference to modify the value of the `height` and `width` fields of the `Rectangle` instance in the `flip` function.
+Pada Listing 4-7, kita menggunakan referensi mutable untuk mengubah nilai bidang `height` dan `width` dari instan `Rectangle` dalam fungsi `flip`.
 
 ```rust
 {{#include ../listings/ch04-understanding-ownership/listing_03_07/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 4-7: Use of a mutable reference to modify a value</span>
+<span class="caption">Listing 4-7: Penggunaan referensi mutable untuk mengubah nilai</span>
 
-First, we change `rec` to be `mut`. Then we pass a mutable reference of `rec` into `flip` with `ref rec`, and update the function signature to accept a mutable reference with `ref rec: Rectangle`. This makes it very clear that the `flip` function will mutate the value of the `Rectangle` instance passed as parameter.
+Pertama, kita ubah `rec` menjadi `mut`. Kemudian kita lewatkan referensi mutable dari `rec` ke `flip` dengan `ref rec`, dan perbarui tanda tangan fungsi untuk menerima referensi mutable dengan `ref rec: Rectangle`. Ini membuatnya sangat jelas bahwa fungsi `flip` akan mengubah nilai dari instan `Rectangle` yang dilewatkan sebagai parameter.
 
-The output of the program is:
+Keluaran dari program ini adalah:
 
 ```shell
 [DEBUG]
@@ -125,14 +111,14 @@ The output of the program is:
 [DEBUG]	                        (raw: 3)
 ```
 
-As expected, the `height` and `width` fields of the `rec` variable have been swapped.
+Seperti yang diharapkan, bidang `height` dan `width` dari variabel `rec` telah ditukar.
 
-### Small recap
+### Ringkasan Kecil
 
-Let’s recap what we’ve discussed about the linear type system, ownership, snapshots, and references:
+Mari kita ringkas apa yang telah kita diskusikan tentang sistem tipe linear, kepemilikan, snapshot, dan referensi:
 
-- At any given time, a variable can only have one owner.
-- You can pass a variable by-value, by-snapshot, or by-reference to a function.
-- If you pass-by-value, ownership of the variable is transferred to the function.
-- If you want to keep ownership of the variable and know that your function won’t mutate it, you can pass it as a snapshot with `@`.
-- If you want to keep ownership of the variable and know that your function will mutate it, you can pass it as a mutable reference with `ref`.
+- Pada suatu waktu tertentu, sebuah variabel hanya dapat dimiliki oleh satu pemilik.
+- Anda dapat melewati sebuah variabel berdasarkan nilai, snapshot, atau referensi ke fungsi.
+- Jika Anda melewatinya berdasarkan nilai, kepemilikan variabel dipindahkan ke fungsi.
+- Jika Anda ingin tetap memegang kepemilikan variabel dan tahu bahwa fungsi Anda tidak akan memutasi variabel tersebut, Anda dapat melewatinya sebagai snapshot dengan `@`.
+- Jika Anda ingin tetap memegang kepemilikan variabel dan tahu bahwa fungsi Anda akan memutasi variabel tersebut, Anda dapat melewatinya sebagai referensi mutable dengan `ref`.

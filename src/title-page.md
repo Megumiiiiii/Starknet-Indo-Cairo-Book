@@ -1,4 +1,4 @@
-# The Cairo Programming Language
+# Bahasa Pemrograman Cairo
 
 oleh Komunitas Cairo dan [kontributornya](https://github.com/cairo-book/cairo-book.github.io). Terima kasih khusus kepada [Starkware](https://starkware.co/) melalui [OnlyDust](https://www.onlydust.xyz/), dan [Voyager](https://voyager.online/) atas dukungan pembuatan buku ini.
 

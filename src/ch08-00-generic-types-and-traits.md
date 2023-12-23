@@ -1,11 +1,11 @@
-# Generic Types and Traits
+# Tipe dan Trait Generik
 
-Every programming language has tools for effectively handling the duplication of concepts. In Cairo, one such tool is generics: abstract stand-ins for concrete types or other properties. We can express the behavior of generics or how they relate to other generics without knowing what will be in their place when compiling and running the code.
+Setiap bahasa pemrograman memiliki alat untuk mengatasi duplikasi konsep dengan efektif. Di Cairo, salah satu alat tersebut adalah generik: representasi abstrak untuk tipe konkret atau properti lain. Kita dapat menyatakan perilaku generik atau bagaimana mereka berhubungan dengan generik lain tanpa mengetahui apa yang akan menggantikan mereka saat mengompilasi dan menjalankan kode.
 
-Functions, structs, enums and traits can incorporate generic types as part of their definition instead of a concrete type like `u32` or `ContractAddress`.
+Fungsi, struktur, enumerasi, dan trait dapat menggunakan tipe generik sebagai bagian dari definisi mereka daripada tipe konkret seperti `u32` atau `ContractAddress`.
 
-Generics allow us to replace specific types with a placeholder that represents multiple types to remove code duplication.
+Generik memungkinkan kita untuk mengganti tipe tertentu dengan placeholder yang mewakili beberapa tipe untuk menghilangkan duplikasi kode.
 
-For each concrete type that replaces a generic type the compiler creates a new definition, reducing development time for the programmer, but code duplication at compile level still exists. This may be of importance if you are writing Starknet contracts and using a generic for multiple types which will cause contract size to increment.
+Untuk setiap tipe konkret yang menggantikan tipe generik, kompiler membuat definisi baru, mengurangi waktu pengembangan bagi pemrogram, tetapi duplikasi kode pada tingkat kompilasi masih ada. Hal ini mungkin penting jika Anda menulis kontrak Starknet dan menggunakan generik untuk beberapa tipe yang akan menyebabkan peningkatan ukuran kontrak.
 
-Then you’ll learn how to use traits to define behavior in a generic way. You can combine traits with generic types to constrain a generic type to accept only those types that have a particular behavior, as opposed to just any type.
+Selanjutnya, Anda akan belajar cara menggunakan trait untuk mendefinisikan perilaku secara generik. Anda dapat menggabungkan trait dengan tipe generik untuk membatasi tipe generik agar hanya menerima tipe-tipe yang memiliki perilaku tertentu, daripada hanya tipe apa pun.

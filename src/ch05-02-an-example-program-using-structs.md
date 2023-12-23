@@ -1,18 +1,18 @@
-# An Example Program Using Structs
+# Contoh Program Menggunakan Structs
 
-To understand when we might want to use structs, let’s write a program that calculates the area of a rectangle. We’ll start by using single variables, and then refactor the program until we’re using structs instead.
+Untuk memahami kapan kita sebaiknya menggunakan structs, mari kita tulis sebuah program yang menghitung luas dari sebuah persegi panjang. Kita akan mulai dengan menggunakan variabel tunggal, dan kemudian merefactor program tersebut hingga kita menggunakan structs.
 
-Let’s make a new project with Scarb called _rectangles_ that will take the width and height of a rectangle specified in pixels and calculate the area of the rectangle. Listing 5-6 shows a short program with one way of doing exactly that in our project’s _src/lib.cairo_.
+Mari buat sebuah proyek baru dengan Scarb yang disebut _rectangles_ yang akan mengambil lebar dan tinggi dari sebuah persegi panjang yang ditentukan dalam piksel dan menghitung luas dari persegi panjang tersebut. Listing 5-6 menunjukkan sebuah program pendek dengan salah satu cara untuk melakukan hal tersebut dalam proyek kita pada _src/lib.cairo_.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch05-using-structs-to-structure-related-data/listing_04_06_no_struct/src/lib.cairo:all}}
 ```
 
-<span class="caption">Listing 5-6: Calculating the area of a rectangle specified by separate width and height variables</span>
+<span class="caption">Listing 5-6: Menghitung luas dari sebuah persegi panjang yang ditentukan oleh variabel lebar dan tinggi terpisah</span>
 
-Now run the program with `scarb cairo-run --available-gas=200000000`:
+Sekarang jalankan program dengan `scarb cairo-run --available-gas=200000000`:
 
 ```bash
 $ scarb cairo-run --available-gas=200000000
@@ -21,51 +21,51 @@ $ scarb cairo-run --available-gas=200000000
 Run completed successfully, returning []
 ```
 
-This code succeeds in figuring out the area of the rectangle by calling the `area` function with each dimension, but we can do more to make this code clear and readable.
+Kode ini berhasil menghitung luas dari persegi panjang dengan memanggil fungsi `area` dengan setiap dimensi, tetapi kita dapat melakukan lebih banyak lagi untuk membuat kode ini lebih jelas dan mudah dibaca.
 
-The issue with this code is evident in the signature of `area`:
+Permasalahan dengan kode ini terlihat pada tanda tangan dari `area`:
 
 ```rust,noplayground
 {{#include ../listings/ch05-using-structs-to-structure-related-data/listing_04_06_no_struct/src/lib.cairo:here}}
 ```
 
-The `area` function is supposed to calculate the area of one rectangle, but the function we wrote has two parameters, and it’s not clear anywhere in our program that the parameters are related. It would be more readable and more manageable to group width and height together. We’ve already discussed one way we might do that in [Chapter 2](ch02-02-data-types.html#the-tuple-type): using tuples.
+Fungsi `area` seharusnya menghitung luas dari satu persegi panjang, namun fungsi yang kita tulis memiliki dua parameter, dan tidak jelas di mana pun dalam program kita bahwa parameter tersebut saling terkait. Akan lebih mudah dibaca dan dikelola jika kita mengelompokkan lebar dan tinggi bersama-sama. Kami telah membahas satu cara yang mungkin kita lakukan dalam [Bab 2](ch02-02-data-types.html#the-tuple-type): menggunakan tuples.
 
-## Refactoring with Tuples
+## Merefactor dengan Tuples
 
-Listing 5-7 shows another version of our program that uses tuples.
+Listing 5-7 menunjukkan versi lain dari program kita yang menggunakan tuples.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch05-using-structs-to-structure-related-data/listing_04_07_w_tuples/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 5-7: Specifying the width and height of the rectangle with a tuple</span>
+<span class="caption">Listing 5-7: Menentukan lebar dan tinggi dari persegi panjang dengan sebuah tuple</span>
 
-In one way, this program is better. Tuples let us add a bit of structure, and we’re now passing just one argument. But in another way, this version is less clear: tuples don’t name their elements, so we have to index into the parts of the tuple, making our calculation less obvious.
+Dalam satu aspek, program ini lebih baik. Tuples memungkinkan kita untuk menambah sedikit struktur, dan sekarang kita hanya melewatkan satu argumen. Namun dalam aspek lain, versi ini kurang jelas: tuples tidak memberi nama pada elemennya, sehingga kita harus mengindeks ke bagian-bagian dari tuple, membuat perhitungan kita kurang jelas.
 
-Mixing up the width and height wouldn’t matter for the area calculation, but if we want to calculate the difference, it would matter! We would have to keep in mind that `width` is the tuple index `0` and `height` is the tuple index `1`. This would be even harder for someone else to figure out and keep in mind if they were to use our code. Because we haven’t conveyed the meaning of our data in our code, it’s now easier to introduce errors.
+Membingungkan lebar dan tinggi tidak akan masalah untuk perhitungan luas, tetapi jika kita ingin menghitung perbedaannya, itu akan masalah! Kita harus ingat bahwa `lebar` adalah indeks tuple `0` dan `tinggi` adalah indeks tuple `1`. Ini akan menjadi lebih sulit bagi orang lain untuk memahami dan diingat jika mereka menggunakan kode kita. Karena kita tidak menyampaikan makna dari data kita dalam kode kita, sekarang lebih mudah untuk memperkenalkan kesalahan.
 
-## Refactoring with Structs: Adding More Meaning
+## Merefactor dengan Structs: Menambah Makna Lebih Banyak
 
-We use structs to add meaning by labeling the data. We can transform the tuple we’re using into a struct with a name for the whole as well as names for the parts.
+Kita menggunakan structs untuk menambah makna dengan memberi label pada data tersebut. Kita dapat mengubah tuple yang kita gunakan menjadi sebuah struct dengan nama untuk keseluruhannya serta nama untuk bagian-bagiannya.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch05-using-structs-to-structure-related-data/listing_04_08_w_structs/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 5-8: Defining a `Rectangle` struct</span>
+<span class="caption">Listing 5-8: Mendefinisikan sebuah struct `Rectangle`</span>
 
-Here we’ve defined a struct and named it `Rectangle`. Inside the curly brackets, we defined the fields as `width` and `height`, both of which have type `u64`. Then, in `main`, we created a particular instance of `Rectangle` that has a width of `30` and a height of `10`. Our `area` function is now defined with one parameter, which we’ve named `rectangle` which is of type `Rectangle` struct. We can then access the fields of the instance with dot notation, and it gives descriptive names to the values rather than using the tuple index values of `0` and `1`.
+Di sini kita telah mendefinisikan sebuah struct dan memberinya nama `Rectangle`. Di dalam kurung kurawal, kita mendefinisikan fields sebagai `lebar` dan `tinggi`, kedua-duanya memiliki tipe `u64`. Kemudian, di `main`, kita membuat sebuah instance tertentu dari `Rectangle` yang memiliki lebar `30` dan tinggi `10`. Fungsi `area` kita sekarang didefinisikan dengan satu parameter, yang kita namakan `persegiPanjang` yang merupakan tipe struct `Rectangle`. Kita dapat mengakses fields dari instance dengan notasi titik, dan ini memberikan nama yang deskriptif pada nilai-nilai tersebut daripada menggunakan nilai indeks tuple `0` dan `1`.
 
-## Adding Useful Functionality with Trait
+## Menambah Fungsionalitas Berguna dengan Trait
 
-It’d be useful to be able to print an instance of `Rectangle` while we’re debugging our program and see the values for all its fields. Listing 5-9 tries using the `print` as we have used in previous chapters. This won’t work.
+Akan berguna untuk dapat mencetak sebuah instance dari `Rectangle` saat kita sedang melakukan debugging pada program kita dan melihat nilai-nilai untuk semua fieldsnya. Listing 5-9 mencoba menggunakan `print` seperti yang telah kita gunakan pada bab-bab sebelumnya. Ini tidak akan berhasil.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 <!-- TODO implement debug instead -->
 
@@ -73,9 +73,9 @@ It’d be useful to be able to print an instance of `Rectangle` while we’re de
 {{#include ../listings/ch05-using-structs-to-structure-related-data/listing_04_10_print_rectangle/src/lib.cairo:here}}
 ```
 
-<span class="caption">Listing 5-9: Attempting to print a `Rectangle` instance</span>
+<span class="caption">Listing 5-9: Mencoba untuk mencetak sebuah instance `Rectangle`</span>
 
-When we compile this code, we get an error with this message:
+Ketika kita mengompilasi kode ini, kita mendapatkan sebuah error dengan pesan ini:
 
 ```text
 $ cairo-compile src/lib.cairo
@@ -87,15 +87,15 @@ error: Method `print` not found on type "../src::Rectangle". Did you import the 
 Error: Compilation failed.
 ```
 
-The `print` trait is implemented for many data types, but not for the `Rectangle` struct. We can fix this by implementing the `PrintTrait` trait on `Rectangle` as shown in Listing 5-10.
-To learn more about traits, see [Traits in Cairo](ch08-02-traits-in-cairo.md).
+Trait `print` diimplementasikan untuk banyak tipe data, tetapi tidak untuk struct `Rectangle`. Kita dapat memperbaikinya dengan mengimplementasikan trait `PrintTrait` pada `Rectangle` seperti yang ditunjukkan pada Listing 5-10.
+Untuk mempelajari lebih lanjut tentang traits, lihat [Traits in Cairo](ch08-02-traits-in-cairo.md).
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 ```rust
 {{#rustdoc_include ../listings/ch05-using-structs-to-structure-related-data/listing_04_10_print_rectangle/src/lib.cairo:all}}
 ```
 
-<span class="caption">Listing 5-10: Implementing the `PrintTrait` trait on `Rectangle`</span>
+<span class="caption">Listing 5-10: Mengimplementasikan trait `PrintTrait` pada `Rectangle`</span>
 
-Nice! It’s not the prettiest output, but it shows the values of all the fields for this instance, which would definitely help during debugging.
+Bagus! Ini bukanlah output yang paling cantik, tetapi ini menunjukkan nilai-nilai dari semua fields untuk instance ini, yang pasti akan membantu saat debugging.

@@ -1,26 +1,26 @@
-# Packages and Crates
+# Paket dan Crate
 
-## What is a crate?
+## Apa itu crate?
 
-A crate is the smallest amount of code that the Cairo compiler considers at a time. Even if you run `cairo-compile` rather than `scarb build` and pass a single source code file, the compiler considers that file to be a crate. Crates can contain modules, and the modules may be defined in other files that get compiled with the crate, as will be discussed in the subsequent sections.
+Sebuah crate merupakan jumlah kode terkecil yang dipertimbangkan oleh kompiler Cairo pada suatu waktu. Bahkan jika Anda menjalankan `cairo-compile` daripada `scarb build` dan menyertakan sebuah file kode sumber tunggal, kompiler akan mempertimbangkan file tersebut sebagai sebuah crate. Crate dapat berisi modul-modul, dan modul-modul tersebut mungkin didefinisikan dalam file-file lain yang dikompilasi bersama dengan crate tersebut, seperti yang akan dibahas pada bagian-bagian selanjutnya.
 
-## What is the crate root?
+## Apa itu crate root?
 
-The crate root is the `lib.cairo` source file that the Cairo compiler starts from and makes up the root module of your crate (we’ll explain modules in depth in the [“Defining Modules to Control Scope”](./ch07-02-defining-modules-to-control-scope.md) section).
+Crate root merupakan file sumber `lib.cairo` yang menjadi awal dari kompilasi oleh kompiler Cairo dan membentuk modul root dari crate Anda (kami akan menjelaskan modul secara mendalam pada bagian [“Defining Modules to Control Scope”](./ch07-02-defining-modules-to-control-scope.md)).
 
-## What is a package?
+## Apa itu sebuah paket?
 
-A cairo package is a bundle of one or more crates with a Scarb.toml file that describes how to build those crates. This enables the splitting of code into smaller, reusable parts and facilitates more structured dependency management.
+Sebuah paket Cairo adalah kumpulan satu atau lebih crate dengan file Scarb.toml yang menjelaskan bagaimana cara membangun crate-crate tersebut. Ini memungkinkan pemisahan kode menjadi bagian-bagian yang lebih kecil dan dapat digunakan kembali, serta memfasilitasi manajemen dependensi yang lebih terstruktur.
 
-## Creating a Package with Scarb
+## Membuat Paket dengan Scarb
 
-You can create a new Cairo package using the scarb command-line tool. To create a new package, run the following command:
+Anda dapat membuat paket Cairo baru menggunakan perangkat baris perintah scarb. Untuk membuat paket baru, jalankan perintah berikut:
 
 ```bash
 scarb new my_package
 ```
 
-This command will generate a new package directory named `my_package` with the following structure:
+Perintah ini akan membuat direktori paket baru bernama `my_package` dengan struktur berikut:
 
 ```
 my_package/
@@ -29,9 +29,9 @@ my_package/
     └── lib.cairo
 ```
 
-- `src/` is the main directory where all the Cairo source files for the package will be stored.
-- `lib.cairo` is the default root module of the crate, which is also the main entry point of the package.
-- `Scarb.toml` is the package manifest file, which contains metadata and configuration options for the package, such as dependencies, package name, version, and authors. You can find documentation about it on the [scarb reference](https://docs.swmansion.com/scarb/docs/reference/manifest.html).
+- `src/` adalah direktori utama di mana semua file sumber Cairo untuk paket akan disimpan.
+- `lib.cairo` adalah modul root default dari crate, yang juga merupakan titik masuk utama dari paket.
+- `Scarb.toml` adalah file manifest paket, yang berisi metadata dan opsi konfigurasi untuk paket, seperti dependensi, nama paket, versi, dan penulis. Anda dapat menemukan dokumentasi tentang ini pada [referensi scarb](https://docs.swmansion.com/scarb/docs/reference/manifest.html).
 
 ```toml
 [package]
@@ -42,4 +42,4 @@ version = "0.1.0"
 # foo = { path = "vendor/foo" }
 ```
 
-As you develop your package, you may want to organize your code into multiple Cairo source files. You can do this by creating additional `.cairo` files within the `src` directory or its subdirectories.
+Saat Anda mengembangkan paket Anda, Anda mungkin ingin mengorganisir kode Anda ke dalam beberapa file sumber Cairo. Anda dapat melakukannya dengan membuat file-file `.cairo` tambahan di dalam direktori `src` atau subdirektorinya.

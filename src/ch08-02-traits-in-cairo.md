@@ -1,92 +1,91 @@
-# Traits in Cairo
+# Sifat-sifat di Cairo
 
-A trait defines a set of methods that can be implemented by a type. These methods can be called on instances of the type when this trait is implemented.
-A trait combined with a generic type defines functionality a particular type has and can share with other types. We can use traits to define shared behavior in an abstract way.
-We can use _trait bounds_ to specify that a generic type can be any type that has certain behavior.
+Sebuah sifat menentukan serangkaian metode yang dapat diimplementasikan oleh suatu tipe. Metode-metode ini dapat dipanggil pada instansi dari tipe tersebut ketika sifat ini diimplementasikan.
+Sebuah sifat yang digabungkan dengan tipe generik menentukan fungsionalitas yang dimiliki oleh suatu tipe tertentu dan dapat dibagikan dengan tipe-tipe lain. Kita dapat menggunakan sifat untuk menentukan perilaku bersama secara abstrak.
+Kita dapat menggunakan _batasan sifat_ untuk menentukan bahwa suatu tipe generik dapat menjadi tipe apa pun yang memiliki perilaku tertentu.
 
-> Note: Note: Traits are similar to a feature often called interfaces in other languages, although with some differences.
+> Catatan: Sifat serupa dengan fitur yang sering disebut antarmuka dalam bahasa pemrograman lain, meskipun dengan beberapa perbedaan.
 
-While traits can be written to not accept generic types, they are most useful when used with generic types. We already covered generics in the [previous chapter](./ch08-01-generic-data-types.md), and we will use them in this chapter to demonstrate how traits can be used to define shared behavior for generic types.
+Meskipun sifat dapat ditulis untuk tidak menerima tipe generik, mereka paling berguna ketika digunakan dengan tipe generik. Kita sudah membahas generik pada [bab sebelumnya](./ch08-01-generic-data-types.md), dan kita akan menggunakannya dalam bab ini untuk menunjukkan bagaimana sifat dapat digunakan untuk menentukan perilaku bersama untuk tipe generik.
 
-## Defining a Trait
+## Menentukan Sifat
 
-A type’s behavior consists of the methods we can call on that type. Different types share the same behavior if we can call the same methods on all of those types. Trait definitions are a way to group method signatures together to define a set of behaviors necessary to accomplish some purpose.
+Perilaku suatu tipe terdiri dari metode-metode yang dapat kita panggil pada tipe tersebut. Tipe-tipe yang berbeda berbagi perilaku yang sama jika kita dapat memanggil metode yang sama pada semua tipe tersebut. Definisi sifat adalah cara untuk mengelompokkan tanda tangan metode bersama untuk menentukan serangkaian perilaku yang diperlukan untuk mencapai suatu tujuan.
 
-For example, let’s say we have a struct `NewsArticle` that holds a news story in a particular location. We can define a trait `Summary` that describes the behavior of something that can summarize the `NewsArticle` type.
+Sebagai contoh, katakanlah kita memiliki sebuah struktur `NewsArticle` yang menyimpan berita di lokasi tertentu. Kita dapat menentukan sifat `Summary` yang menjelaskan perilaku sesuatu yang dapat merangkum tipe `NewsArticle`.
 
 ```rust,noplayground
 {{#rustdoc_include ../listings/ch08-generic-types-and-traits/no_listing_14_simple_trait/src/lib.cairo:trait}}
 ```
 
-<!-- TODO add `pub` visibility -->
+<!-- TODO tambahkan visibilitas `pub` -->
 
-Here, we declare a trait using the trait keyword and then the trait’s name, which is `Summary` in this case.
+Di sini, kita mendeklarasikan suatu sifat menggunakan kata kunci `trait` dan kemudian nama sifatnya, yaitu `Summary` dalam hal ini.
 
-<!-- We’ve also declared the trait as pub so that crates depending on this crate can make use of this trait too, as we’ll see in a few examples.  -->
+<!-- Kita juga telah mendeklarasikan sifat sebagai pub agar kerangka yang bergantung pada kerangka ini dapat menggunakan sifat ini juga, seperti yang akan kita lihat dalam beberapa contoh.  -->
 
-Inside the curly brackets, we declare the method signatures that describe the behaviors of the types that implement this trait, which in this case is `fn summarize(self: @NewsArticle) -> ByteArray`. After the method signature, instead of providing an implementation within curly brackets, we use a semicolon.
+Di dalam kurung kurawal, kita mendeklarasikan tanda tangan metode yang menjelaskan perilaku dari tipe-tipe yang mengimplementasikan sifat ini, yang dalam hal ini adalah `fn summarize(self: @NewsArticle) -> ByteArray`. Setelah tanda tangan metode, alih-alih memberikan implementasi di dalam kurung kurawal, kita menggunakan titik koma.
 
-> Note: the `ByteArray` type is the type used to represent Strings in Cairo.
+> Catatan: Tipe `ByteArray` adalah tipe yang digunakan untuk merepresentasikan String di Cairo.
 
-As the trait is not generic, the `self` parameter is not generic either and is of type `@NewsArticle`. This means that the `summarize` method can only be called on instances of `NewsArticle`.
+Karena sifat tidak bersifat generik, parameter `self` juga tidak bersifat generik dan bertipe `@NewsArticle`. Ini berarti bahwa metode `summarize` hanya dapat dipanggil pada instansi `NewsArticle`.
 
-Now, consider that we want to make a media aggregator library crate named `aggregator` that can display summaries of data that might be stored in a `NewsArticle` or `Tweet` instance. To do this, we need a summary from each type, and we’ll request that summary by calling a summarize method on an instance. By defining the `Summary` trait on generic type `T`, we can implement the `summarize` method on any type we want to be able to summarize.
+Sekarang, pertimbangkan bahwa kita ingin membuat kerangka perpustakaan pengumpul media yang dinamai `aggregator` yang dapat menampilkan ringkasan data yang mungkin disimpan dalam instansi `NewsArticle` atau `Tweet`. Untuk melakukannya, kita memerlukan ringkasan dari setiap tipe, dan kita akan meminta ringkasan tersebut dengan memanggil metode `summarize` pada suatu instansi. Dengan menentukan sifat `Summary` pada tipe generik `T`, kita dapat mengimplementasikan metode `summarize` pada tipe apa pun yang ingin kita rangkum.
 
 ```rust,noplayground
 {{#rustdoc_include ../listings/ch08-generic-types-and-traits/no_listing_15_traits/src/lib.cairo:trait}}
 ```
 
-<span class="caption">A `Summary` trait that consists of the behavior provided by a `summarize` method</span>
+<span class="caption">Sebuah sifat `Summary` yang terdiri dari perilaku yang diberikan oleh metode `summarize`</span>
 
-Each generic type implementing this trait must provide its own custom behavior for the body of the method. The compiler will enforce that any type that has the Summary trait will have the method summarize defined with this signature exactly.
+Setiap tipe generik yang mengimplementasikan sifat ini harus menyediakan perilaku kustomnya sendiri untuk tubuh metode. Kompiler akan menegakkan bahwa setiap tipe yang memiliki sifat Summary akan memiliki metode summarize yang didefinisikan dengan tanda tangan ini secara tepat.
 
-A trait can have multiple methods in its body: the method signatures are listed one per line and each line ends in a semicolon.
+Sebuah sifat dapat memiliki beberapa metode di dalam tubuhnya: tanda tangan metode terdaftar satu per baris dan setiap baris diakhiri dengan titik koma.
 
-## Implementing a Trait on a type
+## Mengimplementasikan Sifat pada Sebuah Tipe
 
-Now that we’ve defined the desired signatures of the `Summary` trait’s methods,
-we can implement it on the types in our media aggregator. The next code snippet shows
-an implementation of the `Summary` trait on the `NewsArticle` struct that uses
-the headline, the author, and the location to create the return value of
-`summarize`. For the `Tweet` struct, we define `summarize` as the username
-followed by the entire text of the tweet, assuming that tweet content is
-already limited to 280 characters.
+Sekarang bahwa kita telah menentukan tanda tangan yang diinginkan dari metode-metode sifat `Summary`,
+kita dapat mengimplementasikannya pada tipe-tipe di pengumpul media kita. Potongan kode berikut menunjukkan
+implementasi sifat `Summary` pada struktur `NewsArticle` yang menggunakan
+judul, penulis, dan lokasi untuk membuat nilai kembalian dari
+`summarize`. Untuk struktur `Tweet`, kita mendefinisikan `summarize` sebagai nama pengguna
+diikuti oleh seluruh teks tweet, dengan asumsi konten tweet
+sudah terbatas pada 280 karakter.
 
 ```rust,noplayground
 {{#rustdoc_include ../listings/ch08-generic-types-and-traits/no_listing_15_traits/src/lib.cairo:impl}}
 ```
 
-Implementing a trait on a type is similar to implementing regular methods. The
-difference is that after `impl`, we put a name for the implementation,
-then use the `of` keyword, and then specify the name of the trait we are writing the implementation for.
-If the implementation is for a generic type, we place the generic type name in the angle brackets after the trait name.
+Mengimplementasikan sifat pada suatu tipe mirip dengan mengimplementasikan metode biasa. Perbedaannya adalah setelah `impl`, kita menentukan nama implementasi,
+kemudian menggunakan kata kunci `of`, dan kemudian menentukan nama sifat untuk implementasi tersebut.
+Jika implementasinya adalah untuk tipe generik, kita menempatkan nama tipe generik di dalam tanda kurung sudut setelah nama sifat.
 
-Within the `impl` block, we put the method signatures
-that the trait definition has defined. Instead of adding a semicolon after each
-signature, we use curly brackets and fill in the method body with the specific
-behavior that we want the methods of the trait to have for the particular type.
+Di dalam blok `impl`, kita menempatkan tanda tangan metode
+yang telah ditentukan oleh definisi sifat. Alih-alih menambahkan titik koma setelah setiap
+tanda tangan, kita menggunakan kurung kurawal dan mengisi tubuh metode dengan perilaku spesifik
+yang kita inginkan agar metode-metode sifat memiliki perilaku tertentu untuk tipe tertentu.
 
-Now that the library has implemented the `Summary` trait on `NewsArticle` and
-`Tweet`, users of the crate can call the trait methods on instances of
-`NewsArticle` and `Tweet` in the same way we call regular methods. The only
-difference is that the user must bring the trait into scope as well as the
-types. Here’s an example of how a crate could use our `aggregator` crate:
+Sekarang bahwa perpustakaan telah mengimplementasikan sifat `Summary` pada `NewsArticle` dan
+`Tweet`, pengguna dari kerangka ini dapat memanggil metode sifat pada instansi
+`NewsArticle` dan `Tweet` dengan cara yang sama seperti memanggil metode biasa. Satu-satunya
+perbedaan adalah bahwa pengguna harus mengimpor sifat ke dalam lingkup serta tipe-tipe tersebut.
+Berikut adalah contoh bagaimana kerangka dapat digunakan:
 
 ```rust
 {{#rustdoc_include ../listings/ch08-generic-types-and-traits/no_listing_15_traits/src/lib.cairo:main}}
 ```
 
-This code prints the following:
+Kode ini mencetak keluar:
 
 ```text
-New article available! Cairo has become the most popular language for developers by Cairo Digger (Worldwide)
+Berita baru tersedia! Cairo telah menjadi bahasa paling populer bagi pengembang oleh Cairo Digger (Seluruh Dunia)
 
-1 new tweet: EliBenSasson: Crypto is full of short-term maximizing projects.
+1 tweet baru: EliBenSasson: Crypto is full of short-term maximizing projects.
  @Starknet and @StarkWareLtd are about long-term vision maximization.
 ```
 
-Other crates that depend on the `aggregator` crate can also bring the `Summary`
-trait into scope to implement `Summary` on their own types.
+Kerangka lain yang bergantung pada kerangka `aggregator` juga dapat mengimpor sifat `Summary`
+ke dalam lingkup untuk mengimplementasikan `Summary` pada tipe-tipe mereka sendiri.
 
 <!-- TODO: move traits as parameters here -->
 <!-- ## Traits as parameters
@@ -115,26 +114,26 @@ because those types don’t implement `Summary`. -->
 
 <!-- TODO: Using trait bounds to conditionally implement methods -->
 
-## Implementing a trait, without writing its declaration.
+## Mengimplementasikan Sifat, Tanpa Menulis Deklarasinya.
 
-You can write implementations directly without defining the corresponding trait. This is made possible by using the `#[generate_trait]` attribute within the implementation, which will make the compiler generate the trait corresponding to the implementation automatically. Remember to add `Trait` as a suffix to your trait name, as the compiler will create the trait by adding a `Trait` suffix to the implementation name.
+Anda dapat menulis implementasi langsung tanpa mendefinisikan sifat yang sesuai. Ini dimungkinkan dengan menggunakan atribut `#[generate_trait]` dalam implementasi, yang akan membuat kompiler secara otomatis menghasilkan sifat yang sesuai dengan implementasi tersebut. Ingatlah untuk menambahkan `Trait` sebagai akhiran dari nama sifat Anda, karena kompiler akan membuat sifat tersebut dengan menambahkan akhiran `Trait` ke nama implementasi.
 
 ```rust,noplayground
 {{#include ../listings/ch08-generic-types-and-traits/no_listing_16_generate_trait/src/lib.cairo}}
 ```
 
-In the aforementioned code, there is no need to manually define the trait. The compiler will automatically handle its definition, dynamically generating and updating it as new functions are introduced.
+Dalam kode tersebut, tidak perlu mendefinisikan sifat secara manual. Kompiler akan menangani definisinya secara otomatis, secara dinamis menghasilkan dan memperbarui sifat saat fungsi-fungsi baru diperkenalkan.
 
 <!-- TODO: rework this section -->
 
-## Managing and using external trait implementations
+## Mengelola dan Menggunakan Implementasi Sifat Eksternal
 
-To use traits methods, you need to make sure the correct traits/implementation(s) are imported. In the code above we imported `PrintTrait` from `debug` with `use core::debug::PrintTrait;` to use the `print()` methods on supported types. All traits included in the prelude don't need to be explicitly imported and are freely accessible.
+Untuk menggunakan metode-metode sifat, Anda perlu memastikan bahwa sifat/implemetasi yang benar diimpor. Dalam kode di atas, kita mengimpor `PrintTrait` dari `debug` dengan `use core::debug::PrintTrait;` untuk menggunakan metode `print()` pada tipe-tipe yang didukung. Semua sifat yang termasuk dalam prelude tidak perlu diimpor secara eksplisit dan dapat diakses secara bebas.
 
-In some cases you might need to import not only the trait but also the implementation if they are declared in separate modules.
-If `CircleGeometry` was in a separate module/file `circle` then to use `boundary` on `circ: Circle`, we'd need to import `CircleGeometry` in addition to `ShapeGeometry`.
+Dalam beberapa kasus, Anda mungkin perlu mengimpor tidak hanya sifat tetapi juga implementasinya jika mereka dideklarasikan dalam modul terpisah.
+Jika `CircleGeometry` berada di modul/berkas terpisah `circle`, maka untuk menggunakan `boundary` pada `circ: Circle`, kita perlu mengimpor `CircleGeometry` selain `ShapeGeometry`.
 
-If the code was organized into modules like this, where the implementation of a trait was defined in a different module than the trait itself, explicitly importing the relevant implementation is required.
+Jika kode diorganisir ke dalam modul seperti ini, di mana implementasi sifat didefinisikan dalam modul yang berbeda dengan sifat itu sendiri, mengimpor implementasi yang relevan secara eksplisit diperlukan.
 
 ```rust,noplayground
 use core::debug::PrintTrait;
@@ -152,7 +151,7 @@ mod geometry {
     }
 }
 
-// Could be in a different file
+// Bisa berada di berkas yang berbeda
 mod circle {
     use super::geometry::ShapeGeometry;
     use super::Circle;
@@ -164,20 +163,20 @@ mod circle {
 fn main() {
     let rect = Rectangle { height: 5, width: 7 };
     let circ = Circle { radius: 5 };
-    // Fails with this error
-    // Method `area` not found on... Did you import the correct trait and impl?
+    // Gagal dengan kesalahan ini
+    // Metode `area` tidak ditemukan pada... Apakah Anda mengimpor sifat dan impl yang benar?
     rect.area().print();
     circ.area().print();
 }
 ```
 
-To make it work, in addition to,
+Untuk membuatnya berfungsi, selain dari,
 
 ```rust
 use geometry::ShapeGeometry;
 ```
 
-you will need to import `CircleGeometry` explicitly. Note that you do not need to import `RectangleGeometry`, as it is defined in the same module as the imported trait, and thus is automatically resolved.
+Anda perlu mengimpor `CircleGeometry` secara eksplisit. Perhatikan bahwa Anda tidak perlu mengimpor `RectangleGeometry`, karena itu didefinisikan dalam modul yang sama dengan sifat yang diimpor, dan dengan demikian secara otomatis dipecahkan.
 
 ```rust
 use circle::CircleGeometry

@@ -1,98 +1,66 @@
-## Separating Modules into Different Files
+## Memisahkan Modul ke dalam Berkas yang Berbeda
 
-So far, all the examples in this chapter defined multiple modules in one file.
-When modules get large, you might want to move their definitions to a separate
-file to make the code easier to navigate.
+Sejauh ini, semua contoh dalam bab ini mendefinisikan beberapa modul dalam satu file. Ketika modul menjadi besar, Anda mungkin ingin memindahkan definisinya ke file terpisah untuk membuat kode lebih mudah dinavigasi.
 
-For example, let’s start from the code in Listing 7-11 that had multiple
-restaurant modules. We’ll extract modules into files instead of having all the
-modules defined in the crate root file. In this case, the crate root file is
-_src/lib.cairo_.
+Sebagai contoh, mari mulai dari kode pada Listing 7-11 yang memiliki beberapa modul restoran. Kita akan mengekstrak modul ke dalam file daripada mendefinisikan semua modul di dalam file akar kerangka. Dalam hal ini, file akar kerangka adalah _src/lib.cairo_.
 
-First, we’ll extract the `front_of_house` module to its own file. Remove the
-code inside the curly brackets for the `front_of_house` module, leaving only
-the `mod front_of_house;` declaration, so that _src/lib.cairo_ contains the code
-shown in Listing 7-12. Note that this won’t compile until we create the
-_src/front_of_house.cairo_ file in Listing 7-13.
+Pertama, kita akan mengekstrak modul `front_of_house` ke dalam file tersendiri. Hapus kode di dalam kurung kurawal untuk modul `front_of_house`, hanya meninggalkan deklarasi `mod front_of_house;`, sehingga _src/lib.cairo_ berisi kode seperti yang terlihat pada Listing 7-12. Perlu diingat bahwa ini tidak akan dikompilasi hingga kita membuat file _src/front_of_house.cairo_ seperti yang terlihat pada Listing 7-13.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 ```rust,noplayground
 {{#include ../listings/ch07-managing-cairo-projects-with-packages-crates-and-modules/listing_06_12/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 7-12: Declaring the `front_of_house` module whose
-body will be in _src/front_of_house.cairo_</span>
+<span class="caption">Listing 7-12: Mendeklarasikan modul `front_of_house` yang
+tubuhnya akan berada di _src/front_of_house.cairo_</span>
 
-Next, place the code that was in the curly brackets into a new file named
-_src/front_of_house.cairo_, as shown in Listing 7-13. The compiler knows to look
-in this file because it came across the module declaration in the crate root
-with the name `front_of_house`.
+Selanjutnya, letakkan kode yang berada di dalam kurung kurawal ke dalam file baru bernama _src/front_of_house.cairo_, seperti yang ditunjukkan pada Listing 7-13. Kompiler tahu untuk mencari di file ini karena menemui deklarasi modul di akar kerangka dengan nama `front_of_house`.
 
-<span class="filename">Filename: src/front_of_house.cairo</span>
+<span class="filename">Nama File: src/front_of_house.cairo</span>
 
 ```rust,noplayground
 {{#include ../listings/ch07-managing-cairo-projects-with-packages-crates-and-modules/listing_06_13/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 7-13: Definitions inside the `front_of_house`
-module in _src/front_of_house.cairo_</span>
+<span class="caption">Listing 7-13: Definisi di dalam modul `front_of_house`
+di _src/front_of_house.cairo_</span>
 
-Note that you only need to load a file using a `mod` declaration _once_ in your
-module tree. Once the compiler knows the file is part of the project (and knows
-where in the module tree the code resides because of where you’ve put the `mod`
-statement), other files in your project should refer to the loaded file’s code
-using a path to where it was declared, as covered in the [“Paths for Referring
-to an Item in the Module Tree”][paths]<!-- ignore --> section. In other words,
-`mod` is _not_ an “include” operation that you may have seen in other
-programming languages.
+Perhatikan bahwa Anda hanya perlu memuat suatu file menggunakan deklarasi `mod` _sekali_ dalam pohon modul Anda. Setelah kompiler tahu bahwa file itu bagian dari proyek (dan tahu di mana kode itu berada dalam pohon modul karena di mana Anda menempatkan pernyataan `mod`), file lain dalam proyek Anda harus merujuk ke kode file yang dimuat menggunakan jalur ke tempat itu dideklarasikan, seperti yang dijelaskan dalam [“Paths for Referring
+to an Item in the Module Tree”][paths]<!-- ignore -->. Dengan kata lain, `mod` _bukan_ operasi "include" yang mungkin telah Anda lihat dalam bahasa pemrograman lain.
 
-Next, we’ll extract the `hosting` module to its own file. The process is a bit
-different because `hosting` is a child module of `front_of_house`, not of the
-root module. We’ll place the file for `hosting` in a new directory that will be
-named for its ancestors in the module tree, in this case _src/front_of_house/_.
+Selanjutnya, kita akan mengekstrak modul `hosting` ke dalam file terpisah. Proses ini sedikit berbeda karena `hosting` adalah modul anak dari `front_of_house`, bukan dari modul akar. Kita akan meletakkan file untuk `hosting` dalam direktori baru yang akan dinamai sesuai dengan leluhurnya dalam pohon modul, dalam hal ini _src/front_of_house/_.
 
-To start moving `hosting`, we change _src/front_of_house.cairo_ to contain only the
-declaration of the `hosting` module:
+Untuk memulai memindahkan `hosting`, kita ubah _src/front_of_house.cairo_ untuk hanya berisi deklarasi modul `hosting`:
 
-<span class="filename">Filename: src/front_of_house.cairo</span>
+<span class="filename">Nama File: src/front_of_house.cairo</span>
 
 ```rust,noplayground
 mod hosting;
 ```
 
-Then we create a _src/front_of_house_ directory and a file _hosting.cairo_ to
-contain the definitions made in the `hosting` module:
+Kemudian, kita membuat direktori _src/front_of_house_ dan sebuah file _hosting.cairo_ untuk berisi definisi yang dibuat di dalam modul `hosting`:
 
-<span class="filename">Filename: src/front_of_house/hosting.cairo</span>
+<span class="filename">Nama File: src/front_of_house/hosting.cairo</span>
 
 ```rust,noplayground
 fn add_to_waitlist() {}
 ```
 
-If we instead put _hosting.cairo_ in the _src_ directory, the compiler would
-expect the _hosting.cairo_ code to be in a `hosting` module declared in the crate
-root, and not declared as a child of the `front_of_house` module. The
-compiler’s rules for which files to check for which modules’ code means the
-directories and files more closely match the module tree.
+Jika kita malah meletakkan _hosting.cairo_ di dalam direktori _src_, kompiler akan mengharapkan kode _hosting.cairo_ berada dalam modul `hosting` yang dideklarasikan di akar kerangka, dan tidak dideklarasikan sebagai anak dari modul `front_of_house`. Aturan kompiler untuk file mana yang akan diperiksa untuk kode modul mana berarti direktori dan file lebih mendekati pohon modul.
 
-We’ve moved each module’s code to a separate file, and the module tree remains
-the same. The function calls in `eat_at_restaurant` will work without any
-modification, even though the definitions live in different files. This
-technique lets you move modules to new files as they grow in size.
+Kita telah memindahkan kode setiap modul ke dalam file terpisah, dan pohon modul tetap sama. Panggilan fungsi di dalam `eat_at_restaurant` akan berfungsi tanpa modifikasi apa pun, meskipun definisinya berada di file yang berbeda. Teknik ini memungkinkan Anda memindahkan modul ke file baru seiring pertumbuhannya.
 
-Note that the `use restaurant::front_of_house::hosting` statement in
-_src/lib.cairo_ also hasn’t changed, nor does `use` have any impact on what files
-are compiled as part of the crate. The `mod` keyword declares modules, and Cairo
-looks in a file with the same name as the module for the code that goes into
-that module.
+Perlu diingat bahwa pernyataan `use restaurant::front_of_house::hosting` di
+_src/lib.cairo_ juga tidak berubah, dan `use` tidak memiliki dampak pada file mana
+yang dikompilasi sebagai bagian dari crate. Kata kunci `mod` mendeklarasikan modul, dan Cairo mencari di file dengan nama yang sama dengan modul untuk kode yang masuk ke dalam modul tersebut.
 
-## Summary
+## Ringkasan
 
-Cairo lets you split a package into multiple crates and a crate into modules
-so you can refer to items defined in one module from another module. You can do
-this by specifying absolute or relative paths. These paths can be brought into
-scope with a `use` statement so you can use a shorter path for multiple uses of
-the item in that scope. Module code is public by default.
+Cairo memungkinkan Anda membagi paket menjadi beberapa crate dan crate menjadi modul
+sehingga Anda dapat merujuk pada item yang didefinisikan di satu modul dari modul lainnya. Anda dapat
+melakukan ini dengan menentukan jalur absolut atau relatif. Jalur-jalur ini dapat dibawa
+ke dalam lingkup dengan pernyataan `use` sehingga Anda dapat menggunakan jalur yang lebih pendek untuk penggunaan
+item tersebut dalam lingkup tersebut. Kode modul secara default bersifat publik.
 
 [paths]: ch06-03-paths-for-referring-to-an-item-in-the-module-tree.html

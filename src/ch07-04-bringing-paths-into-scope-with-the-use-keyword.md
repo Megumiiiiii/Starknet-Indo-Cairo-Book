@@ -1,38 +1,32 @@
-# Bringing Paths into Scope with the `use` Keyword
+# Membawa Jalur ke dalam Lingkup dengan Kata Kunci `use`
 
-Having to write out the paths to call functions can feel inconvenient and repetitive. Fortunately, there’s a way to simplify this process: we can create a shortcut to a path with the `use` keyword once, and then use the shorter name everywhere else in the scope.
+Menulis jalur untuk memanggil fungsi dapat terasa merepotkan dan repetitif. Untungnya, ada cara untuk menyederhanakan proses ini: kita dapat membuat pintasan ke suatu jalur dengan kata kunci `use` sekali, dan kemudian menggunakan nama yang lebih pendek di mana pun di dalam lingkup.
 
-In Listing 7-5, we bring the `restaurant::front_of_house::hosting` module into the
-scope of the `eat_at_restaurant` function so we only have to specify
-`hosting::add_to_waitlist` to call the `add_to_waitlist` function in
-`eat_at_restaurant`.
+Pada Listing 7-5, kita membawa modul `restaurant::front_of_house::hosting` ke dalam lingkup fungsi `eat_at_restaurant` sehingga kita hanya perlu menyebutkan `hosting::add_to_waitlist` untuk memanggil fungsi `add_to_waitlist` di dalam `eat_at_restaurant`.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch07-managing-cairo-projects-with-packages-crates-and-modules/listing_06_05/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 7-5: Bringing a module into scope with
+<span class="caption">Listing 7-5: Membawa modul ke dalam lingkup dengan
 `use`</span>
 
-Adding use and a path in a scope is similar to creating a symbolic link in the filesystem. By adding `use restaurant::front_of_house::hosting` in the crate root, hosting is now a valid name in that scope, just as though the `hosting` module had been defined in the crate root.
+Menambahkan `use` dan suatu jalur dalam suatu lingkup mirip dengan membuat symbolic link dalam sistem file. Dengan menambahkan `use restaurant::front_of_house::hosting` di akar kerangka, `hosting` sekarang adalah nama yang valid di dalam lingkup tersebut, seolah-olah modul `hosting` telah didefinisikan di akar kerangka.
 
-Note that `use` only creates the shortcut for the particular scope in which the `use` occurs. Listing 7-6 moves the `eat_at_restaurant` function into a new
-child module named `customer`, which is then a different scope than the `use`
-statement, so the function body won’t compile:
+Perhatikan bahwa `use` hanya membuat pintasan untuk lingkup tertentu di mana `use` tersebut terjadi. Listing 7-6 memindahkan fungsi `eat_at_restaurant` ke dalam modul anak baru yang diberi nama `customer`, yang kemudian menjadi lingkup yang berbeda dari pernyataan `use`, sehingga tubuh fungsi tidak akan dikompilasi:
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch07-managing-cairo-projects-with-packages-crates-and-modules/listing_06_06/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 7-6: A `use` statement only applies in the scope
-it’s in</span>
+<span class="caption">Listing 7-6: Pernyataan `use` hanya berlaku dalam lingkup
+yang ada di dalamnya</span>
 
-The compiler error shows that the shortcut no longer applies within the
-`customer` module:
+Error kompilator menunjukkan bahwa pintasan tidak lagi berlaku di dalam modul `customer`:
 
 ```shell
 ❯ scarb build
@@ -42,121 +36,100 @@ error: Identifier not found.
         ^*****^
 ```
 
-## Creating Idiomatic `use` Paths
+## Membuat Jalur `use` yang Idiomatik
 
-In Listing 7-5, you might have wondered why we specified `use
-restaurant::front_of_house::hosting` and then called `hosting::add_to_waitlist` in
-`eat_at_restaurant` rather than specifying the `use` path all the way out to
-the `add_to_waitlist` function to achieve the same result, as in Listing 7-7.
+Pada Listing 7-5, Anda mungkin bertanya-tanya mengapa kita menentukan `use
+restaurant::front_of_house::hosting` dan kemudian memanggil `hosting::add_to_waitlist` di
+`eat_at_restaurant` daripada menentukan jalur `use` sampai ke
+fungsi `add_to_waitlist` untuk mencapai hasil yang sama, seperti pada Listing 7-7.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch07-managing-cairo-projects-with-packages-crates-and-modules/listing_06_07/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 7-7: Bringing the `add_to_waitlist` function
-into scope with `use`, which is unidiomatic</span>
+<span class="caption">Listing 7-7: Membawa fungsi `add_to_waitlist` ke dalam lingkup dengan `use`, yang tidak idiomatik</span>
 
-Although both Listing 7-5 and 6-7 accomplish the same task, Listing 7-5 is
-the idiomatic way to bring a function into scope with `use`. Bringing the
-function’s parent module into scope with `use` means we have to specify the
-parent module when calling the function. Specifying the parent module when
-calling the function makes it clear that the function isn’t locally defined
-while still minimizing repetition of the full path. The code in Listing 7-7 is
-unclear as to where `add_to_waitlist` is defined.
+Meskipun keduanya, Listing 7-5 dan 6-7, mencapai tugas yang sama, Listing 7-5 adalah cara yang idiomatik untuk membawa fungsi ke dalam lingkup dengan `use`. Membawa modul induk fungsi ke dalam lingkup dengan `use` berarti kita harus menyebutkan modul induk saat memanggil fungsi. Menyebutkan modul induk saat memanggil fungsi membuat jelas bahwa fungsi tersebut tidak didefinisikan secara lokal sambil tetap meminimalkan pengulangan dari jalur lengkap. Kode pada Listing 7-7 tidak jelas di mana `add_to_waitlist` didefinisikan.
 
-On the other hand, when bringing in structs, enums, traits, and other items with `use`,
-it’s idiomatic to specify the full path. Listing 7-8 shows the idiomatic way
-to bring the core library’s `ArrayTrait` trait into the scope.
+Di sisi lain, ketika membawa dalam struktur, enumerasi, trait, dan item lain dengan menggunakan `use`, cara idiomatik adalah dengan menentukan jalur lengkap. Listing 7-8 menunjukkan cara idiomatik membawa trait `ArrayTrait` dari pustaka inti ke dalam lingkup.
 
 ```rust
 {{#include ../listings/ch07-managing-cairo-projects-with-packages-crates-and-modules/listing_06_08/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 7-8: Bringing `ArrayTrait` into scope in an
-idiomatic way</span>
+<span class="caption">Listing 7-8: Membawa `ArrayTrait` ke dalam lingkup dengan cara
+idiomatik</span>
 
-There’s no strong reason behind this idiom: it’s just the convention that has
-emerged in the Rust community, and folks have gotten used to reading and writing Rust code this way.
-As Cairo shares many idioms with Rust, we follow this convention as well.
+Tidak ada alasan kuat di balik idiom ini: ini hanya konvensi yang muncul dalam komunitas Rust, dan orang-orang telah terbiasa membaca dan menulis kode Rust dengan cara ini. Karena Cairo memiliki banyak idiom yang sama dengan Rust, kami mengikuti konvensi ini juga.
 
-The exception to this idiom is if we’re bringing two items with the same name
-into scope with `use` statements, because Cairo doesn’t allow that.
+Pengecualian dari idiom ini adalah jika kita membawa dua item dengan nama yang sama ke dalam lingkup yang sama dengan pernyataan `use`, karena Cairo tidak mengizinkan hal tersebut.
 
-### Providing New Names with the `as` Keyword
+### Memberikan Nama Baru dengan Kata Kunci `as`
 
-There’s another solution to the problem of bringing two types of the same name
-into the same scope with `use`: after the path, we can specify `as` and a new
-local name, or _alias_, for the type. Listing 7-9 shows how you can rename an import with `as`:
+Ada solusi lain untuk masalah membawa dua jenis dengan nama yang sama ke dalam lingkup yang sama dengan `use`: setelah jalur, kita dapat menentukan `as` dan nama lokal baru, atau _alias_, untuk jenis tersebut. Listing 7-9 menunjukkan cara Anda dapat mengganti nama impor dengan `as`:
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch07-managing-cairo-projects-with-packages-crates-and-modules/listing_06_09/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 7-9: Renaming a trait when it’s brought into
-scope with the `as` keyword</span>
+<span class="caption">Listing 7-9: Mengganti nama trait ketika dibawa ke dalam
+lingkup dengan kata kunci `as`</span>
 
-Here, we brought `ArrayTrait` into scope with the alias `Arr`. We can now access the trait's methods with the `Arr` identifier.
+Di sini, kami membawa `ArrayTrait` ke dalam lingkup dengan alias `Arr`. Sekarang kita dapat mengakses metode-metode trait dengan pengenal `Arr`.
 
-### Importing multiple items from the same module
+### Mengimpor beberapa item dari modul yang sama
 
-When you want to import multiple items (like functions, structs or enums)
-from the same module in Cairo, you can use curly braces `{}` to list all of
-the items that you want to import. This helps to keep your code clean and easy
-to read by avoiding a long list of individual use statements.
+Ketika Anda ingin mengimpor beberapa item (seperti fungsi, struktur, atau enumerasi) dari modul yang sama di Cairo, Anda dapat menggunakan kurung kurawal `{}` untuk mencantumkan semua item yang ingin Anda impor. Ini membantu menjaga kode Anda bersih dan mudah dibaca dengan menghindari daftar panjang pernyataan `use` yang terpisah.
 
-The general syntax for importing multiple items from the same module is:
+Syntax umum untuk mengimpor beberapa item dari modul yang sama adalah:
 
 ```rust
 use module::{item1, item2, item3};
 ```
 
-Here is an example where we import three structures from the same module:
+Berikut adalah contoh di mana kita mengimpor tiga struktur dari modul yang sama:
 
 ```rust
 {{#include ../listings/ch07-managing-cairo-projects-with-packages-crates-and-modules/listing_06_10/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 7-10: Importing multiple items from the same module</span>
+<span class="caption">Listing 7-10: Mengimpor beberapa item dari modul yang sama</span>
 
-## Re-exporting Names in Module Files
+## Mengulang Nama dalam Berkas Modul
 
-When we bring a name into scope with the `use` keyword, the name available in
-the new scope can be imported as if it had been defined in that code’s scope.
-This technique is called _re-exporting_ because we’re bringing an item into scope,
-but also making that item available for others to bring into their scope.
+Ketika kita membawa suatu nama ke dalam lingkup dengan kata kunci `use`, nama yang tersedia dalam lingkup baru dapat diimpor seolah-olah telah didefinisikan dalam lingkup kode tersebut. Teknik ini disebut _re-exporting_ karena kita membawa suatu item ke dalam lingkup, tetapi juga membuat item tersebut tersedia bagi orang lain untuk membawanya ke dalam lingkup mereka.
 
-For example, let's re-export the `add_to_waitlist` function in the restaurant example:
+Sebagai contoh, mari re-export fungsi `add_to_waitlist` pada contoh restoran:
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch07-managing-cairo-projects-with-packages-crates-and-modules/listing_06_11/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 7-11: Making a name available for any code to use
-from a new scope with `pub use`</span>
+<span class="caption">Listing 7-11: Membuat suatu nama tersedia untuk kode apa pun digunakan
+dari lingkup baru dengan `pub use`</span>
 
-Before this change, external code would have to call the `add_to_waitlist`
-function by using the path
-`restaurant::front_of_house::hosting::add_to_waitlist()`. Now that this `use`
-has re-exported the `hosting` module from the root module, external code
-can now use the path `restaurant::hosting::add_to_waitlist()` instead.
+Sebelum perubahan ini, kode eksternal harus memanggil fungsi `add_to_waitlist` dengan menggunakan jalur
+`restaurant::front_of_house::hosting::add_to_waitlist()`. Sekarang bahwa `use`
+ini telah mere-export modul `hosting` dari modul akar, kode eksternal
+sekarang dapat menggunakan jalur `restaurant::hosting::add_to_waitlist()` sebagai gantinya.
 
-Re-exporting is useful when the internal structure of your code is different
-from how programmers calling your code would think about the domain. For
-example, in this restaurant metaphor, the people running the restaurant think
-about “front of house” and “back of house.” But customers visiting a restaurant
-probably won’t think about the parts of the restaurant in those terms. With
-`use`, we can write our code with one structure but expose a different
-structure. Doing so makes our library well organized for programmers working on
-the library and programmers calling the library.
+Mere-export berguna ketika struktur internal kode Anda berbeda
+dengan cara pemrogram yang memanggil kode Anda akan memikirkan domain tersebut. Sebagai
+contoh, dalam metafora restoran ini, orang-orang yang menjalankan restoran berpikir
+tentang "front of house" dan "back of house." Tetapi pelanggan yang mengunjungi restoran
+mungkin tidak akan memikirkan bagian-bagian restoran dengan istilah tersebut. Dengan
+`use`, kita dapat menulis kode kita dengan satu struktur tetapi mengekspos struktur
+yang berbeda. Melakukan hal tersebut membuat perpustakaan kita terorganisir dengan baik untuk pemrogram yang bekerja pada
+perpustakaan dan pemrogram yang memanggil perpustakaan tersebut.
 
-## Using External Packages in Cairo with Scarb
+## Menggunakan Paket Eksternal di Cairo dengan Scarb
 
-You might need to use external packages to leverage the functionality provided by the community. To use an external package in your project with Scarb, follow these steps:
+Anda mungkin perlu menggunakan paket eksternal untuk memanfaatkan fungsionalitas yang disediakan oleh komunitas. Untuk menggunakan paket eksternal dalam proyek Anda dengan Scarb, ikuti langkah-langkah berikut:
 
-> The dependencies system is still a work in progress. You can check the official [documentation](https://docs.swmansion.com/scarb/docs/guides/dependencies.html).
+> Sistem dependensi masih dalam tahap pengembangan. Anda dapat memeriksa [dokumentasi resmi](https://docs.swmansion.com/scarb/docs/guides/dependencies.html).

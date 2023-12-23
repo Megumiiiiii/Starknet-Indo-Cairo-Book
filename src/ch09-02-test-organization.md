@@ -1,34 +1,34 @@
-# Testing Organization
+# Pengujian Organisasi
 
-We'll think about tests in terms of two main categories: unit tests and integration tests. Unit tests are small and more focused, testing one module in isolation at a time, and can test private functions. Although Cairo doesn't implement the concept of public/private functions/fields yet, it's good practice to start organizing your code as if it were. Integration tests use your code in the same way any other external code would, using only the public interface and potentially exercising multiple modules per test.
+Kita akan memikirkan tentang pengujian dalam dua kategori utama: pengujian unit dan pengujian integrasi. Pengujian unit bersifat kecil dan lebih terfokus, menguji satu modul pada satu waktu secara terisolasi, dan dapat menguji fungsi-fungsi pribadi. Meskipun Cairo belum mengimplementasikan konsep fungsi/lapangan publik/privat, tetapi adalah praktik yang baik untuk mulai mengorganisir kode Anda seolah-olah itu demikian. Pengujian integrasi menggunakan kode Anda dengan cara yang sama seperti kode eksternal lainnya, menggunakan hanya antarmuka publik dan mungkin melibatkan beberapa modul per pengujian.
 
-Writing both kinds of tests is important to ensure that the pieces of your library are doing what you expect them to, separately and together.
+Menulis kedua jenis pengujian ini penting untuk memastikan bahwa bagian-bagian dari perpustakaan Anda melakukan apa yang Anda harapkan, baik secara terpisah maupun bersama-sama.
 
-## Unit Tests
+## Pengujian Unit
 
-The purpose of unit tests is to test each unit of code in isolation from the rest of the code to quickly pinpoint where code is and isn’t working as expected. You’ll put unit tests in the `src` directory in each file with the code that they’re testing.
+Tujuan dari pengujian unit adalah untuk menguji setiap unit kode secara terisolasi dari sisa kode untuk dengan cepat menentukan di mana kode bekerja atau tidak sesuai harapan. Anda akan menempatkan pengujian unit di direktori `src` dalam setiap file dengan kode yang sedang diuji.
 
-The convention is to create a module named tests in each file to contain the test functions and to annotate the module with `cfg(test)`.
+Konvensinya adalah membuat modul bernama `tests` di setiap file untuk menyimpan fungsi-fungsi pengujian dan memberikan anotasi modul dengan `cfg(test)`.
 
-### The Tests Module and `#[cfg(test)]`
+### Modul Pengujian dan `#[cfg(test)]`
 
-The `#[cfg(test)]` annotation on the tests module tells Cairo to compile and run the test code only when you run `scarb cairo-test`, not when you run `cairo-run`. This saves compile time when you only want to build the library and saves space in the resulting compiled artifact because the tests are not included. You’ll see that because integration tests go in a different directory, they don’t need the `#[cfg(test)]` annotation. However, because unit tests go in the same files as the code, you’ll use `#[cfg(test)]` to specify that they shouldn’t be included in the compiled result.
+Anotasi `#[cfg(test)]` pada modul pengujian memberi tahu Cairo untuk mengompilasi dan menjalankan kode pengujian hanya ketika Anda menjalankan `scarb cairo-test`, bukan ketika Anda menjalankan `cairo-run`. Ini menghemat waktu kompilasi saat Anda hanya ingin membangun perpustakaan dan menghemat ruang dalam artefak yang dikompilasi karena pengujian tidak disertakan. Anda akan melihat bahwa karena pengujian integrasi berada di direktori yang berbeda, mereka tidak memerlukan anotasi `#[cfg(test)]`. Namun, karena pengujian unit berada di file yang sama dengan kode, Anda akan menggunakan `#[cfg(test)]` untuk menentukan bahwa mereka tidak boleh disertakan dalam hasil yang dikompilasi.
 
-Recall that when we created the new `adder` project in the first section of this chapter, we wrote this first test:
+Ingat bahwa ketika kita membuat proyek `adder` baru di bagian pertama bab ini, kita menulis pengujian pertama ini:
 
 ```rust
 {{#include ../listings/ch09-testing-cairo-programs/no_listing_06_cfg_attr/src/lib.cairo}}
 ```
 
-<span class="caption">Filename: src/lib.cairo</span>
+<span class="caption">Nama file: src/lib.cairo</span>
 
-The attribute `cfg` stands for configuration and tells Cairo that the following item should only be included given a certain configuration option. In this case, the configuration option is `test`, which is provided by Cairo for compiling and running tests. By using the `cfg` attribute, Cairo compiles our test code only if we actively run the tests with `scarb cairo-test`. This includes any helper functions that might be within this module, in addition to the functions annotated with `#[test]`.
+Atribut `cfg` singkatan dari konfigurasi dan memberi tahu Cairo bahwa item berikutnya hanya harus disertakan dengan opsi konfigurasi tertentu. Dalam hal ini, opsi konfigurasi adalah `test`, yang disediakan oleh Cairo untuk mengompilasi dan menjalankan pengujian. Dengan menggunakan atribut `cfg`, Cairo mengompilasi kode pengujian kita hanya jika kita secara aktif menjalankan pengujian dengan `scarb cairo-test`. Ini mencakup fungsi bantu apa pun yang mungkin ada dalam modul ini, selain fungsi-fungsi yang dianotasi dengan `#[test]`.
 
-## Integration Tests
+## Pengujian Integrasi
 
-Integration tests use your library in the same way any other code would. Their purpose is to test whether many parts of your library work together correctly. Units of code that work correctly on their own could have problems when integrated, so test coverage of the integrated code is important as well. To create integration tests, you first need a `tests` directory.
+Pengujian integrasi menggunakan perpustakaan Anda dengan cara yang sama seperti kode lainnya. Tujuannya adalah untuk menguji apakah banyak bagian dari perpustakaan Anda bekerja bersama dengan benar. Unit kode yang bekerja dengan benar secara independen bisa memiliki masalah saat diintegrasikan, jadi cakupan pengujian dari kode yang terintegrasi juga penting. Untuk membuat pengujian integrasi, pertama-tama Anda memerlukan direktori `tests`.
 
-### The `tests` Directory
+### Direktori `tests`
 
 ```shell
 adder
@@ -44,26 +44,26 @@ adder
 {{#include ../listings/ch09-testing-cairo-programs/no_listing_07_integration_test/src/lib.cairo}}
 ```
 
-<span class="caption">Filename: src/lib.cairo</span>
+<span class="caption">Nama file: src/lib.cairo</span>
 
 ```rust
 #[cfg(tests)]
 mod integration_tests;
 ```
 
-<span class="caption">Filename: src/tests.cairo</span>
+<span class="caption">Nama file: src/tests.cairo</span>
 
-Enter the code in Listing 9-11 into the _src/tests/integration_test.cairo_ file:
+Masukkan kode pada Listing 9-11 ke dalam file _src/tests/integration_test.cairo_:
 
 ```rust
 {{#include ../listings/ch09-testing-cairo-programs/no_listing_07_integration_test/src/tests/integration_tests.cairo}}
 ```
 
-<span class="caption">Filename: src/tests/integration_test.cairo</span>
+<span class="caption">Nama file: src/tests/integration_test.cairo</span>
 
-We need to bring our tested functions into each test file scope. For that reason we add `use adder::it_adds_two` at the top of the code, which we didn’t need in the unit tests.
+Kita perlu membawa fungsi-fungsi yang diuji ke dalam ruang lingkup setiap file pengujian. Untuk alasan itu, kami menambahkan `use adder::it_adds_two` di bagian atas kode, yang tidak perlu kami lakukan dalam pengujian unit.
 
-Then, to run all of our integration tests, we can just add a filter to only run tests whose path contains "integration_tests".
+Kemudian, untuk menjalankan semua pengujian integrasi kita, kita hanya perlu menambahkan filter untuk hanya menjalankan pengujian yang path-nya mengandung "integration_tests".
 
 ```shell
 $ scarb test -f integration_tests
@@ -74,4 +74,4 @@ test adder::tests::integration_tests::internal ... ok (gas usage est.: 3770)
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 filtered out;
 ```
 
-The result of the tests is the same as what we've been seeing: one line for each test.
+Hasil dari pengujian sama dengan yang telah kita lihat sebelumnya: satu baris untuk setiap pengujian.

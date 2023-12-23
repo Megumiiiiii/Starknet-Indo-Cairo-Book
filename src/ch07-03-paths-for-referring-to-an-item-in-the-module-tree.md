@@ -1,47 +1,45 @@
-## Paths for Referring to an Item in the Module Tree
+## Path untuk Merujuk ke Item dalam Pohon Modul
 
-To show Cairo where to find an item in a module tree, we use a path in the same way we use a path when navigating a filesystem. To call a function, we need to know its path.
+Untuk menunjukkan kepada Cairo di mana menemukan suatu item dalam pohon modul, kita menggunakan path dengan cara yang sama seperti kita menggunakan path saat menjelajahi sistem file. Untuk memanggil sebuah fungsi, kita perlu tahu path-nya.
 
-A path can take two forms:
+Sebuah path dapat memiliki dua bentuk:
 
-- An _absolute path_ is the full path starting from a crate root. The absolute path begins with the crate name.
-- A _relative path_ starts from the current module.
+- Sebuah _absolute path_ adalah path lengkap yang dimulai dari root kardus. Absolute path dimulai dengan nama kardus.
+- Sebuah _relative path_ dimulai dari modul saat ini.
 
-  Both absolute and relative paths are followed by one or more identifiers
-  separated by double colons (`::`).
+  Keduanya, absolute dan relative paths diikuti oleh satu atau lebih identifikasi
+  yang dipisahkan oleh titik dua ganda (`::`).
 
-To illustrate this notion let's take back our example Listing 7-1 for the restaurant we used in the last chapter. We have a crate named `restaurant` in which we have a module named `front_of_house` that contains a module named `hosting`. The `hosting` module contains a function named `add_to_waitlist`. We want to call the `add_to_waitlist` function from the `eat_at_restaurant` function. We need to tell Cairo the path to the `add_to_waitlist` function so it can find it.
+Untuk mengilustrasikan konsep ini, mari kita ambil contoh Listing 7-1 untuk restoran yang kita gunakan dalam bab terakhir. Kita memiliki sebuah kardus bernama `restaurant` di dalamnya terdapat modul bernama `front_of_house` yang berisi modul bernama `hosting`. Modul `hosting` berisi fungsi bernama `add_to_waitlist`. Kita ingin memanggil fungsi `add_to_waitlist` dari fungsi `eat_at_restaurant`. Kita perlu memberi tahu Cairo path ke fungsi `add_to_waitlist` agar bisa menemukannya.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 ```rust,noplayground
 {{#include ../listings/ch07-managing-cairo-projects-with-packages-crates-and-modules/listing_06_03/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 7-3: Calling the `add_to_waitlist` function using absolute and relative paths</span>
+<span class="caption">Listing 7-3: Memanggil fungsi `add_to_waitlist` menggunakan absolute dan relative paths</span>
 
-The first time we call the `add_to_waitlist` function in `eat_at_restaurant`,
-we use an absolute path. The `add_to_waitlist` function is defined in the same
-crate as `eat_at_restaurant`. In Cairo, absolute paths start from the crate root, which you need to refer to by using the crate name.
+Pertama kali kita memanggil fungsi `add_to_waitlist` di dalam `eat_at_restaurant`,
+kita menggunakan absolute path. Fungsi `add_to_waitlist` didefinisikan dalam kardus yang sama dengan `eat_at_restaurant`. Dalam Cairo, absolute paths dimulai dari root kardus, yang perlu Anda sebutkan dengan menggunakan nama kardus.
 
-The second time we call `add_to_waitlist`, we use a relative path. The path starts with `front_of_house`, the name of the module
-defined at the same level of the module tree as `eat_at_restaurant`. Here the
-filesystem equivalent would be using the path
-`./front_of_house/hosting/add_to_waitlist`. Starting with a module name means
-that the path is relative to the current module.
+Kedua kalinya kita memanggil `add_to_waitlist`, kita menggunakan relative path. Path dimulai dengan `front_of_house`, nama modul
+yang didefinisikan pada tingkat yang sama dalam pohon modul seperti `eat_at_restaurant`. Di sini, ekuivalen sistem file akan menggunakan path
+`./front_of_house/hosting/add_to_waitlist`. Memulai dengan nama modul berarti
+bahwa path ini bersifat relatif terhadap modul saat ini.
 
-### Starting Relative Paths with `super`
+### Memulai Relative Paths dengan `super`
 
-Choosing whether to use a `super` or not is a decision you’ll make
-based on your project, and depends on whether you’re more likely to move item
-definition code separately from or together with the code that uses the item.
+Memilih apakah akan menggunakan `super` atau tidak adalah keputusan yang akan Anda ambil
+berdasarkan proyek Anda, dan tergantung pada apakah Anda lebih mungkin memindahkan definisi item
+terpisah dari atau bersamaan dengan kode yang menggunakan item tersebut.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama File: src/lib.cairo</span>
 
 ```rust,noplayground
 {{#include ../listings/ch07-managing-cairo-projects-with-packages-crates-and-modules/listing_06_04/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 7-4: Calling a function using a relative path starting with super</span>
+<span class="caption">Listing 7-4: Memanggil fungsi menggunakan relative path yang dimulai dengan super</span>
 
-Here you can see directly that you access a parent's module easily using `super`, which wasn't the case previously.
+Di sini Anda dapat melihat secara langsung bahwa Anda dapat mengakses modul induk dengan mudah menggunakan `super`, yang tidak mungkin sebelumnya.

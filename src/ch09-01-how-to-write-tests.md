@@ -1,20 +1,20 @@
-# How To Write Tests
+# Cara Menulis Uji Coba
 
-## The Anatomy of a Test Function
+## Anatomi Fungsi Uji Coba
 
-Tests are Cairo functions that verify that the non-test code is functioning in the expected manner. The bodies of test functions typically perform these three actions:
+Uji coba adalah fungsi Cairo yang memverifikasi bahwa kode non-uji berfungsi sesuai dengan yang diharapkan. Tubuh fungsi uji coba biasanya melakukan tiga tindakan ini:
 
-- Set up any needed data or state.
-- Run the code you want to test.
-- Assert the results are what you expect.
+- Menyiapkan data atau keadaan yang diperlukan.
+- Menjalankan kode yang ingin diuji.
+- Memastikan hasil sesuai dengan yang diharapkan.
 
-Let’s look at the features Cairo provides specifically for writing tests that take these actions, which include the `test` attribute, the `assert` function, and the `should_panic` attribute.
+Mari kita lihat fitur-fitur yang disediakan Cairo khusus untuk menulis uji coba yang melibatkan tindakan-tindakan ini, termasuk atribut `test`, fungsi `assert`, dan atribut `should_panic`.
 
-### The Anatomy of a Test Function
+### Anatomi Fungsi Uji Coba
 
-At its simplest, a test in Cairo is a function that’s annotated with the `test` attribute. Attributes are metadata about pieces of Cairo code; one example is the derive attribute we used with structs in Chapter 5. To change a function into a test function, add `#[test]` on the line before `fn`. When you run your tests with the `scarb cairo-test` command, Scarb runs Cairo's test runner binary that runs the annotated functions and reports on whether each test function passes or fails.
+Pada dasarnya, uji coba di Cairo adalah fungsi yang dianotasi dengan atribut `test`. Atribut adalah metadata tentang potongan kode Cairo; salah satu contohnya adalah atribut derive yang kita gunakan dengan struct di Bab 5. Untuk mengubah fungsi menjadi fungsi uji coba, tambahkan `#[test]` pada baris sebelum `fn`. Saat Anda menjalankan uji coba dengan perintah `scarb cairo-test`, Scarb menjalankan binary pelari uji coba Cairo yang menjalankan fungsi-fungsi yang dianotasi dan melaporkan apakah setiap fungsi uji coba lulus atau gagal.
 
-Let's create a new project called `adder` that will add two numbers using Scarb with the command `scarb new adder`:
+Mari buat proyek baru bernama `adder` yang akan menambahkan dua angka menggunakan Scarb dengan perintah `scarb new adder`:
 
 ```shell
 adder
@@ -23,21 +23,21 @@ adder
     └── lib.cairo
 ```
 
-In _lib.cairo_, let's remove the existing content and add a first test, as shown in Listing 9-1.
+Di _lib.cairo_, mari hapus konten yang ada dan tambahkan uji coba pertama, seperti yang ditunjukkan dalam Listing 9-1.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama file: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch09-testing-cairo-programs/listing_08_01_02/src/lib.cairo:it_works}}
 ```
 
-<span class="caption">Listing 9-1: A test module and function</span>
+<span class="caption">Listing 9-1: Modul dan fungsi uji coba</span>
 
-For now, let’s ignore the top two lines and focus on the function. Note the `#[test]` annotation: this attribute indicates this is a test function, so the test runner knows to treat this function as a test. We might also have non-test functions in the tests module to help set up common scenarios or perform common operations, so we always need to indicate which functions are tests.
+Saat ini, mari abaikan dua baris teratas dan fokus pada fungsi. Perhatikan anotasi `#[test]`: atribut ini menunjukkan bahwa ini adalah fungsi uji coba, sehingga pelari uji coba tahu untuk memperlakukan fungsi ini sebagai uji coba. Kita juga mungkin memiliki fungsi-fungsi non-uji coba di modul uji coba untuk membantu menyiapkan skenario umum atau melakukan operasi umum, jadi kita selalu perlu menunjukkan fungsi mana yang merupakan uji coba.
 
-The example function body uses the `assert` function, which contains the result of adding 2 and 2, equals 4. This assertion serves as an example of the format for a typical test. Let’s run it to see that this test passes.
+Tubuh fungsi contoh menggunakan fungsi `assert`, yang berisi hasil penambahan 2 dan 2, sama dengan 4. Pernyataan ini berfungsi sebagai contoh format uji coba yang khas. Mari jalankan untuk melihat bahwa uji coba ini lulus.
 
-The `scarb cairo-test` command runs all tests founds in our project, as shown in Listing 9-2.
+Perintah `scarb cairo-test` menjalankan semua uji coba yang ditemukan di proyek kita, seperti yang ditunjukkan dalam Listing 9-2.
 
 ```shell
 $ scarb cairo-test
@@ -47,83 +47,82 @@ test adder::lib::tests::it_works ... ok
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 filtered out;
 ```
 
-<span class="caption">Listing 9-2: The output from running a test</span>
+<span class="caption">Listing 9-2: Keluaran dari menjalankan uji coba</span>
 
-`scarb cairo-test` compiled and ran the test. We see the line `running 1 tests`. The next line shows the name of the test function, called `it_works`, and that the result of running that test is `ok`. The overall summary `test result: ok.` means that all the tests passed, and the portion that reads `1 passed; 0 failed` totals the number of tests that passed or failed.
+`scarb cairo-test` mengompilasi dan menjalankan uji coba. Kami melihat baris `running 1 tests`. Baris berikutnya menunjukkan nama fungsi uji coba, disebut `it_works`, dan bahwa hasil dari menjalankan uji coba tersebut adalah `ok`. Ringkasan keseluruhan `test result: ok.` berarti bahwa semua uji coba berhasil, dan bagian yang membaca `1 passed; 0 failed` menjumlahkan jumlah uji coba yang berhasil atau gagal.
 
-It’s possible to mark a test as ignored so it doesn’t run in a particular instance; we’ll cover that in the [Ignoring Some Tests Unless Specifically Requested](#ignoring-some-tests-unless-specifically-requested) section later in this chapter. Because we haven’t done that here, the summary shows `0 ignored`. We can also pass an argument to the `scarb cairo-test` command to run only a test whose name matches a string; this is called filtering and we’ll cover that in the [Running Single Tests](#running-single-tests) section. We also haven’t filtered the tests being run, so the end of the summary shows `0 filtered out`.
+Mungkin untuk menandai uji coba sebagai diabaikan sehingga tidak berjalan dalam suatu instance tertentu; kita akan membahasnya dalam bagian [Mengabaikan Beberapa Uji Coba Kecuali Diminta Secara Khusus](#ignoring-some-tests-unless-specifically-requested) lebih lanjut dalam bab ini. Karena kita belum melakukannya di sini, ringkasan menunjukkan `0 ignored`. Kami juga dapat menyertakan argumen ke perintah `scarb cairo-test` untuk menjalankan hanya uji coba yang namanya cocok dengan string tertentu; ini disebut penyaringan dan kita akan membahasnya dalam bagian [Menjalankan Uji Coba Tunggal](#running-single-tests). Kami juga belum menyaring uji coba yang dijalankan, sehingga akhir ringkasan menunjukkan `0 filtered out`.
 
-Let’s start to customize the test to our own needs. First change the name of the `it_works` function to a different name, such as `exploration`, like so:
+Mari mulai menyesuaikan uji coba sesuai kebutuhan kita. Pertama, ubah nama fungsi `it_works` menjadi nama yang berbeda, seperti `eksplorasi`, seperti ini:
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama file: src/lib.cairo</span>
 
 ```rust
-{{#include ../listings/ch09-testing-cairo-programs/listing_08_01_02/src/lib.cairo:exploration}}
+{{#include ../listings/ch09-testing-cairo-programs/listing_08_01_02/src/lib.cairo:eksplorasi}}
 ```
 
-Then run `scarb cairo-test` again. The output now shows `exploration` instead of `it_works`:
+Kemudian jalankan `scarb cairo-test` lagi. Keluaran sekarang menunjukkan `eksplorasi` bukan `it_works`:
 
 ```shell
 $ scarb cairo-test
 running 1 tests
-test adder::lib::tests::exploration ... ok
+test adder::lib::tests::eksplorasi ... ok
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 filtered out;
 ```
 
-Now we’ll add another test, but this time we’ll make a test that fails! Tests fail when something in the test function panics. Each test is run in a new thread, and when the main thread sees that a test thread has died, the test is marked as failed. Enter the new test as a function named `another`, so your _src/lib.cairo_ file looks like Listing 9-3.
+Sekarang kita akan menambahkan uji coba lain, tapi kali ini kita akan membuat uji coba yang gagal! Uji coba gagal ketika ada yang panic dalam fungsi uji coba. Setiap uji coba dijalankan dalam thread baru, dan ketika thread utama melihat bahwa thread uji coba telah mati, uji coba ditandai sebagai gagal. Masukkan uji coba baru sebagai fungsi bernama `lainnya`, sehingga file _src/lib.cairo_ Anda terlihat seperti Listing 9-3.
 
 ```rust
-{{#include ../listings/ch09-testing-cairo-programs/listing_08_03/src/lib.cairo:another}}
-
+{{#include ../listings/ch09-testing-cairo-programs/listing_08_03/src/lib.cairo:lainnya}}
 ```
 
-<span class="caption">Listing 9-3: Adding a second test that will fail</span>
+<span class="caption">Listing 9-3: Menambahkan uji coba kedua yang akan gagal</span>
 
 ```shell
 $ scarb cairo-test
 running 2 tests
-test adder::lib::tests::exploration ... ok
-test adder::lib::tests::another ... fail
+test adder::lib::tests::eksplorasi ... ok
+test adder::lib::tests::lainnya ... fail
 failures:
-    adder::lib::tests::another - panicked with [1725643816656041371866211894343434536761780588 ('Make this test fail'), ].
+    adder::lib::tests::lainnya - panicked with [1725643816656041371866211894343434536761780588 ('Make this test fail'), ].
 Error: test result: FAILED. 1 passed; 1 failed; 0 ignored
 ```
 
-<span class="caption">Listing 9-4: Test results when one test passes and one test fails</span>
+<span class="caption">Listing 9-4: Hasil uji coba ketika satu uji coba lulus dan satu uji coba gagal</span>
 
-Instead of `ok`, the line `adder::lib::tests::another` shows `fail`. A new section appears between the individual results and the summary. It displays the detailed reason for each test failure. In this case, we get the details that `another` failed because it panicked with `[1725643816656041371866211894343434536761780588 ('Make this test fail'), ]` in the _src/lib.cairo_ file.
+Daripada `ok`, baris `adder::lib::tests::lainnya` menunjukkan `fail`. Bagian baru muncul di antara hasil individual dan ringkasan. Ini menampilkan alasan rinci untuk setiap kegagalan uji coba. Dalam kasus ini, kita mendapatkan detail bahwa `lainnya` gagal karena panic dengan `[1725643816656041371866211894343434536761780588 ('Make this test fail'), ]` di file _src/lib.cairo_.
 
-The summary line displays at the end: overall, our test result is `FAILED`. We had one test pass and one test fail.
+Baris ringkasan ditampilkan di akhir: secara keseluruhan, hasil uji coba kita adalah `FAILED`. Kami memiliki satu uji coba yang lulus dan satu uji coba yang gagal.
 
-Now that you’ve seen what the test results look like in different scenarios, let’s look at some functions that are useful in tests.
+Sekarang setelah Anda melihat seperti apa hasil uji coba dalam skenario yang berbeda, mari kita lihat beberapa fungsi yang berguna dalam uji coba.
 
-## Checking Results with the assert function
+## Memeriksa Hasil dengan Fungsi assert
 
-The `assert` function, provided by Cairo, is useful when you want to ensure that some condition in a test evaluates to `true`. We give the `assert` function a first argument that evaluates to a Boolean. If the value is `true`, nothing happens and the test passes. If the value is `false`, the assert function calls `panic()` to cause the test to fail with a message we defined as the second argument of the `assert` function. Using the `assert` function helps us check that our code is functioning in the way we intend.
+Fungsi `assert`, yang disediakan oleh Cairo, berguna ketika Anda ingin memastikan bahwa suatu kondisi dalam uji coba mengevaluasi menjadi `true`. Kami memberikan fungsi `assert` argumen pertama yang mengevaluasi menjadi Boolean. Jika nilai tersebut adalah `true`, tidak ada yang terjadi dan uji coba lulus. Jika nilai tersebut adalah `false`, fungsi assert memanggil `panic()` untuk menyebabkan uji coba gagal dengan pesan yang kita tentukan sebagai argumen kedua fungsi `assert`. Menggunakan fungsi `assert` membantu kita memeriksa bahwa kode kita berfungsi sesuai yang diinginkan.
 
-In [Chapter 5, Listing 5-15](ch05-03-method-syntax.md#multiple-impl-blocks), we used a `Rectangle` struct and a `can_hold` method, which are repeated here in Listing 9-5. Let’s put this code in the _src/lib.cairo_ file, then write some tests for it using the `assert` function.
+Pada [Bab 5, Listing 5-15](ch05-03-method-syntax.md#multiple-impl-blocks), kita menggunakan struktur `Rectangle` dan metode `can_hold`, yang diulang di Listing 9-5. Mari letakkan kode ini di file _src/lib.cairo_, lalu tulis beberapa uji coba untuknya menggunakan fungsi `assert`.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama file: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch09-testing-cairo-programs/listing_08_06/src/lib.cairo:trait_impl}}
 ```
 
-<span class="caption">Listing 9-5: Using the `Rectangle` struct and its `can_hold` method from Chapter 5</span>
+<span class="caption">Listing 9-5: Menggunakan struktur `Rectangle` dan metode `can_hold` dari Bab 5</span>
 
-The `can_hold` method returns a `bool`, which means it’s a perfect use case for the assert function. In Listing 9-6, we write a test that exercises the `can_hold` method by creating a `Rectangle` instance that has a width of `8` and a height of `7` and asserting that it can hold another `Rectangle` instance that has a width of `5` and a height of `1`.
+Metode `can_hold` mengembalikan `bool`, yang berarti ini adalah kasus penggunaan yang sempurna untuk fungsi assert. Pada Listing 9-6, kita menulis uji coba yang menggunakan metode `can_hold` dengan membuat instans `Rectangle` yang memiliki lebar `8` dan tinggi `7` dan menegaskan bahwa itu dapat menahan instans `Rectangle` lain yang memiliki lebar `5` dan tinggi `1`.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama file: src/lib.cairo</span>
 
 ```rust
 {{#rustdoc_include ../listings/ch09-testing-cairo-programs/listing_08_06/src/lib.cairo:test1}}
 ```
 
-<span class="caption">Listing 9-6: A test for `can_hold` that checks whether a larger rectangle can indeed hold a smaller rectangle</span>
+<span class="caption">Listing 9-6: Sebuah uji coba untuk `can_hold` yang memeriksa apakah suatu persegi panjang yang lebih besar dapat benar-benar menahan persegi panjang yang lebih kecil</span>
 
-Note that we’ve added two new lines inside the tests module: `use super::Rectangle;` and `use super::RectangleTrait;`. The tests module is a regular module that follows the usual visibility rules. Because the tests module is an inner module, we need to bring the code under test in the outer module into the scope of the inner module.
+Perhatikan bahwa kita telah menambahkan dua baris baru di dalam modul uji coba: `use super::Rectangle;` dan `use super::RectangleTrait;`. Modul uji coba adalah modul biasa yang mengikuti aturan visibilitas biasa. Karena modul uji coba adalah modul dalam, kita perlu membawa kode yang diuji di modul luar ke dalam cakupan modul dalam.
 
-We’ve named our test `larger_can_hold_smaller`, and we’ve created the two `Rectangle` instances that we need. Then we called the assert function and passed it the result of calling `larger.can_hold(@smaller)`. This expression is supposed to return `true`, so our test should pass. Let’s find out!
+Kami menamai uji coba kami `larger_can_hold_smaller`, dan kami telah membuat dua instans `Rectangle` yang kami butuhkan. Kemudian kami memanggil fungsi assert dan meneruskannya hasil dari pemanggilan `larger.can_hold(@smaller)`. Ekspresi ini seharusnya mengembalikan `true`, jadi uji coba kita seharusnya lulus. Mari kita cari tahu!
 
 ```shell
 $ scarb cairo-test
@@ -132,15 +131,15 @@ test adder::lib::tests::larger_can_hold_smaller ... ok
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 filtered out;
 ```
 
-It does pass! Let’s add another test, this time asserting that a smaller rectangle cannot hold a larger rectangle:
+Itu berhasil! Mari tambahkan uji coba lain, kali ini menegaskan bahwa persegi panjang yang lebih kecil tidak dapat menahan persegi panjang yang lebih besar:
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama file: src/lib.cairo</span>
 
 ```rust
 {{#rustdoc_include ../listings/ch09-testing-cairo-programs/listing_08_06/src/lib.cairo:test2}}
 ```
 
-Because the correct result of the `can_hold` function in this case is `false`, we need to negate that result before we pass it to the assert function. As a result, our test will pass if `can_hold` returns false:
+Karena hasil yang benar dari fungsi `can_hold` dalam kasus ini adalah `false`, kita perlu membalik hasil tersebut sebelum kami meneruskannya ke fungsi assert. Akibatnya, uji coba kita akan lulus jika `can_hold` mengembalikan false:
 
 ```shell
 $ scarb cairo-test
@@ -150,13 +149,13 @@ $ scarb cairo-test
     test result: ok. 2 passed; 0 failed; 0 ignored; 0 filtered out;
 ```
 
-Two tests that pass! Now let’s see what happens to our test results when we introduce a bug in our code. We’ll change the implementation of the `can_hold` method by replacing the greater-than sign with a less-than sign when it compares the widths:
+Dua uji coba yang lulus! Sekarang mari lihat apa yang terjadi pada hasil uji coba kita ketika kita memperkenalkan bug dalam kode kita. Kami akan mengubah implementasi metode `can_hold` dengan mengganti tanda lebih dari dengan tanda kurang dari saat membandingkan lebar:
 
 ```rust
 {{#include ../listings/ch09-testing-cairo-programs/no_listing_02_wrong_can_hold_impl/src/lib.cairo:wrong_impl}}
 ```
 
-Running the tests now produces the following:
+Menjalankan uji coba sekarang menghasilkan hal berikut:
 
 ```shell
 $ scarb cairo-test
@@ -169,25 +168,25 @@ failures:
 Error: test result: FAILED. 1 passed; 1 failed; 0 ignored
 ```
 
-Our tests caught the bug! Because `larger.width` is `8` and `smaller.width` is `5`, the comparison of the widths in `can_hold` now returns `false`: `8` is not less than `5`.
+Uji coba kita menangkap bug tersebut! Karena `larger.width` adalah `8` dan `smaller.width` adalah `5`, perbandingan lebar dalam `can_hold` sekarang mengembalikan `false`: `8` tidak kurang dari `5`.
 
-## Checking for panics with `should_panic`
+## Memeriksa Panic dengan `should_panic`
 
-In addition to checking return values, it’s important to check that our code handles error conditions as we expect. For example, consider the Guess type in Listing 9-8. Other code that uses `Guess` depends on the guarantee that `Guess` instances will contain only values between `1` and `100`. We can write a test that ensures that attempting to create a `Guess` instance with a value outside that range panics.
+Selain memeriksa nilai kembalian, penting untuk memastikan bahwa kode kita menangani kondisi kesalahan sebagaimana yang diharapkan. Sebagai contoh, pertimbangkan tipe `Guess` pada Listing 9-8. Kode lain yang menggunakan `Guess` bergantung pada jaminan bahwa instance `Guess` hanya akan berisi nilai antara `1` dan `100`. Kita dapat menulis uji yang memastikan mencoba membuat instance `Guess` dengan nilai di luar rentang tersebut menyebabkan panic.
 
-We do this by adding the attribute `should_panic` to our test function. The test passes if the code inside the function panics; the test fails if the code inside the function doesn’t panic.
+Ini dapat dilakukan dengan menambahkan atribut `should_panic` pada fungsi uji kita. Uji tersebut lulus jika kode di dalam fungsi menyebabkan panic; uji tersebut gagal jika kode di dalam fungsi tidak menyebabkan panic.
 
-Listing 9-8 shows a test that checks that the error conditions of `GuessTrait::new` happen when we expect them to.
+Listing 9-8 menunjukkan uji yang memeriksa bahwa kondisi kesalahan dari `GuessTrait::new` terjadi seperti yang diharapkan.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama file: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch09-testing-cairo-programs/listing_08_08/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 9-8: Testing that a condition will cause a panic</span>
+<span class="caption">Listing 9-8: Menguji bahwa suatu kondisi akan menyebabkan panic</span>
 
-We place the `#[should_panic]` attribute after the `#[test]` attribute and before the test function it applies to. Let’s look at the result when this test passes:
+Kita menempatkan atribut `#[should_panic]` setelah atribut `#[test]` dan sebelum fungsi uji yang diterapkannya. Mari lihat hasilnya ketika uji ini berhasil:
 
 ```shell
 $ scarb cairo-test
@@ -196,13 +195,13 @@ test adder::lib::tests::greater_than_100 ... ok
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 filtered out;
 ```
 
-Looks good! Now let’s introduce a bug in our code by removing the condition that the new function will panic if the value is greater than `100`:
+Tampak bagus! Sekarang mari kita perkenalkan bug dalam kode kita dengan menghapus kondisi bahwa fungsi baru akan panic jika nilai lebih dari `100`:
 
 ```rust
 {{#rustdoc_include ../listings/ch09-testing-cairo-programs/no_listing_03_wrong_new_impl/src/lib.cairo:here}}
 ```
 
-When we run the test in Listing 9-8, it will fail:
+Ketika kita menjalankan uji pada Listing 9-8, itu akan gagal:
 
 ```shell
 $ scarb cairo-test
@@ -213,27 +212,27 @@ failures:
 Error: test result: FAILED. 0 passed; 1 failed; 0 ignored
 ```
 
-We don’t get a very helpful message in this case, but when we look at the test function, we see that it’s annotated with `#[should_panic]`. The failure we got means that the code in the test function did not cause a panic.
+Kita tidak mendapatkan pesan yang sangat membantu dalam kasus ini, tetapi ketika kita melihat fungsi uji, kita melihat bahwa itu di-annotasi dengan `#[should_panic]`. Kegagalan yang kita dapatkan berarti bahwa kode di dalam fungsi uji tidak menyebabkan panic.
 
-Tests that use `should_panic` can be imprecise. A `should_panic` test would pass even if the test panics for a different reason from the one we were expecting. To make `should_panic` tests more precise, we can add an optional expected parameter to the `should_panic` attribute. The test harness will make sure that the failure message contains the provided text. For example, consider the modified code for `Guess` in Listing 9-9 where the new function panics with different messages depending on whether the value is too small or too large.
+Uji yang menggunakan `should_panic` dapat tidak akurat. Uji `should_panic` akan lulus bahkan jika uji menyebabkan panic karena alasan yang berbeda dari yang kita harapkan. Untuk membuat uji `should_panic` lebih tepat, kita dapat menambahkan parameter opsional yang diharapkan ke atribut `should_panic`. Harness uji akan memastikan bahwa pesan kegagalan berisi teks yang diberikan. Sebagai contoh, pertimbangkan kode yang dimodifikasi untuk `Guess` pada Listing 9-9 di mana fungsi baru menyebabkan panic dengan pesan yang berbeda tergantung pada apakah nilai terlalu kecil atau terlalu besar.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama file: src/lib.cairo</span>
 
 ```rust
 {{#rustdoc_include ../listings/ch09-testing-cairo-programs/listing_08_09/src/lib.cairo:test_panic}}
 ```
 
-<span class="caption">Listing 9-9: Testing for a panic with a panic message containing the error message string</span>
+<span class="caption">Listing 9-9: Menguji panic dengan pesan panic yang berisi string pesan kesalahan</span>
 
-This test will pass because the value we put in the `should_panic` attribute’s expected parameter is the array of string of the message that the `Guess::new` function panics with. We need to specify the entire panic message that we expect.
+Uji ini akan lulus karena nilai yang kita masukkan pada parameter yang diharapkan atribut `should_panic` adalah array string dari pesan bahwa fungsi `Guess::new` panic. Kita perlu menentukan seluruh pesan panic yang kita harapkan.
 
-To see what happens when a `should_panic` test with an expected message fails, let’s again introduce a bug into our code by swapping the bodies of the if `value < 1` and the else if `value > 100` blocks:
+Untuk melihat apa yang terjadi ketika uji `should_panic` dengan pesan yang diharapkan gagal, mari kita lagi memasukkan bug ke dalam kode kita dengan menukar tubuh blok if `value < 1` dan blok else if `value > 100`:
 
 ```rust
 {{#include ../listings/ch09-testing-cairo-programs/no_listing_04_new_bug/src/lib.cairo:here}}
 ```
 
-This time when we run the `should_panic` test, it will fail:
+Kali ini ketika kita menjalankan uji `should_panic`, itu akan gagal:
 
 ```shell
 $ scarb cairo-test
@@ -245,23 +244,23 @@ failures:
 Error: test result: FAILED. 0 passed; 1 failed; 0 ignored
 ```
 
-The failure message indicates that this test did indeed panic as we expected, but the panic message did not include the expected string. The panic message that we did get in this case was `Guess must be >= 1`. Now we can start figuring out where our bug is!
+Pesan kegagalan menunjukkan bahwa uji ini memang panic sesuai yang kita harapkan, tetapi pesan panic tidak menyertakan string yang diharapkan. Pesan panic yang kita dapatkan dalam kasus ini adalah `Guess must be >= 1`. Sekarang kita dapat mulai mencari di mana letak bug kita!
 
-## Running Single Tests
+## Menjalankan Uji Tunggal
 
-Sometimes, running a full test suite can take a long time. If you’re working on code in a particular area, you might want to run only the tests pertaining to that code. You can choose which tests to run by passing `scarb cairo-test` an option `-f` (for "filter"), followed by the name of the test you want to run as an argument.
+Terkadang, menjalankan seluruh rangkaian uji bisa memakan waktu lama. Jika Anda sedang bekerja pada kode di area tertentu, Anda mungkin hanya ingin menjalankan uji yang berkaitan dengan kode tersebut. Anda dapat memilih uji mana yang akan dijalankan dengan melewatkan opsi `-f` (untuk "filter") kepada `scarb cairo-test`, diikuti dengan nama uji yang ingin dijalankan sebagai argumen.
 
-To demonstrate how to run a single test, we’ll first create two tests functions, as shown in Listing 9-10, and choose which ones to run.
+Untuk mendemonstrasikan cara menjalankan uji tunggal, pertama-tama kita akan membuat dua fungsi uji, seperti yang ditunjukkan pada Listing 9-10, dan memilih mana yang ingin dijalankan.
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama file: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch09-testing-cairo-programs/listing_08_10/src/lib.cairo}}
 ```
 
-<span class="caption">Listing 9-10: Two tests with two different names</span>
+<span class="caption">Listing 9-10: Dua uji dengan dua nama berbeda</span>
 
-We can pass the name of any test function to `cairo-test` to run only that test using the `-f` flag:
+Kita dapat melewatkan nama fungsi uji apa pun kepada `cairo-test` untuk menjalankan hanya uji itu menggunakan opsi `-f`:
 
 ```shell
 $ scarb cairo-test -f add_two_and_two
@@ -270,21 +269,21 @@ test adder::lib::tests::add_two_and_two ... ok
 test result: ok. 1 passed; 0 failed; 0 ignored; 1 filtered out;
 ```
 
-Only the test with the name `add_two_and_two` ran; the other test didn’t match that name. The test output lets us know we had one more test that didn’t run by displaying 1 filtered out at the end.
+Hanya uji dengan nama `add_two_and_two` yang dijalankan; uji lainnya tidak cocok dengan nama tersebut. Output uji memberi tahu kita bahwa ada satu uji lagi yang tidak dijalankan dengan menampilkan 1 filtered out di akhir.
 
-We can also specify part of a test name, and any test whose name contains that value will be run.
+Kita juga dapat menentukan sebagian dari nama uji, dan semua uji yang namanya mengandung nilai tersebut akan dijalankan.
 
-## Ignoring Some Tests Unless Specifically Requested
+## Mengabaikan Beberapa Uji Kecuali Diminta Secara Khusus
 
-Sometimes a few specific tests can be very time-consuming to execute, so you might want to exclude them during most runs of `scarb cairo-test`. Rather than listing as arguments all tests you do want to run, you can instead annotate the time-consuming tests using the `ignore` attribute to exclude them, as shown here:
+Terkadang beberapa uji tertentu dapat sangat memakan waktu untuk dieksekusi, sehingga Anda mungkin ingin mengeluarkannya selama sebagian besar jalankan `scarb cairo-test`. Alih-alih menyebutkan sebagai argumen semua uji yang ingin dijalankan, Anda dapat memberi tanda uji yang memakan waktu menggunakan atribut `ignore` untuk mengeluarkannya, seperti yang ditunjukkan di sini:
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama file: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch09-testing-cairo-programs/no_listing_05_ignore_tests/src/lib.cairo}}
 ```
 
-After `#[test]` we add the `#[ignore]` line to the test we want to exclude. Now when we run our tests, `it_works` runs, but `expensive_test` doesn’t:
+Setelah `#[test]`, kita tambahkan baris `#[ignore]` pada uji yang ingin kita eksklusikan. Sekarang ketika kita menjalankan uji kita, `it_works` berjalan, tetapi `expensive_test` tidak:
 
 ```shell
 $ scarb cairo-test
@@ -294,38 +293,38 @@ test adder::lib::tests::it_works ... ok
 test result: ok. 1 passed; 0 failed; 1 ignored; 0 filtered out;
 ```
 
-The `expensive_test` function is listed as ignored.
+Fungsi `expensive_test` dicatat sebagai diabaikan.
 
-When you’re at a point where it makes sense to check the results of the ignored tests and you have time to wait for the results, you can run `scarb cairo-test --include-ignored` to run all tests whether they’re ignored or not.
+Ketika Anda sudah pada titik di mana masuk akal untuk memeriksa hasil uji yang diabaikan dan Anda memiliki waktu untuk menunggu hasilnya, Anda dapat menjalankan `scarb cairo-test --include-ignored` untuk menjalankan semua uji apakah diabaikan atau tidak.
 
-## Testing recursive functions or loops
+## Menguji fungsi rekursif atau perulangan
 
-When testing recursive functions or loops, you must provide the test with a maximum amount of gas that it can consume. This prevents running infinite loops or consuming too much gas, and can help you benchmark the efficiency of your implementations. To do so, you must add the `#[available_gas(<Number>)]` attribute on the test function. The following example shows how to use it:
+Saat menguji fungsi rekursif atau perulangan, Anda harus memberikan jumlah gas maksimum yang dapat dikonsumsi oleh uji. Ini mencegah terjadinya perulangan tak terbatas atau penggunaan gas yang terlalu banyak, dan dapat membantu Anda melakukan pengukuran efisiensi implementasi Anda. Untuk melakukannya, Anda harus menambahkan atribut `#[available_gas(<Number>)]` pada fungsi uji. Contoh berikut menunjukkan cara menggunakannya:
 
-<span class="filename">Filename: src/lib.cairo</span>
+<span class="filename">Nama file: src/lib.cairo</span>
 
 ```rust
 {{#include ../listings/ch09-testing-cairo-programs/no_listing_08_test_gas/src/lib.cairo}}
 ```
 
-## Benchmarking the gas usage of a specific operation
+## Benchmark penggunaan gas dari suatu operasi tertentu
 
-When you want to benchmark the gas usage of a specific operation, you can use the following pattern in your test function.
+Saat Anda ingin melakukan benchmark penggunaan gas dari suatu operasi tertentu, Anda dapat menggunakan pola berikut dalam fungsi uji Anda.
 
 ```rust
 let initial = testing::get_available_gas();
 gas::withdraw_gas().unwrap();
-    /// code we want to bench.
+    /// kode yang ingin kita benchmark.
 (testing::get_available_gas() - x).print();
 ```
 
-The following example shows how to use it to test the gas function of the `sum_n` function above.
+Contoh berikut menunjukkan cara menggunakannya untuk menguji fungsi gas dari fungsi `sum_n` di atas.
 
 ```rust
 {{#include ../listings/ch09-testing-cairo-programs/no_listing_09_benchmark_gas/src/lib.cairo}}
 ```
 
-The value printed when running `scarb cairo-test` is the amount of gas that was consumed by the operation benchmarked.
+Nilai yang dicetak ketika menjalankan `scarb cairo-test` adalah jumlah gas yang dikonsumsi oleh operasi yang di-benchmark.
 
 ```shell
 $ scarb cairo-test
@@ -338,4 +337,4 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 0 filtered out;
 
 ```
 
-Here, the gas usage of the `sum_n` function is 96760 (decimal representation of the hex number). The total amount consumed by the test is slightly higher at 98030, due to some extra steps required to run the entire test function.
+Di sini, penggunaan gas dari fungsi `sum_n` adalah 96760 (representasi desimal dari angka heksadesimal). Jumlah total yang dikonsumsi oleh uji sedikit lebih tinggi pada 98030, karena beberapa langkah ekstra diperlukan untuk menjalankan seluruh fungsi uji.
