@@ -1,21 +1,21 @@
-# A deeper dive into contracts
+# Pemahaman yang Lebih Mendalam tentang Kontrak
 
-In the previous section, we gave an introductory example of a smart contract written in Cairo. In this section, we'll be taking a deeper look at all the components of a smart contract, step by step.
+Pada bagian sebelumnya, kami memberikan contoh pengantar tentang kontrak pintar yang ditulis dalam bahasa Cairo. Pada bagian ini, kita akan melihat lebih mendalam semua komponen dari kontrak pintar, langkah demi langkah.
 
-When we discussed [_interfaces_](./ch99-01-02-a-simple-contract.md), we specified the difference between _public functions, external functions and view functions_, and we mentioned how to interact with _storage_.
+Ketika kita membahas [_interfaces_](./ch99-01-02-a-simple-contract.md), kami menjelaskan perbedaan antara _public functions, external functions, dan view functions_, dan kami menyebutkan bagaimana berinteraksi dengan _storage_.
 
-At this point, you should have multiple questions that come to mind:
+Pada titik ini, seharusnya ada beberapa pertanyaan yang muncul di pikiran Anda:
 
-- How do I define internal/private functions?
-- How can I emit events? How can I index them?
-- Where should I define functions that do not need to access the contract's state?
-- Is there a way to reduce the boilerplate?
-- How can I store more complex data types?
+- Bagaimana cara saya mendefinisikan fungsi internal atau privat?
+- Bagaimana cara saya mengeluarkan peristiwa (events)? Bagaimana cara saya membuat indeks untuk mereka?
+- Di mana seharusnya saya mendefinisikan fungsi yang tidak perlu mengakses status kontrak?
+- Adakah cara untuk mengurangi kode boilerplate?
+- Bagaimana cara menyimpan jenis data yang lebih kompleks?
 
-Luckily, we'll be answering all these questions in this chapter. Let's consider the following example contract that we'll be using throughout this chapter:
+Untungnya, kita akan menjawab semua pertanyaan ini dalam bab ini. Mari pertimbangkan contoh kontrak berikut yang akan kita gunakan sepanjang bab ini:
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:all}}
 ```
 
-<span class="caption">Listing 99-1bis: Our reference contract for this chapter</span>
+<span class="caption">Listing 99-1bis: Kontrak referensi kita untuk bab ini</span>

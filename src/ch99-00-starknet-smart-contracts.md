@@ -1,20 +1,20 @@
-# Starknet Smart Contracts
+# Kontrak Pintar Starknet
 
-All through the previous sections, you've mostly written programs with a `main` entrypoint. In the coming sections, you will learn to write and deploy Starknet contracts.
+Sepanjang bagian-bagian sebelumnya, Anda sebagian besar telah menulis program-program dengan `main` sebagai titik masuk. Pada bagian-bagian mendatang, Anda akan belajar menulis dan mendeploy kontrak-kontrak Starknet.
 
-One of the applications of the Cairo language is to write smart contracts for the Starknet network. Starknet is a permissionless network that leverages zk-STARKs technology for scalability. As a Layer-2 scalability solution for Ethereum, Starknet's goal is to offer fast, secure, and low-cost transactions. It functions as a Validity Rollup (commonly known as a zero-knowledge Rollup) and is built on top of the Cairo language and the Starknet VM.
+Salah satu aplikasi dari bahasa Cairo adalah menulis kontrak pintar untuk jaringan Starknet. Starknet adalah jaringan tanpa izin yang memanfaatkan teknologi zk-STARKs untuk skalabilitas. Sebagai solusi skalabilitas Layer-2 untuk Ethereum, tujuan Starknet adalah menawarkan transaksi yang cepat, aman, dan berbiaya rendah. Ini berfungsi sebagai Validity Rollup (umumnya dikenal sebagai zero-knowledge Rollup) dan dibangun di atas bahasa Cairo dan Starknet VM.
 
-Starknet contracts, in simple words, are programs that can run on the Starknet VM. Since they run on the VM, they have access to Starknet’s persistent state, can alter or modify variables in Starknet’s states, communicate with other contracts, and interact seamlessly with the underlying L1.
+Kontrak-kontrak Starknet, dengan kata-kata sederhana, adalah program-program yang dapat berjalan pada Starknet VM. Karena mereka berjalan di VM, mereka memiliki akses ke status persisten Starknet, dapat mengubah atau memodifikasi variabel-variabel dalam status Starknet, berkomunikasi dengan kontrak-kontrak lain, dan berinteraksi dengan mudah dengan L1 yang mendasarinya.
 
-Starknet contracts are denoted by the `#[contract]` attribute. We'll dive deeper into this in the next sections.
-If you want to learn more about the Starknet network itself, its architecture and the tooling available, you should read the [Starknet Book](https://book.starknet.io/). This section will focus on writing smart contracts in Cairo.
+Kontrak-kontrak Starknet ditandai dengan atribut `#[contract]`. Kami akan lebih mendalam tentang ini pada bagian-bagian selanjutnya.
+Jika Anda ingin mempelajari lebih lanjut tentang jaringan Starknet itu sendiri, arsitekturnya, dan perangkat yang tersedia, Anda sebaiknya membaca [Buku Starknet](https://book.starknet.io/). Bagian ini akan fokus pada penulisan kontrak pintar di Cairo.
 
 #### Scarb
 
-Scarb supports smart contract development for Starknet. To enable this functionality, you'll need to make some configurations in your `Scarb.toml` file (see [Installation](./ch01-01-installation.md) for how to install Scarb).
-You have to add the `starknet` dependency and add a `[[target.starknet-contract]]` section to enable contract compilation.
+Scarb mendukung pengembangan kontrak pintar untuk Starknet. Untuk mengaktifkan fungsionalitas ini, Anda perlu melakukan beberapa konfigurasi dalam file `Scarb.toml` Anda (lihat [Instalasi](./ch01-01-installation.md) untuk cara menginstal Scarb).
+Anda harus menambahkan dependensi `starknet` dan menambahkan bagian `[[target.starknet-contract]]` untuk mengaktifkan kompilasi kontrak.
 
-Below is the minimal Scarb.toml file required to compile a crate containing Starknet contracts:
+Berikut adalah file Scarb.toml minimal yang diperlukan untuk mengompilasi crate yang berisi kontrak-kontrak Starknet:
 
 ```toml
 [package]
@@ -27,6 +27,6 @@ starknet = ">=2.4.0"
 [[target.starknet-contract]]
 ```
 
-For additional configuration, such as external contract dependencies, please refer to the [Scarb documentation](https://docs.swmansion.com/scarb/docs/extensions/starknet/contract-target.html#compiling-external-contracts).
+Untuk konfigurasi tambahan, seperti dependensi kontrak eksternal, silakan merujuk ke [Dokumentasi Scarb](https://docs.swmansion.com/scarb/docs/extensions/starknet/contract-target.html#compiling-external-contracts).
 
-Each example in this chapter can be used with Scarb.
+Setiap contoh dalam bab ini dapat digunakan dengan Scarb.

@@ -1,56 +1,56 @@
-# Recoverable Errors with `Result`
+# Kesalahan yang Dapat Diperbaiki dengan `Result`
 
 <br />
 
-Most errors aren’t serious enough to require the program to stop entirely. Sometimes, when a function fails, it’s for a reason that you can easily interpret and respond to. For example, if you try to add two large integers and the operation overflows because the sum exceeds the maximum representable value, you might want to return an error or a wrapped result instead of causing undefined behavior or terminating the process.
+Sebagian besar kesalahan tidak cukup serius untuk memerlukan program berhenti sepenuhnya. Terkadang, ketika suatu fungsi gagal, itu disebabkan oleh suatu alasan yang dapat Anda interpretasikan dan tanggapi dengan mudah. Sebagai contoh, jika Anda mencoba menambahkan dua bilangan bulat besar dan operasinya melampaui batas nilai yang dapat direpresentasikan, Anda mungkin ingin mengembalikan kesalahan atau hasil yang dibungkus daripada menyebabkan perilaku yang tidak terdefinisi atau menghentikan proses.
 
-## The `Result` enum
+## Enum `Result`
 
-Recall from [“Generic data types”](ch08-01-generic-data-types.md#enums) in Chapter 8 that the `Result` enum is defined as having two variants, `Ok` and `Err`, as follows:
+Ingat dari [“Tipe data generik”](ch08-01-generic-data-types.md#enums) di Bab 8 bahwa enum `Result` didefinisikan memiliki dua varian, `Ok` dan `Err`, sebagai berikut:
 
 ```rust,noplayground
 {{#include ../listings/ch10-error-handling/no_listing_07_result_enum/src/lib.cairo}}
 ```
 
-The `Result<T, E>` enum has two generic types, `T` and `E`, and two variants: `Ok` which holds the value of type `T` and `Err` which holds the value of type `E`. This definition makes it convenient to use the `Result` enum anywhere we have an operation that might succeed (by returning a value of type `T`) or fail (by returning a value of type `E`).
+Enum `Result<T, E>` memiliki dua tipe generik, `T` dan `E`, dan dua varian: `Ok` yang menyimpan nilai bertipe `T` dan `Err` yang menyimpan nilai bertipe `E`. Definisi ini memudahkan penggunaan enum `Result` di mana pun kita memiliki operasi yang mungkin berhasil (dengan mengembalikan nilai bertipe `T`) atau gagal (dengan mengembalikan nilai bertipe `E`).
 
-## The `ResultTrait`
+## Trait `ResultTrait`
 
-The `ResultTrait` trait provides methods for working with the `Result<T, E>` enum, such as unwrapping values, checking whether the `Result` is `Ok` or `Err`, and panicking with a custom message. The `ResultTraitImpl` implementation defines the logic of these methods.
+Trait `ResultTrait` menyediakan metode-metode untuk bekerja dengan enum `Result<T, E>`, seperti membuka nilai, memeriksa apakah `Result` adalah `Ok` atau `Err`, dan memicu panic dengan pesan kustom. Implementasi `ResultTraitImpl` mendefinisikan logika dari metode-metode ini.
 
 ```rust,noplayground
 {{#include ../listings/ch10-error-handling/no_listing_08_result_trait/src/lib.cairo}}
 ```
 
-The `expect` and `unwrap` methods are similar in that they both attempt to extract the value of type `T` from a `Result<T, E>` when it is in the `Ok` variant. If the `Result` is `Ok(x)`, both methods return the value `x`. However, the key difference between the two methods lies in their behavior when the `Result` is in the `Err` variant. The `expect` method allows you to provide a custom error message (as a `felt252` value) that will be used when panicking, giving you more control and context over the panic. On the other hand, the `unwrap` method panics with a default error message, providing less information about the cause of the panic.
+Metode `expect` dan `unwrap` serupa dalam hal keduanya mencoba mengekstrak nilai bertipe `T` dari `Result<T, E>` ketika berada dalam varian `Ok`. Jika `Result` adalah `Ok(x)`, keduanya mengembalikan nilai `x`. Namun, perbedaan kunci antara kedua metode tersebut terletak pada perilaku mereka saat `Result` berada dalam varian `Err`. Metode `expect` memungkinkan Anda menyediakan pesan kesalahan kustom (sebagai nilai `felt252`) yang akan digunakan saat terjadi panic, memberi Anda lebih banyak kontrol dan konteks atas panic tersebut. Di sisi lain, metode `unwrap` memicu panic dengan pesan kesalahan default, memberikan informasi yang lebih sedikit tentang penyebab panic.
 
-The `expect_err` and `unwrap_err` have the exact opposite behavior. If the `Result` is `Err(x)`, both methods return the value `x`. However, the key difference between the two methods is in case of `Result::Ok()`. The `expect_err` method allows you to provide a custom error message (as a `felt252` value) that will be used when panicking, giving you more control and context over the panic. On the other hand, the `unwrap_err` method panics with a default error message, providing less information about the cause of the panic.
+Metode `expect_err` dan `unwrap_err` memiliki perilaku yang sama persis, tetapi kebalikannya. Jika `Result` adalah `Err(x)`, keduanya mengembalikan nilai `x`. Namun, perbedaan kunci antara keduanya terletak pada kasus `Result::Ok()`. Metode `expect_err` memungkinkan Anda menyediakan pesan kesalahan kustom (sebagai nilai `felt252`) yang akan digunakan saat terjadi panic, memberi Anda lebih banyak kontrol dan konteks atas panic tersebut. Di sisi lain, metode `unwrap_err` memicu panic dengan pesan kesalahan default, memberikan informasi yang lebih sedikit tentang penyebab panic.
 
-A careful reader may have noticed the `<+Drop<T>>` and `<+Drop<E>>` in the first four methods signatures. This syntax represents generic type constraints in the Cairo language. These constraints indicate that the associated functions require an implementation of the `Drop` trait for the generic types `T` and `E`, respectively.
+Seorang pembaca yang teliti mungkin telah memperhatikan `<+Drop<T>>` dan `<+Drop<E>>` dalam empat tanda tangan metode pertama. Sintaks ini mewakili kendala tipe generik dalam bahasa Cairo. Kendala ini menunjukkan bahwa fungsi terkait memerlukan implementasi dari trait `Drop` untuk tipe generik `T` dan `E` masing-masing.
 
-Finally, the `is_ok` and `is_err` methods are utility functions provided by the `ResultTrait` trait to check the variant of a `Result` enum value.
+Terakhir, metode `is_ok` dan `is_err` adalah fungsi utilitas yang disediakan oleh trait `ResultTrait` untuk memeriksa varian dari nilai enum `Result`.
 
-`is_ok` takes a snapshot of a `Result<T, E>` value and returns `true` if the `Result` is the `Ok` variant, meaning the operation was successful. If the `Result` is the `Err` variant, it returns `false`.
+`is_ok` mengambil cuplikan nilai `Result<T, E>` dan mengembalikan `true` jika `Result` adalah varian `Ok`, yang berarti operasi berhasil. Jika `Result` adalah varian `Err`, metode ini mengembalikan `false`.
 
-`is_err` takes a reference to a `Result<T, E>` value and returns `true` if the `Result` is the `Err` variant, meaning the operation encountered an error. If the `Result` is the `Ok` variant, it returns `false`.
+`is_err` mengambil referensi ke nilai `Result<T, E>` dan mengembalikan `true` jika `Result` adalah varian `Err`, yang berarti operasi mengalami kesalahan. Jika `Result` adalah varian `Ok`, metode ini mengembalikan `false`.
 
-These methods are helpful when you want to check the success or failure of an operation without consuming the Result value, allowing you to perform additional operations or make decisions based on the variant without unwrapping it.
+Metode-metode ini berguna ketika Anda ingin memeriksa keberhasilan atau kegagalan suatu operasi tanpa mengonsumsi nilai Result, memungkinkan Anda melakukan operasi tambahan atau membuat keputusan berdasarkan varian tanpa membungkusnya.
 
-You can find the implementation of the `ResultTrait` [here](https://github.com/starkware-libs/cairo/blob/main/corelib/src/result.cairo#L20).
+Anda dapat menemukan implementasi dari `ResultTrait` [di sini](https://github.com/starkware-libs/cairo/blob/main/corelib/src/result.cairo#L20).
 
 <br />
 
-It is always easier to understand with examples.
+Selalu lebih mudah dipahami dengan contoh.
 
-Have a look at this function signature:
+Lihatlah tanda tangan fungsi ini:
 
 ```rust,noplayground
 fn u128_overflowing_add(a: u128, b: u128) -> Result<u128, u128>;
 ```
 
-It takes two u128 integers, a and b, and returns a `Result<u128, u128>` where the `Ok` variant holds the sum if the addition does not overflow, and the `Err` variant holds the overflowed value if the addition does overflow.
+Fungsi ini mengambil dua bilangan bulat u128, a dan b, dan mengembalikan `Result<u128, u128>` di mana varian `Ok` menyimpan jumlah jika penambahan tidak melampaui batas, dan varian `Err` menyimpan nilai yang melampaui batas jika penambahan melampaui batas.
 
-Now, we can use this function elsewhere. For instance:
+Sekarang, kita bisa menggunakan fungsi ini di tempat lain. Misalnya:
 
 ```rust,noplayground
 fn u128_checked_add(a: u128, b: u128) -> Option<u128> {
@@ -61,59 +61,59 @@ fn u128_checked_add(a: u128, b: u128) -> Option<u128> {
 }
 ```
 
-Here, it accepts two u128 integers, a and b, and returns an `Option<u128>`. It uses the `Result` returned by `u128_overflowing_add` to determine the success or failure of the addition operation. The match expression checks the `Result` from `u128_overflowing_add`. If the result is `Ok(r)`, it returns `Option::Some(r)` containing the sum. If the result is `Err(r)`, it returns `Option::None` to indicate that the operation has failed due to overflow. The function does not panic in case of an overflow.
+Di sini, fungsi ini menerima dua bilangan bulat u128, a dan b, dan mengembalikan `Option<u128>`. Ini menggunakan `Result` yang dikembalikan oleh `u128_overflowing_add` untuk menentukan keberhasilan atau kegagalan operasi penambahan. Ekspresi match memeriksa `Result` dari `u128_overflowing_add`. Jika hasilnya adalah `Ok(r)`, itu mengembalikan `Option::Some(r)` yang berisi jumlah. Jika hasilnya adalah `Err(r)`, itu mengembalikan `Option::None` untuk menunjukkan bahwa operasi telah gagal karena melampaui batas. Fungsi ini tidak memicu panic dalam kasus melampaui batas.
 
-Let's take another example demonstrating the use of `unwrap`.
+Mari kita lihat contoh lain yang menunjukkan penggunaan `unwrap`.
 
 ```rust,noplayground
 {{#include ../listings/ch10-error-handling/listing_01/src/lib.cairo:function}}
 ```
 
-<span class="caption">Listing 10-1: Using the Result type</span>
+<span class="caption">Listing 10-1: Menggunakan tipe Result</span>
 
-In this example, the `parse_u8` function takes a `felt252` integer and tries to convert it into a `u8` integer using the `try_into` method. If successful, it returns `Result::Ok(value)`, otherwise it returns `Result::Err('Invalid integer')`.
+Dalam contoh ini, fungsi `parse_u8` mengambil integer `felt252` dan mencoba mengonversinya menjadi integer `u8` menggunakan metode `try_into`. Jika berhasil, itu mengembalikan `Result::Ok(value)`, jika tidak mengembalikan `Result::Err('Invalid integer')`.
 
-Our two test cases are:
+Dua kasus uji kita adalah:
 
 ```rust,noplayground
 {{#rustdoc_include ../listings/ch10-error-handling/listing_01/src/lib.cairo:tests}}
 ```
 
-The first one tests a valid conversion from `felt252` to `u8`, expecting the `unwrap` method not to panic. The second test function attempts to convert a value that is out of the `u8` range, expecting the `unwrap` method to panic with the error message 'Invalid integer'.
+Yang pertama menguji konversi yang valid dari `felt252` menjadi `u8`, mengharapkan metode `unwrap` tidak memicu panic. Fungsi uji kedua mencoba mengonversi nilai yang berada di luar rentang `u8`, mengharapkan metode `unwrap` memicu panic dengan pesan kesalahan 'Invalid integer'.
 
-> We could have also used the #[should_panic] attribute here.
+> Kita juga bisa menggunakan atribut #[should_panic] di sini.
 
-### The `?` operator ?
+### `?` operator ?
 
-The last operator we will talk about is the `?` operator. The `?` operator is used for more idiomatic and concise error handling. When you use the `?` operator on a `Result` or `Option` type, it will do the following:
+Operator terakhir yang akan kita bahas adalah operator `?`. Operator `?` digunakan untuk penanganan kesalahan yang lebih idiomatik dan ringkas. Ketika Anda menggunakan operator `?` pada tipe `Result` atau `Option`, itu akan melakukan hal berikut:
 
-- If the value is `Result::Ok(x)` or `Option::Some(x)`, it will return the inner value `x` directly.
-- If the value is `Result::Err(e)` or `Option::None`, it will propagate the error or `None` by immediately returning from the function.
+- Jika nilai adalah `Result::Ok(x)` atau `Option::Some(x)`, itu akan langsung mengembalikan nilai dalamnya, yaitu `x`.
+- Jika nilai adalah `Result::Err(e)` atau `Option::None`, itu akan menyebarkan kesalahan atau `None` dengan segera keluar dari fungsi.
 
-The `?` operator is useful when you want to handle errors implicitly and let the calling function deal with them.
+Operator `?` berguna ketika Anda ingin menangani kesalahan secara implisit dan membiarkan fungsi pemanggil mengatasinya.
 
-Here is an example.
+Berikut adalah contoh penggunaannya.
 
 ```rust,noplayground
 {{#include ../listings/ch10-error-handling/listing_02/src/lib.cairo:function}}
 ```
 
-<span class="caption">Listing 10-1: Using the `?` operator</span>
+<span class="caption">Listing 10-1: Menggunakan operator `?`</span>
 
-`do_something_with_parse_u8` function takes a `felt252` value as input and calls `parse_u8`. The `?` operator is used to propagate the error, if any, or unwrap the successful value.
+Fungsi `do_something_with_parse_u8` mengambil nilai `felt252` sebagai input dan memanggil `parse_u8`. Operator `?` digunakan untuk menyebarkan kesalahan, jika ada, atau membuka kemasan nilai yang berhasil.
 
-And with a little test case:
+Dan dengan sedikit kasus uji:
 
 ```rust,noplayground
 {{#rustdoc_include ../listings/ch10-error-handling/listing_02/src/lib.cairo:tests}}
 ```
 
-The console will print the error "Invalid Integer".
+Konsol akan mencetak kesalahan "Invalid Integer".
 
 <br/>
 
-### Summary
+### Ringkasan
 
-We saw that recoverable errors can be handled in Cairo using the Result enum, which has two variants: `Ok` and `Err`. The `Result<T, E>` enum is generic, with types `T` and `E` representing the successful and error values, respectively. The `ResultTrait` provides methods for working with `Result<T, E>`, such as unwrapping values, checking if the result is `Ok` or `Err`, and panicking with custom messages.
+Kita melihat bahwa kesalahan yang dapat diperbaiki dapat ditangani di Cairo menggunakan enum Result, yang memiliki dua varian: `Ok` dan `Err`. Enum `Result<T, E>` bersifat generik, dengan tipe `T` dan `E` mewakili nilai yang berhasil dan nilai kesalahan, secara berturut-turut. `ResultTrait` menyediakan metode-metode untuk bekerja dengan `Result<T, E>`, seperti membuka nilai, memeriksa apakah hasilnya adalah `Ok` atau `Err`, dan memicu panic dengan pesan kustom.
 
-To handle recoverable errors, a function can return a `Result` type and use pattern matching to handle the success or failure of an operation. The `?` operator can be used to implicitly handle errors by propagating the error or unwrapping the successful value. This allows for more concise and clear error handling, where the caller is responsible for managing errors raised by the called function.
+Untuk menangani kesalahan yang dapat diperbaiki, sebuah fungsi dapat mengembalikan tipe `Result` dan menggunakan pola pencocokan untuk menangani keberhasilan atau kegagalan suatu operasi. Operator `?` dapat digunakan untuk menangani kesalahan secara implisit dengan menyebarkan kesalahan atau membuka kemasan nilai yang berhasil. Ini memungkinkan penanganan kesalahan yang lebih ringkas dan jelas, di mana pemanggil bertanggung jawab untuk mengelola kesalahan yang dibangkitkan oleh fungsi yang dipanggil.

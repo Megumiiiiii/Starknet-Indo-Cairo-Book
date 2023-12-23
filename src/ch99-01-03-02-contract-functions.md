@@ -1,60 +1,60 @@
-## Contract Functions
+## Fungsi Kontrak
 
-In this section, we are going to be looking at the different types of functions you could encounter in contracts:
+Pada bagian ini, kita akan melihat berbagai jenis fungsi yang dapat Anda temui dalam kontrak:
 
-### 1. Constructors
+### 1. Konstruktor
 
-Constructors are a special type of function that only runs once when deploying a contract, and can be used to initialize the state of a contract.
+Konstruktor adalah jenis fungsi khusus yang hanya dijalankan sekali saat mendeploy kontrak, dan dapat digunakan untuk menginisialisasi status sebuah kontrak.
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:constructor}}
 ```
 
-Some important rules to note:
+Beberapa aturan penting yang perlu diperhatikan:
 
-1. Your contract can't have more than one constructor.
-2. Your constructor function must be named `constructor`.
-3. It must be annotated with the `#[constructor]` attribute.
+1. Kontrak Anda tidak boleh memiliki lebih dari satu konstruktor.
+2. Fungsi konstruktor Anda harus diberi nama `constructor`.
+3. Harus diberi anotasi dengan atribut `#[constructor]`.
 
-### 2. Public functions
+### 2. Fungsi Publik
 
-As stated previously, public functions are accessible from outside of the contract. They must be defined inside an implementation block annotated with the `#[external(v0)]` attribute. This attribute only affects the visibility (public vs private/internal), but it doesn't inform us on the ability of these functions to modify the state of the contract.
+Seperti yang disebutkan sebelumnya, fungsi publik dapat diakses dari luar kontrak. Mereka harus didefinisikan di dalam blok implementasi yang dianotasi dengan atribut `#[external(v0)]`. Atribut ini hanya memengaruhi keterlihatan (publik vs privat/internal), namun tidak memberi informasi kepada kita tentang kemampuan fungsi-fungsi ini untuk memodifikasi status kontrak.
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:impl_public}}
 ```
 
-#### External functions
+### Fungsi Eksternal
 
-External functions are functions that can modify the state of a contract. They are public and can be called by any other contract or externally.
-External functions are _public_ functions where the `self: ContractState` is passed as reference with the `ref` keyword, allowing you to modify the state of the contract.
+Fungsi eksternal adalah fungsi yang dapat memodifikasi status sebuah kontrak. Mereka bersifat publik dan dapat dipanggil oleh kontrak lain atau dari luar.
+Fungsi eksternal adalah fungsi _publik_ di mana `self: ContractState` dilewatkan sebagai referensi dengan kata kunci `ref`, memungkinkan Anda untuk memodifikasi status kontrak.
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:external}}
 ```
 
-#### View functions
+### Fungsi View
 
-View functions are read-only functions allowing you to access data from the contract while ensuring that the state of the contract is not modified. They can be called by other contracts or externally.
-View functions are _public_ functions where the `self: ContractState` is passed as snapshot, preventing you from modifying the state of the contract.
+Fungsi view adalah fungsi hanya baca yang memungkinkan Anda mengakses data dari kontrak sambil memastikan bahwa status kontrak tidak dimodifikasi. Mereka dapat dipanggil oleh kontrak lain atau dari luar.
+Fungsi view adalah fungsi _publik_ di mana `self: ContractState` dilewatkan sebagai snapshot, mencegah Anda untuk memodifikasi status kontrak.
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:view}}
 ```
 
-> **Note:** It's important to note that both external and view functions are public. To create an internal function in a contract, you will need to define it outside of the implementation block annotated with the `#[external(v0)]` attribute.
+> **Catatan:** Penting untuk dicatat bahwa baik fungsi eksternal maupun fungsi view bersifat publik. Untuk membuat fungsi internal dalam sebuah kontrak, Anda perlu mendefinisikannya di luar blok implementasi yang dianotasi dengan atribut `#[external(v0)]`.
 
-### 3. Private functions
+### 3. Fungsi Privat
 
-Functions that are not defined in a block annotated with the `#[external(v0)]` attribute are private functions (also called internal functions). They can only be called from within the contract.
+Fungsi yang tidak didefinisikan dalam blok yang dianotasi dengan atribut `#[external(v0)]` adalah fungsi privat (juga disebut fungsi internal). Mereka hanya dapat dipanggil dari dalam kontrak.
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:state_internal}}
 ```
 
-> Wait, what is this `#[generate_trait]` attribute? Where is the trait definition for this implementation? Well, the `#[generate_trait]` attribute is a special attribute that tells the compiler to generate a trait definition for the implementation block. This allows you to get rid of the boilerplate code of defining a trait and implementing it for the implementation block. We will see more about this in the [next section](./ch99-01-03-04-reducing-boilerplate.md).
+> Tunggu, apa itu atribut `#[generate_trait]`? Di mana definisi trait untuk blok implementasi ini? Nah, atribut `#[generate_trait]` adalah atribut khusus yang memberi tahu kompiler untuk menghasilkan definisi trait untuk blok implementasi tersebut. Ini memungkinkan Anda untuk menghilangkan kode boilerplate dari definisi trait dan implementasinya untuk blok implementasi. Kita akan melihat lebih lanjut tentang ini di [bagian selanjutnya](./ch99-01-03-04-reducing-boilerplate.md).
 
-At this point, you might still be wondering if all of this is really necessary if you don't need to access the contract's state in your function (for example, a helper/library function). As a matter of fact, you can also define internal functions outside of implementation blocks. The only reason why we _need_ to define functions inside impl blocks is if we want to access the contract's state.
+Pada titik ini, Anda mungkin masih bertanya-tanya apakah semua ini benar-benar diperlukan jika Anda tidak perlu mengakses status kontrak dalam fungsi Anda (misalnya, fungsi bantuan/pustaka). Sebenarnya, Anda juga dapat mendefinisikan fungsi internal di luar blok implementasi. Satu-satunya alasan mengapa kita _perlu_ mendefinisikan fungsi di dalam blok impl adalah jika kita ingin mengakses status kontrak.
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:stateless_internal}}

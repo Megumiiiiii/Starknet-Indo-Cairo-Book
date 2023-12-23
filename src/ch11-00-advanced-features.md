@@ -1,3 +1,3 @@
-# Advanced Features
+# Fitur Lanjutan
 
-Now, let's learn about more advanced features offered by Cairo.
+Sekarang, mari kita pelajari tentang fitur-fitur lanjutan yang ditawarkan oleh Cairo.

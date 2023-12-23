@@ -1,71 +1,71 @@
-# Introduction to smart-contracts
+# Pengantar tentang Kontrak Pintar
 
-This chapter will give you a high level introduction to what smart-contracts are, what are they used for and why would blockchain developers use Cairo and Starknet.
-If you are already familiar with blockchain programming, feel free to skip this chapter. The last part might still be interesting though.
+Bab ini akan memberikan pengantar tingkat tinggi tentang apa itu kontrak pintar, untuk apa mereka digunakan, dan mengapa pengembang blockchain menggunakan Cairo dan Starknet.
+Jika Anda sudah familiar dengan pemrograman blockchain, silakan lewati bab ini. Bagian terakhir mungkin tetap menarik.
 
-## Smart-contracts
+## Kontrak Pintar
 
-Smart contracts gained popularity and became more widespread with the birth of Ethereum. Smart contracts are essentially programs deployed on a blockchain. The term "smart contract" is somewhat misleading, as they are neither "smart" nor "contracts" but rather code and instructions that are executed based on specific inputs. They primarily consist of two components: storage and functions. Once deployed, users can interact with smart contracts by initiating blockchain transactions containing execution data (which function to call and with what input). Smart contracts can modify and read the storage of the underlying blockchain. A smart contract has its own address and is considered a blockchain account, meaning it can hold tokens.
+Kontrak pintar menjadi populer dan semakin tersebar luas dengan lahirnya Ethereum. Kontrak pintar pada dasarnya adalah program-program yang diterapkan pada blockchain. Istilah "kontrak pintar" agak menyesatkan, karena mereka tidak benar-benar "pintar" atau "kontrak," melainkan kode dan instruksi yang dieksekusi berdasarkan input tertentu. Mereka terutama terdiri dari dua komponen: penyimpanan dan fungsi. Setelah diterapkan, pengguna dapat berinteraksi dengan kontrak pintar dengan memulai transaksi blockchain yang berisi data eksekusi (fungsi apa yang harus dipanggil dan dengan input apa). Kontrak pintar dapat memodifikasi dan membaca penyimpanan dari blockchain yang mendasarinya. Kontrak pintar memiliki alamat sendiri dan dianggap sebagai akun blockchain, yang berarti dapat menyimpan token.
 
-The programming language used to write smart contracts varies depending on the blockchain. For example, on Ethereum and the [EVM-compatible ecosystem](https://ethereum.org/en/developers/docs/evm/), the most commonly used language is Solidity, while on Starknet, it is Cairo. The way the code is compiled also differs based on the blockchain. On Ethereum, Solidity is compiled into bytecode. On Starknet, Cairo is compiled into Sierra and then into Cairo Assembly (casm).
+Bahasa pemrograman yang digunakan untuk menulis kontrak pintar bervariasi tergantung pada blockchain. Misalnya, di Ethereum dan [ekosistem yang kompatibel dengan EVM](https://ethereum.org/en/developers/docs/evm/), bahasa yang paling umum digunakan adalah Solidity, sedangkan di Starknet, menggunakan bahasa Cairo. Cara kode dikompilasi juga berbeda berdasarkan blockchain. Di Ethereum, Solidity dikompilasi menjadi bytecode. Di Starknet, Cairo dikompilasi menjadi Sierra, kemudian menjadi Cair Assembly (casm).
 
-Smart contracts possess several unique characteristics. They are **permissionless**, meaning anyone can deploy a smart contract on the network (within the context of a decentralized blockchain, of course). Smart contracts are also **transparent**; the data stored by the smart contract is accessible to anyone. The code that composes the contract can also be transparent, enabling **composability**. This allows developers to write smart contracts that use other smart contracts. Smart contracts can only access and interact with data from the blockchain they are deployed on. They require third-party software (called `oracles`) to access external data (the price of a token for instance).
+Kontrak pintar memiliki beberapa karakteristik unik. Mereka **tanpa izin**, artinya siapa pun dapat menerapkan kontrak pintar di jaringan (dalam konteks blockchain terdesentralisasi, tentu saja). Kontrak pintar juga **transparan**; data yang disimpan oleh kontrak pintar dapat diakses oleh siapa pun. Kode yang menyusun kontrak juga dapat transparan, memungkinkan **komposabilitas**. Ini memungkinkan pengembang menulis kontrak pintar yang menggunakan kontrak pintar lainnya. Kontrak pintar hanya dapat mengakses dan berinteraksi dengan data dari blockchain tempat mereka diterapkan. Mereka memerlukan perangkat lunak pihak ketiga (yang disebut `oracle`) untuk mengakses data eksternal (seperti harga token, misalnya).
 
-For developers to build smart contracts that can interact with each other, it is required to know what the other contracts look like. Hence, Ethereum developers started to build standards for smart contract development, the `ERCxx`. The two most used and famous standards are the `ERC20`, used to build tokens like `USDC`, `DAI` or `STARK`, and the `ERC721`, for NFTs (Non-fungible tokens) like `CryptoPunks` or `Everai`.
+Untuk memungkinkan pengembang membangun kontrak pintar yang dapat berinteraksi satu sama lain, diperlukan pengetahuan tentang bagaimana kontrak lainnya terlihat. Oleh karena itu, pengembang Ethereum mulai membangun standar untuk pengembangan kontrak pintar, yang dikenal sebagai `ERCxx`. Dua standar yang paling banyak digunakan dan terkenal adalah `ERC20`, digunakan untuk membangun token seperti `USDC`, `DAI`, atau `STARK`, dan `ERC721`, untuk NFT (Token Non-fungible) seperti `CryptoPunks` atau `Everai`.
 
-## Use cases
+## Kasus Penggunaan
 
-There are many possible use cases for smart-contracts. The only limits are the technical constraints of the blockchain and the creativity of developers.
+Ada banyak kasus penggunaan potensial untuk kontrak pintar. Satu-satunya batasan adalah kendala teknis dari blockchain dan kreativitas para pengembang.
 
 #### DeFi
 
-Right now, the principal use case for smart contracts is similar to that of Ethereum or Bitcoin, which is essentially handling money. In the context of the alternative payment system promised by Bitcoin, smart contracts on Ethereum enable the creation of decentralized financial applications that no longer rely on traditional financial intermediaries. This is what we call DeFi (decentralized finance). DeFi consists of various projects such as lending/borrowing apps, decentralized exchanges (DEX), on-chain derivatives, stablecoins, decentralized hedge funds, insurance, and many more.
+Saat ini, penggunaan utama untuk kontrak pintar serupa dengan Ethereum atau Bitcoin, yaitu pada dasarnya menangani uang. Dalam konteks sistem pembayaran alternatif yang dijanjikan oleh Bitcoin, kontrak pintar di Ethereum memungkinkan pembuatan aplikasi keuangan terdesentralisasi yang tidak lagi bergantung pada perantara keuangan tradisional. Ini yang disebut sebagai DeFi (keuangan terdesentralisasi). DeFi terdiri dari berbagai proyek seperti aplikasi peminjaman/pinjaman, pertukaran terdesentralisasi (DEX), derivatif on-chain, stablecoin, dana lindung terdesentralisasi, asuransi, dan banyak lagi.
 
-#### Tokenization
+#### Tokenisasi
 
-Smart contracts can facilitate the tokenization of real-world assets, such as real estate, art, or precious metals. Tokenization divides an asset into digital tokens, which can be easily traded and managed on blockchain platforms. This can increase liquidity, enable fractional ownership, and simplify the buying and selling process.
+Kontrak pintar dapat memfasilitasi tokenisasi aset dunia nyata, seperti properti, seni, atau logam mulia. Tokenisasi membagi suatu aset menjadi token digital, yang dapat dengan mudah diperdagangkan dan dikelola di platform blockchain. Ini dapat meningkatkan likuiditas, memungkinkan kepemilikan fraksional, dan menyederhanakan proses jual beli.
 
 #### Voting
 
-Smart contracts can be used to create secure and transparent voting systems. Votes can be recorded on the blockchain, ensuring immutability and transparency. The smart contract can then automatically tally the votes and declare the results, minimizing the potential for fraud or manipulation.
+Kontrak pintar dapat digunakan untuk membuat sistem pemilihan yang aman dan transparan. Suara dapat dicatat di blockchain, memastikan ketidakubahannya dan transparansi. Kontrak pintar kemudian dapat secara otomatis menghitung suara dan mengumumkan hasilnya, meminimalkan potensi kecurangan atau manipulasi.
 
-#### Royalties
+#### Royalti
 
-Smart contracts can automate royalty payments for artists, musicians, and other content creators. When a piece of content is consumed or sold, the smart contract can automatically calculate and distribute the royalties to the rightful owners, ensuring fair compensation and reducing the need for intermediaries.
+Kontrak pintar dapat mengotomatisasi pembayaran royalti bagi seniman, musisi, dan pencipta konten lainnya. Ketika suatu konten dikonsumsi atau dijual, kontrak pintar dapat secara otomatis menghitung dan mendistribusikan royalti kepada pemilik yang berhak, memastikan kompensasi yang adil dan mengurangi kebutuhan akan perantara.
 
-#### Decentralized identities DIDs
+#### Identitas Terdesentralisasi (DID)
 
-Smart contracts can be used to create and manage digital identities, allowing individuals to control their personal information and share it with third parties securely. The smart contract could verify the authenticity of a user's identity and automatically grant or revoke access to specific services based on the user's credentials.
+Kontrak pintar dapat digunakan untuk membuat dan mengelola identitas digital, memungkinkan individu mengontrol informasi pribadi mereka dan berbagi dengan pihak ketiga secara aman. Kontrak pintar dapat memverifikasi otentisitas identitas pengguna dan secara otomatis memberikan atau mencabut akses ke layanan tertentu berdasarkan kredensial pengguna.
 
 <br/>
 <br/>
-As Ethereum continues to mature, we can expect the use cases and applications of smart contracts to expand further, bringing about exciting new opportunities and reshaping traditional systems for the better.
+Seiring berlanjutnya kedewasaan Ethereum, kita dapat mengharapkan kasus penggunaan dan aplikasi kontrak pintar berkembang lebih jauh, membawa peluang baru yang menarik dan membentuk kembali sistem tradisional menjadi lebih baik.
 
-## The rise of Starknet and Cairo
+## Munculnya Starknet dan Cairo
 
-Ethereum, being the most widely used and resilient smart-contract platform, became a victim of its own success. With the rapid adoption of some previously mentioned use cases, mainly DeFi, the cost of performing transactions became extremely high, rendering the network almost unusable. Engineers and researchers in the ecosystem began working on solutions to address this scalability issue.
+Ethereum, sebagai platform kontrak pintar yang paling banyak digunakan dan tangguh, menjadi korban kesuksesannya sendiri. Dengan adopsi cepat beberapa kasus penggunaan yang telah disebutkan sebelumnya, terutama DeFi, biaya untuk melakukan transaksi menjadi sangat tinggi, membuat jaringan hampir tidak dapat digunakan. Insinyur dan peneliti di ekosistem ini mulai bekerja pada solusi untuk mengatasi masalah skalabilitas ini.
 
-A famous trilemma ([The Blockchain Trilemma](https://vitalik.ca/general/2021/04/07/sharding.html#the-scalability-trilemma)) in the blockchain space states that it is impossible to achieve a high level of scalability, decentralization, and security simultaneously; trade-offs must be made. Ethereum is at the intersection of decentralization and security. Eventually, it was decided that Ethereum's purpose would be to serve as a secure settlement layer, while complex computations would be offloaded to other networks built on top of Ethereum. These are called Layer 2s (L2s).
+Trilema terkenal ([The Blockchain Trilemma](https://vitalik.ca/general/2021/04/07/sharding.html#the-scalability-trilemma)) dalam ruang blockchain menyatakan bahwa tidak mungkin mencapai tingkat skalabilitas, desentralisasi, dan keamanan yang tinggi secara bersamaan; harus ada kompromi. Ethereum berada pada persimpangan desentralisasi dan keamanan. Akhirnya, diputuskan bahwa tujuan Ethereum akan menjadi sebagai lapisan penyelesaian yang aman, sementara perhitungan kompleks akan dipindahkan ke jaringan lain yang dibangun di atas Ethereum. Ini disebut sebagai Layer 2 (L2).
 
-The two primary types of L2s are optimistic rollups and validity rollups. Both approaches involve compressing and batching numerous transactions together, computing the new state, and settling the result on Ethereum (L1). The difference lies in the way the result is settled on L1. For optimistic rollups, the new state is considered valid by default, but there is a 7-day window for nodes to identify malicious transactions.
+Dua jenis utama dari L2 adalah optimistic rollups dan validity rollups. Kedua pendekatan melibatkan kompresi dan pengelompokan sejumlah transaksi bersama-sama, menghitung status baru, dan menyelesaikan hasilnya di Ethereum (L1). Perbedaannya terletak pada cara hasilnya diselesaikan di L1. Untuk optimistic rollups, status baru dianggap valid secara default, tetapi ada jendela 7 hari bagi node untuk mengidentifikasi transaksi yang bersifat berbahaya.
 
-In contrast, validity rollups, such as Starknet, use cryptography to prove that the new state has been correctly computed. This is the purpose of STARKs, this cryptographic technology could permit validity rollups to scale significantly more than optimistic rollups. You can learn more about STARKs from Starkware's Medium [article](https://medium.com/starkware/starks-starkex-and-starknet-9a426680745a), which serves as a good primer.
+Sebaliknya, validity rollups, seperti Starknet, menggunakan kriptografi untuk membuktikan bahwa status baru telah dihitung dengan benar. Ini adalah tujuan dari STARKs, teknologi kriptografi ini dapat memungkinkan validity rollups untuk dapat meningkatkan skalabilitas secara signifikan lebih dari optimistic rollups. Anda dapat mempelajari lebih lanjut tentang STARKs dari [artikel](https://medium.com/starkware/starks-starkex-and-starknet-9a426680745a) Medium Starkware, yang berfungsi sebagai panduan yang baik.
 
-> Starknet's architecture is thoroughly described in the [Starknet Book](https://book.starknet.io/chapter_4/index.html), which is a great resource to learn more about the Starknet network.
+> Arsitektur Starknet dijelaskan secara rinci dalam [Buku Starknet](https://book.starknet.io/chapter_4/index.html), yang merupakan sumber yang bagus untuk mempelajari lebih lanjut tentang jaringan Starknet.
 
-Remember Cairo? It is, in fact, a language developed specifically to work with STARKs and make them general-purpose. With Cairo, we can write **provable code**. In the context of Starknet, this allows proving the correctness of computations from one state to another.
+Ingat Cairo? Sebenarnya, ini adalah bahasa yang dikembangkan khusus untuk bekerja dengan STARKs dan membuatnya menjadi tujuan umum. Dengan Cairo, kita dapat menulis **kode yang dapat dibuktikan**. Dalam konteks Starknet, ini memungkinkan membuktikan kebenaran perhitungan dari satu status ke status lainnya.
 
-Unlike most (if not all) of Starknet's competitors that chose to use the EVM (either as-is or adapted) as a base layer, Starknet employs its own VM. This frees developers from the constraints of the EVM, opening up a broader range of possibilities. Coupled with decreased transaction costs, the combination of Starknet and Cairo creates an exciting playground for developers. Native account abstraction enables more complex logic for accounts, that we call "Smart Accounts", and transaction flows. Emerging use cases include **transparent AI** and machine learning applications. Finally, **blockchain games** can be developed entirely **on-chain**. Starknet has been specifically designed to maximize the capabilities of STARK proofs for optimal scalability.
+Berbeda dengan sebagian besar (jika tidak semua) pesaing Starknet yang memilih menggunakan EVM (entah itu apa adanya atau disesuaikan) sebagai lapisan dasar, Starknet menggunakan VM sendiri. Ini membebaskan pengembang dari batasan EVM, membuka berbagai kemungkinan. Bersamaan dengan penurunan biaya transaksi, kombinasi Starknet dan Cairo menciptakan tempat bermain yang menarik bagi para pengembang. Abstraksi akun asli memungkinkan logika yang lebih kompleks untuk akun, yang disebut "Smart Accounts," dan alur transaksi. Kasus penggunaan yang muncul termasuk **kecerdasan buatan yang transparan** dan aplikasi pembelajaran mesin. Akhirnya, **game blockchain** dapat dikembangkan sepenuhnya **on-chain**. Starknet telah dirancang khusus untuk memaksimalkan kemampuan bukti STARK untuk skalabilitas yang optimal.
 
-> Learn more about Account Abstraction in the [Starknet Book](https://book.starknet.io/chapter_5/index.html).
+> Pelajari lebih lanjut tentang Abstraksi Akun di [Buku Starknet](https://book.starknet.io/chapter_5/index.html).
 
-## Cairo programs and Starknet contracts: what is the difference?
+## Program Cairo dan Kontrak Starknet: Apa Perbedaannya?
 
-Starknet contracts are a special superset of Cairo programs, so the concepts previously learned in this book are still applicable to write Starknet contracts.
-As you may have already noticed, a Cairo program must always have a function `main` that serves as the entry point for this program:
+Kontrak Starknet adalah superset khusus dari program Cairo, sehingga konsep-konsep yang telah dipelajari sebelumnya dalam buku ini masih berlaku untuk menulis kontrak Starknet.
+Seperti yang mungkin telah Anda perhatikan, program Cairo harus selalu memiliki fungsi `main` yang berfungsi sebagai titik masuk untuk program ini:
 
 ```rust
 fn main() {}
 ```
 
-Starknet contracts are essentially programs that can run on the Starknet OS, and as such, have access to Starknet's state. For a module to be handled as a contract by the compiler, it must be annotated with the `#[starknet::contract]` attribute.
+Kontrak Starknet pada dasarnya adalah program-program yang dapat berjalan di sistem operasi Starknet, dan sebagai program semacam itu, mereka memiliki akses ke status Starknet. Agar suatu modul dapat dianggap sebagai kontrak oleh kompiler, modul tersebut harus dianotasi dengan atribut `#[starknet::contract]`.

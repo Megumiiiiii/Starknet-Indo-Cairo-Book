@@ -1,77 +1,77 @@
-# A simple contract
+# Kontrak Sederhana
 
-This chapter will introduce you to the basics of Starknet contracts with an example of a basic contract. You will learn how to write a simple contract that stores a single number on the blockchain.
+Bab ini akan memperkenalkan dasar-dasar kontrak Starknet dengan contoh kontrak dasar. Anda akan belajar bagaimana menulis kontrak sederhana yang menyimpan sebuah angka tunggal di blockchain.
 
-## Anatomy of a simple Starknet Contract
+## Anatomi dari Kontrak Starknet Sederhana
 
-Let's consider the following contract to present the basics of a Starknet contract. It might not be easy to understand it all at once, but we will go through it step by step:
+Mari pertimbangkan kontrak berikut untuk menjelaskan dasar-dasar kontrak Starknet. Mungkin tidak mudah untuk memahaminya sekaligus, tetapi kita akan menjelaskannya langkah demi langkah:
 
 ```rust
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_01/src/lib.cairo:all}}
 ```
 
-<span class="caption">Listing 99-1: A simple storage contract</span>
+<span class="caption">Listing 99-1: Kontrak penyimpanan sederhana</span>
 
-> Note: Starknet contracts are defined within [modules](./ch07-02-defining-modules-to-control-scope.md).
+> Catatan: Kontrak Starknet didefinisikan dalam [modul](./ch07-02-defining-modules-to-control-scope.md).
 
-### What is this contract?
+### Apa maksudnya kontrak ini?
 
-In this example, the `Storage` struct declares a storage variable called `stored_data` of type `u128` (unsigned integer of 128 bits).
-You can think of it as a single slot in a database that you can query and alter by calling functions of the code that manages the database.
-The contract defines and exposes publicly the functions `set` and `get` that can be used to modify or retrieve the value of that variable.
+Pada contoh ini, `Storage` struct mendeklarasikan variabel penyimpanan yang disebut `stored_data` dengan tipe `u128` (bilangan bulat tak bertanda 128 bit).
+Anda dapat memandangnya sebagai sebuah slot tunggal dalam sebuah database yang dapat Anda panggil dan ubah dengan memanggil fungsi dari kode yang mengelola database tersebut.
+Kontrak ini mendefinisikan dan mengekspos secara publik fungsi-fungsi `set` dan `get` yang dapat digunakan untuk memodifikasi atau mengambil nilai dari variabel tersebut.
 
-### The Interface: the contract's blueprint
+### Antarmuka: desain kontrak
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_01/src/lib.cairo:interface}}
 ```
 
-The interface of a contract represents the functions this contract exposes to the outside world. Here, the interface exposes two functions: `set` and `get`. By leveraging the [traits & impls](./ch08-02-traits-in-cairo.md) mechanism from Cairo, we can make sure that the actual implementation of the contract matches its interface. In fact, you will get a compilation error if your contract doesn’t conform with the declared interface.
+Antarmuka kontrak mewakili fungsi-fungsi yang kontrak ini tawarkan kepada dunia luar. Di sini, antarmuka mengekspos dua fungsi: `set` dan `get`. Dengan memanfaatkan mekanisme [traits & impls](./ch08-02-traits-in-cairo.md) dari Cairo, kita dapat memastikan bahwa implementasi sebenarnya dari kontrak sesuai dengan antarmukanya. Bahkan, Anda akan mendapatkan kesalahan kompilasi jika kontrak Anda tidak sesuai dengan antarmuka yang dinyatakan.
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_01_bis_wrong_impl/src/lib.cairo:impl}}
 ```
 
-<span class="caption">Listing 99-1-bis: A wrong implementation of the interface of the contract. This does not compile.</span>
+<span class="caption">Listing 99-1-bis: Implementasi yang salah dari antarmuka kontrak. Ini tidak dapat dikompilasi.</span>
 
-In the interface, note the generic type `TContractState` of the `self` argument which is passed by reference to the `set` function. The `self` parameter represents the contract state. Seeing the `self` argument passed to `set` tells us that this function might access the state of the contract, as it is what gives us access to the contract’s storage. The `ref` modifier implies that `self` may be modified, meaning that the storage variables of the contract may be modified inside the `set` function.
+Pada antarmuka, perhatikan tipe generik `TContractState` dari argumen `self` yang dilewatkan secara referensi ke fungsi `set`. Parameter `self` mewakili status kontrak. Melihat argumen `self` yang dilewatkan ke `set` memberi tahu kita bahwa fungsi ini mungkin mengakses status kontrak, karena itulah yang memberi kita akses ke penyimpanan kontrak. Modifikator `ref` mengimplikasikan bahwa `self` dapat dimodifikasi, yang berarti variabel penyimpanan kontrak dapat dimodifikasi di dalam fungsi `set`.
 
-On the other hand, `get` takes a _snapshot_ of `TContractState`, which immediately tells us that it does not modify the state (and indeed, the compiler will complain if we try to modify storage inside the `get` function).
+Di sisi lain, `get` mengambil _snapshot_ dari `TContractState`, yang segera memberi tahu kita bahwa ini tidak mengubah status (dan memang, kompiler akan mengeluh jika kita mencoba mengubah penyimpanan di dalam fungsi `get`).
 
-### Public functions are defined in an implementation block
+### Fungsi publik didefinisikan dalam blok implementasi
 
-Before we explore things further down, let's define some terminology.
+Sebelum kita menjelajahi lebih jauh, mari tentukan beberapa terminologi.
 
-- In the context of Starknet, a _public function_ is a function that is exposed to the outside world. In the example above, `set` and `get` are public functions. A public function can be called by anyone, and can be called from outside the contract, or from within the contract. In the example above, `set` and `get` are public functions.
+- Dalam konteks Starknet, _fungsi publik_ adalah fungsi yang diakses oleh dunia luar. Dalam contoh di atas, `set` dan `get` adalah fungsi publik. Fungsi publik dapat dipanggil oleh siapa pun, dan dapat dipanggil dari luar kontrak atau dari dalam kontrak. Dalam contoh di atas, `set` dan `get` adalah fungsi publik.
 
-- What we call an _external_ function is a public function that is invoked through a transaction and that can mutate the state of the contract. `set` is an external function.
+- Apa yang kita sebut sebagai _fungsi eksternal_ adalah fungsi publik yang dipanggil melalui transaksi dan dapat mengubah status kontrak. `set` adalah fungsi eksternal.
 
-- A _view_ function is a public function that can be called from outside the contract, but that cannot mutate the state of the contract. `get` is a view function.
+- Fungsi _view_ adalah fungsi publik yang dapat dipanggil dari luar kontrak, tetapi tidak dapat mengubah status kontrak. `get` adalah fungsi view.
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_01/src/lib.cairo:impl}}
 ```
 
-Since the contract interface is defined as the `ISimpleStorage` trait, in order to match the interface, the external functions of the contract
-must be defined in an implementation of this trait — which allows us to make sure that the implementation of the contract matches its interface.
+Karena antarmuka kontrak didefinisikan sebagai trait `ISimpleStorage`, untuk sesuai dengan antarmuka, fungsi eksternal kontrak
+harus didefinisikan dalam implementasi dari trait ini — yang memungkinkan kita memastikan bahwa implementasi kontrak sesuai dengan antarmukanya.
 
-However, simply defining the functions in the implementation is not enough. The implementation block must be annotated with the `#[external(v0)]` attribute. This attribute exposes the functions defined in this implementation to the outside world — forget to add it and your functions will not be callable from the outside. All functions defined in a block marked as `#[external(v0)]` are consequently _public functions_.
+Namun, hanya mendefinisikan fungsi-fungsi dalam implementasi belum cukup. Blok implementasi harus dianotasi dengan atribut `#[external(v0)]`. Atribut ini mengekspos fungsi-fungsi yang didefinisikan dalam implementasi ini ke dunia luar — lupakan untuk menambahkannya dan fungsi-fungsi Anda tidak dapat dipanggil dari luar. Semua fungsi yang didefinisikan dalam blok yang ditandai dengan `#[external(v0)]` secara konsekuensial adalah _fungsi publik_.
 
-When writing the implementation of the interface, the generic parameter corresponding to the `self` argument in the trait must be `ContractState`. The `ContractState` type is generated by the compiler, and gives access to the storage variables defined in the `Storage` struct.
-Additionally, `ContractState` gives us the ability to emit events. The name `ContractState` is not surprising, as it’s a representation of the contract’s state, which is what we think of `self` in the contract interface trait.
+Saat menulis implementasi antarmuka, parameter generik yang sesuai dengan argumen `self` dalam trait harus `ContractState`. Tipe `ContractState` dihasilkan oleh kompiler, dan memberikan akses ke variabel penyimpanan yang didefinisikan dalam struktur `Storage`.
+Selain itu, `ContractState` memberikan kita kemampuan untuk menghasilkan acara (events). Nama `ContractState` tidak mengherankan, karena ini adalah representasi dari status kontrak, yang merupakan apa yang kita pikirkan sebagai `self` dalam trait antarmuka kontrak.
 
-### Modifying the contract's state
+### Memodifikasi Status Kontrak
 
-As you can notice, all functions that need to access the state of the contract are defined under the implementation of a trait that has a `TContractState` generic parameter, and take a `self: ContractState` parameter.
-This allows us to explicitly pass the `self: ContractState` parameter to the function, allowing access the storage variables of the contract.
-To access a storage variable of the current contract, you add the `self` prefix to the storage variable name, which allows you to use the `read` and `write` methods to either read or write the value of the storage variable.
+Seperti yang dapat Anda perhatikan, semua fungsi yang perlu mengakses status kontrak didefinisikan dalam implementasi dari suatu trait yang memiliki parameter generik `TContractState`, dan mengambil parameter `self: ContractState`.
+Ini memungkinkan kita secara eksplisit melewatkan parameter `self: ContractState` ke fungsi, memungkinkan akses ke variabel penyimpanan kontrak.
+Untuk mengakses variabel penyimpanan dari kontrak saat ini, Anda menambahkan awalan `self` ke nama variabel penyimpanan, yang memungkinkan Anda menggunakan metode `read` dan `write` untuk membaca atau menulis nilai variabel penyimpanan.
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/listing_99_01/src/lib.cairo:write_state}}
 ```
 
-<span class="caption">Using `self` and the `write` method to modify the value of a storage variable</span>
+<span class="caption">Menggunakan `self` dan metode `write` untuk memodifikasi nilai variabel penyimpanan</span>
 
-> Note: if the contract state is passed as a snapshot instead of `ref`, attempting to modify will result in a compilation error.
+> Catatan: jika status kontrak dilewatkan sebagai snapshot daripada `ref`, upaya untuk memodifikasinya akan menghasilkan kesalahan kompilasi.
 
-This contract does not do much yet apart from allowing anyone to store a single number that is accessible by anyone in the world. Anyone could call `set` again with a different value and overwrite your number, but the number is still stored in the history of the blockchain. Later, you will see how you can impose access restrictions so that only you can alter the number.
+Kontrak ini belum melakukan banyak hal selain memungkinkan siapa pun menyimpan satu angka yang dapat diakses oleh siapa pun di dunia. Siapa pun bisa memanggil `set` lagi dengan nilai yang berbeda dan menimpa angka Anda, tetapi angka tersebut masih tersimpan dalam riwayat blockchain. Nanti, Anda akan melihat bagaimana Anda dapat memberlakukan pembatasan akses agar hanya Anda yang dapat mengubah angka tersebut.

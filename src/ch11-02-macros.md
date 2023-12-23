@@ -1,19 +1,19 @@
 # Macros
 
-The Cairo language has some plugins that allows developers to simplify their code. They are called `inline_macros` and are a way of writing code that generates other code. In Cairo, there are only two `macros`: `array![]` and `consteval_int!()`.
+Bahasa Cairo memiliki beberapa plugin yang memungkinkan pengembang menyederhanakan kode mereka. Mereka disebut `inline_macros` dan merupakan cara penulisan kode yang menghasilkan kode lain. Dalam Cairo, hanya ada dua `macros`: `array![]` dan `consteval_int!()`.
 
-### Let's start by `array!`
+### Mari kita mulai dengan `array!`
 
-Sometimes, we need to create arrays with values that are already known at compile time. The basic way of doing that is redundant. You would first declare the array and then append each value one by one. `array!` is a simpler way of doing this task by combining the two steps.
-At compile-time, the compiler will create an array and append all values passed to the `array!` macro sequentially.
+Kadang-kadang, kita perlu membuat array dengan nilai yang sudah diketahui pada saat kompilasi. Cara dasar untuk melakukannya redundan. Pertama, Anda akan mendeklarasikan array dan kemudian menambahkan setiap nilai satu per satu. `array!` adalah cara yang lebih sederhana untuk melakukan tugas ini dengan menggabungkan dua langkah.
+Pada saat kompilasi, kompiler akan membuat array dan menambahkan semua nilai yang dilewatkan ke makro `array!` secara berurutan.
 
-Without `array!`:
+Tanpa `array!`:
 
 ```rust
 {{#include ../listings/ch11-advanced-features/no_listing_02_array_macro/src/lib.cairo:no_macro}}
 ```
 
-With `array!`:
+Dengan `array!`:
 
 ```rust
 {{#include ../listings/ch11-advanced-features/no_listing_02_array_macro/src/lib.cairo:array_macro}}
@@ -21,12 +21,12 @@ With `array!`:
 
 ### `consteval_int!`
 
-In some situations, a developer might need to declare a constant that is the result of a computation of integers. To compute a constant expression and use its result at compile time, it is required to use the `consteval_int!` macro.
+Dalam beberapa situasi, seorang pengembang mungkin perlu mendeklarasikan konstanta yang merupakan hasil dari perhitungan bilangan bulat. Untuk menghitung ekspresi konstan dan menggunakan hasilnya pada waktu kompilasi, diperlukan penggunaan makro `consteval_int!`.
 
-Here is an example of `consteval_int!`:
+Berikut adalah contoh dari `consteval_int!`:
 
 ```rust
 const a: felt252 = consteval_int!(2 * 2 * 2);
 ```
 
-This will be interpreted as `const a: felt252 = 8;` by the compiler.
+Ini akan diinterpretasikan sebagai `const a: felt252 = 8;` oleh kompiler.

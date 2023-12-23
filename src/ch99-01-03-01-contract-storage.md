@@ -1,139 +1,135 @@
-# Contract Storage
+# Storage Kontrak
 
-The most common way for interacting with a contract’s storage is through storage variables. As stated previously, storage variables allow you to store data that will be stored in the contract's storage that is itself stored on the blockchain. These data are persistent and can be accessed and modified anytime once the contract is deployed.
+Cara paling umum untuk berinteraksi dengan Storage kontrak adalah melalui variabel Storage. Seperti yang disebutkan sebelumnya, variabel Storage memungkinkan Anda menyimpan data yang akan disimpan di Storage kontrak yang sendiri disimpan di blockchain. Data ini persisten dan dapat diakses serta dimodifikasi kapan saja setelah kontrak diimplementasikan.
 
-Storage variables in Starknet contracts are stored in a special struct called `Storage`:
+Variabel Storage dalam kontrak Starknet disimpan dalam struktur khusus yang disebut `Storage`:
 
 ```rust, noplayground
 {{#rustdoc_include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:storage}}
 ```
 
-<span class="caption">A Storage Struct</span>
+<span class="caption">Sebuah Struktur Storage</span>
 
-The storage struct is a [struct](./ch05-00-using-structs-to-structure-related-data.md) like any other,
-except that it **must** be annotated with `#[storage]`. This annotation tells the compiler to generate the required code to interact with the blockchain state, and allows you to read and write data from and to storage. Moreover, this allows you to define storage mappings using the `LegacyMap` type.
+Struktur Storage adalah [struktur](./ch05-00-using-structs-to-structure-related-data.md) seperti struktur lainnya,
+kecuali bahwa ini **harus** diberi anotasi `#[storage]`. Anotasi ini memberi tahu kompiler untuk menghasilkan kode yang diperlukan untuk berinteraksi dengan status blockchain, dan memungkinkan Anda membaca dan menulis data dari dan ke Storage. Selain itu, ini memungkinkan Anda mendefinisikan pemetaan Storage menggunakan tipe `LegacyMap`.
 
-Each variable stored in the storage struct is stored in a different location in the contract's storage. The storage address of a variable is determined by the variable's name, and the eventual keys of the variable if it is a [mapping](#storing-mappings).
+Setiap variabel yang disimpan dalam struktur Storage disimpan di lokasi yang berbeda dalam Storage kontrak. Alamat Storage variabel ditentukan oleh nama variabel, dan kunci eventual dari variabel jika itu adalah [pemetaan](#storing-mappings).
 
-## Storage Addresses
+## Alamat Storage
 
-The address of a storage variable is computed as follows:
+Alamat variabel Storage dihitung sebagai berikut:
 
-- If the variable is a single value (not a mapping), the address is the `sn_keccak` hash of the ASCII encoding of the variable's name. `sn_keccak` is Starknet's version of the Keccak256 hash function, whose output is truncated to 250 bits.
-- If the variable is a [mapping](#storing-mappings), the address of the value at key `k_1,...,k_n` is `h(...h(h(sn_keccak(variable_name),k_1),k_2),...,k_n)` where ℎ is the Pedersen hash and the final value is taken `mod (2^251) − 256`.
-- If it is a mapping to complex values (e.g., tuples or structs), then this complex value lies in a continuous segment starting from the address calculated in the previous point. Note that 256 field elements is the current limitation on the maximal size of a complex storage value.
+- Jika variabel adalah nilai tunggal (bukan pemetaan), alamatnya adalah hash `sn_keccak` dari pengkodean ASCII nama variabel. `sn_keccak` adalah versi Starknet dari fungsi hash Keccak256, yang keluarannya dipotong menjadi 250 bit.
+- Jika variabel adalah [pemetaan](#storing-mappings), alamat nilai pada kunci `k_1,...,k_n` adalah `h(...h(h(sn_keccak(nama_variabel),k_1),k_2),...,k_n)` di mana ℎ adalah hash Pedersen dan nilai akhir diambil `mod (2^251) − 256`.
+- Jika ini adalah pemetaan ke nilai-nilai kompleks (misalnya, tuple atau struktur), maka nilai kompleks ini terletak dalam segmen yang berkelanjutan dimulai dari alamat yang dihitung pada poin sebelumnya. Perlu dicatat bahwa 256 elemen lapangan adalah batasan saat ini pada ukuran maksimal nilai Storage kompleks.
 
-You can access the address of a storage variable by calling the `address` function on the variable, which returns a `StorageBaseAddress` value.
+Anda dapat mengakses alamat variabel Storage dengan memanggil fungsi `address` pada variabel, yang mengembalikan nilai `StorageBaseAddress`.
 
 ```rust, noplayground
 {{#rustdoc_include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:owner_address}}
 ```
 
-## Interacting with Storage Variables
+## Berinteraksi dengan Variabel Storage
 
-Variables stored in the storage struct can be accessed and modified using the `read` and `write` functions, and you can get their address in storage using the `addr` function. These functions are automatically generated by the compiler for each storage variable.
+Variabel yang disimpan dalam struktur Storage dapat diakses dan dimodifikasi menggunakan fungsi `read` dan `write`, dan Anda dapat mendapatkan alamat mereka di Storage menggunakan fungsi `addr`. Fungsi-fungsi ini secara otomatis dihasilkan oleh kompiler untuk setiap variabel Storage.
 
-To read the value of the `owner` storage variable, which is a single value, we call the `read` function on the `owner` variable, passing in no parameters.
+Untuk membaca nilai dari variabel Storage `owner`, yang merupakan nilai tunggal, kita memanggil fungsi `read` pada variabel `owner`, tanpa parameter.
 
 ```rust, noplayground
 {{#rustdoc_include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:read_owner}}
 ```
 
-<span class="caption">Calling the `read` function on the `owner` variable</span>
+<span class="caption">Memanggil fungsi `read` pada variabel `owner`</span>
 
-To read the value of the storage variable `names`, which is a mapping from `ContractAddress` to `felt252`, we call the `read` function on the `names` variable, passing in the key `address` as a parameter. If the mapping had more than one key, we would pass in the other keys as parameters as well.
+Untuk membaca nilai dari variabel Storage `names`, yang merupakan pemetaan dari `ContractAddress` ke `felt252`, kita memanggil fungsi `read` pada variabel `names`, dengan memberikan kunci `address` sebagai parameter. Jika pemetaan memiliki lebih dari satu kunci, kita akan memberikan kunci-kunci lain sebagai parameter juga.
 
 ```rust, noplayground
 {{#rustdoc_include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:read}}
 ```
 
-<span class="caption">Calling the `read` function on the `names` variable</span>
+<span class="caption">Memanggil fungsi `read` pada variabel `names`</span>
 
-To write a value to a storage variable, we call the `write` function passing in the eventual keys the value as arguments. As with the `read` function, the number of arguments depends on the number of keys - here, we only pass in the value to write to the `owner` variable as it is a simple variable.
+Untuk menulis nilai ke variabel Storage, kita memanggil fungsi `write` dengan memberikan kunci-kunci akhir nilai sebagai argumen. Seperti halnya dengan fungsi `read`, jumlah argumen tergantung pada jumlah kunci - di sini, kita hanya memberikan nilai untuk ditulis ke variabel `owner` karena itu adalah variabel sederhana.
 
 ```rust, noplayground
 {{#rustdoc_include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:write_owner}}
 ```
 
-<span class="caption">Calling the `write` function on the `owner` variable</span>
+<span class="caption">Memanggil fungsi `write` pada variabel `owner`</span>
 
 ```rust, noplayground
 {{#rustdoc_include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:write}}
 ```
 
-<span class="caption">Calling the `write` function on the `names` variable</span>
+<span class="caption">Memanggil fungsi `write` pada variabel `names`</span>
 
-## Storing custom types
+## Menyimpan Tipe Kustom
 
-The `Store` trait, defined in the `starknet::storage_access` module, is used to specify how a type should be stored in storage. In order for a type to be stored in storage, it must implement the `Store` trait. Most types from the core library, such as unsigned integers (`u8`, `u128`, `u256`...), `felt252`, `bool`, `ContractAddress`, etc. implement the `Store` trait and can thus be stored without further action.
+Trait `Store`, yang didefinisikan dalam modul `starknet::storage_access`, digunakan untuk menentukan bagaimana suatu tipe harus disimpan dalam Storage. Agar suatu tipe dapat disimpan dalam Storage, ia harus mengimplementasikan trait `Store`. Sebagian besar tipe dari pustaka inti, seperti bilangan bulat tidak bertanda (`u8`, `u128`, `u256`, ...), `felt252`, `bool`, `ContractAddress`, dll. mengimplementasikan trait `Store` dan dapat disimpan tanpa tindakan lebih lanjut.
 
-But what if you wanted to store a type that you defined yourself, such as an enum or a struct? In that case, you have to explicitly tell the compiler how to store this type.
+Tetapi bagaimana jika Anda ingin menyimpan tipe yang Anda tentukan sendiri, seperti enum atau struct? Dalam hal ini, Anda harus secara eksplisit memberi tahu kompiler cara menyimpan tipe ini.
 
-In our example, we want to store a `Person` struct in storage, which is possible by implementing the `Store` trait for the `Person` type. This can be achieved by simply adding a `#[derive(starknet::Store)]` attribute on top of our struct definition.
+Dalam contoh kita, kita ingin menyimpan struct `Person` dalam Storage, yang dapat dilakukan dengan mengimplementasikan trait `Store` untuk tipe `Person`. Ini dapat dicapai dengan menambahkan atribut `#[derive(starknet::Store)]` di atas definisi struct kita.
 
 ```rust, noplayground
 {{#rustdoc_include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:person}}
 ```
 
-Similarly, Enums can be written to storage if they implement the `Store` trait, which can be trivially derived as long as all associated types implement the `Store` trait.
+Demikian pula, Enums dapat ditulis ke Storage jika mereka mengimplementasikan trait `Store`, yang dapat dengan mudah di-derive selama semua tipe terkait mengimplementasikan trait `Store`.
 
 ```rust, noplayground
 {{#rustdoc_include ../listings/ch99-starknet-smart-contracts/listing_99_03_example_contract/src/lib.cairo:enum_store}}
 ```
 
-### Structs storage layout
+### Tata Letak Storage Structs
 
-On Starknet, structs are stored in storage as a sequence of primitive types.
-The elements of the struct are stored in the same order as they are defined in the struct definition. The first element of the struct is stored at the base address of the struct, which is computed as specified in [Storage Addresses](#storage-addresses) and can be obtained by calling `var.address()`, and subsequent elements are stored at addresses contiguous to the first element.
-For example, the storage layout for the `owner` variable of type `Person` will result in the following layout:
+Pada Starknet, structs disimpan dalam Storage sebagai urutan tipe primitif. Elemen-elemen struct disimpan dalam urutan yang sama seperti yang didefinisikan dalam definisi struct. Elemen pertama dari struct disimpan pada alamat dasar struct, yang dihitung seperti yang dijelaskan dalam [Alamat Storage](#storage-addresses) dan dapat diperoleh dengan memanggil `var.address()`, dan elemen-elemen berikutnya disimpan pada alamat yang berdekatan dengan elemen pertama. Sebagai contoh, tata letak Storage untuk variabel `owner` bertipe `Person` akan menghasilkan tata letak berikut:
 
-| Fields  | Address            |
+| Kolom   | Alamat             |
 | ------- | ------------------ |
-| name    | owner.address()    |
-| address | owner.address() +1 |
+| nama    | owner.address()    |
+| alamat  | owner.address() +1 |
 
-### Enums storage layout
+### Tata Letak Storage Enums
 
-When you store an enum variant, what you're essentially storing is the variant's index and an eventual associated values. This index starts at 0 for the first variant of your enum and increments by 1 for each subsequent variant.
-If your variant has an associated value, it's stored starting from the address immediately following the base address.
-For example, suppose we have the `RegistrationType` enum with the `finite` variant, which carries an associated limit date. The storage layout would look like this:
+Ketika Anda menyimpan suatu varian enum, pada dasarnya yang Anda simpan adalah indeks varian dan nilai terkait yang mungkin. Indeks ini dimulai dari 0 untuk varian pertama enum Anda dan bertambah 1 untuk setiap varian berikutnya. Jika varian Anda memiliki nilai terkait, itu disimpan mulai dari alamat yang segera mengikuti alamat dasar. Sebagai contoh, misalkan kita memiliki enum `RegistrationType` dengan varian `finite`, yang membawa tanggal batas terkait. Tata letak Storagenya akan terlihat seperti ini:
 
-| Element                           | Address                         |
+| Elemen                            | Alamat                          |
 | --------------------------------- | ------------------------------- |
-| Variant index (e.g. 1 for finite) | registration_type.address()     |
-| Associated limit date             | registration_type.address() + 1 |
+| Indeks varian (misalnya 1 untuk finite) | registration_type.address()     |
+| Tanggal batas terkait             | registration_type.address() + 1 |
 
-## Storage mappings
+## Pemetaan Storage
 
-Storage mappings are similar to hash tables in that they allow mapping keys to values. However, unlike a typical hash table, the key data itself is not stored - only its hash is used to look up the associated value in the contract's storage.
-Mappings do not have a concept of length or whether a key/value pair is set. The only way to remove a mapping is to set its value to the default zero value.
+Pemetaan Storage mirip dengan tabel hash karena memungkinkan pemetaan kunci ke nilai. Namun, tidak seperti tabel hash biasa, data kunci itu sendiri tidak disimpan - hanya hash-nya yang digunakan untuk mencari nilai terkait dalam Storage kontrak.
+Pemetaan tidak memiliki konsep panjang atau apakah sepasang kunci/nilai diatur. Satu-satunya cara untuk menghapus pemetaan adalah dengan mengatur nilainya ke nilai default nol.
 
-Mappings are only used to compute the location of data in the storage of a
-contract given certain keys. They are thus **only allowed as storage variables**.
-They cannot be used as parameters or return parameters of contract functions,
-and cannot be used as types inside structs.
+Pemetaan hanya digunakan untuk menghitung lokasi data dalam Storage suatu
+kontrak dengan memberikan kunci tertentu. Oleh karena itu, mereka **hanya diperbolehkan sebagai variabel Storage**.
+Mereka tidak dapat digunakan sebagai parameter atau parameter pengembalian fungsi kontrak,
+dan tidak dapat digunakan sebagai tipe dalam struct.
 
 <div align="center">
-    <img src="mappings.png" alt="mappings" width="500px"/>
+    <img src="mappings.png" alt="pemetaan" width="500px"/>
 <div align="center">
     </div>
-    <span class="caption">Mapping keys to storage values</span>
+    <span class="caption">Memetakan kunci ke nilai Storage</span>
 </div>
 
-To declare a mapping, use the `LegacyMap` type enclosed in angle brackets `<>`,
-specifying the key and value types.
+Untuk mendeklarasikan pemetaan, gunakan tipe `LegacyMap` yang diapit dalam tanda kurung sudut `<>`,
+menentukan tipe kunci dan nilai.
 
-You can also create more complex mappings with multiple keys. You can find one in Listing 99-2bis like the popular `allowances` storage variable in the ERC20 Standard which maps an `owner` and an allowed `spender` to its `allowance` amount using multiple keys passed inside a tuple:
+Anda juga dapat membuat pemetaan yang lebih kompleks dengan beberapa kunci. Anda dapat menemukannya dalam Listing 99-2bis seperti variabel Storage `allowances` yang populer dalam Standar ERC20 yang memetakan `owner` dan `spender` yang diizinkan ke jumlah `allowance` menggunakan beberapa kunci yang dilewatkan dalam tupel:
 
 ```rust,noplayground
 {{#include ../listings/ch99-starknet-smart-contracts/no_listing_01_storage_mapping/src/lib.cairo:here}}
 ```
 
-<span class="caption">Listing 99-2bis: Storing mappings</span>
+<span class="caption">Listing 99-2bis: Menyimpan pemetaan</span>
 
-The address in storage of a variable stored in a mapping is computed according to the description in the [Storage Addresses](#storage-addresses) section.
-If the key of a mapping is a struct, each element of the struct constitutes a key. Moreover, the struct should implement the `Hash` trait, which can be derived with the `#[derive(Hash)]` attribute. For example, if you have struct with two fields, the address will be `h(h(sn_keccak(variable_name),k_1),k_2)` - where `k_1` and `k_2` are the values of the two fields of the struct.
+Alamat dalam Storage dari suatu variabel yang disimpan dalam pemetaan dihitung sesuai dengan deskripsi dalam bagian [Alamat Storage](#storage-addresses).
+Jika kunci pemetaan adalah struct, setiap elemen struct menjadi kunci. Selain itu, struct harus mengimplementasikan trait `Hash`, yang dapat diperoleh dengan atribut `#[derive(Hash)]`. Sebagai contoh, jika Anda memiliki struct dengan dua bidang, alamatnya akan menjadi `h(h(sn_keccak(nama_variabel),k_1),k_2)` - di mana `k_1` dan `k_2` adalah nilai dari dua bidang struct.
 
-Similarly, in the case of a nested mapping such as `LegacyMap((ContractAddress, ContractAddress), u8)`, the address will be computed in the same way: `h(h(sn_keccak(variable_name),k_1),k_2)`.
+Demikian pula, dalam kasus pemetaan bertingkat seperti `LegacyMap((ContractAddress, ContractAddress), u8)`, alamatnya akan dihitung dengan cara yang sama: `h(h(sn_keccak(nama_variabel),k_1),k_2)`.
 
-For more details about the contract storage layout in the [Starknet Documentation](https://docs.starknet.io/documentation/architecture_and_concepts/Smart_Contracts/contract-storage/#storage_variables)
+Untuk lebih jelasnya tentang tata letak Storage kontrak, kunjungi [Dokumentasi Starknet](https://docs.starknet.io/documentation/architecture_and_concepts/Smart_Contracts/contract-storage/#storage_variables)
