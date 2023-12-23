@@ -1,8 +1,3 @@
-# Understanding Cairo's Ownership system
+# Memahami Sistem Kepemilikan Cairo
 
-Cairo is a language built around a linear type system that allows us to
-statically ensure that in every Cairo program, a value is used exactly once.
-This linear type system helps preventing runtime errors by ensuring that operations that could cause such errors, such as writing twice to a memory cell, are detected at compile time.
-This is achieved by implementing an ownership system
-and forbidding copying and dropping values by default. In this chapter, we’ll
-talk about Cairo's ownership system as well as references and snapshots.
+Cairo adalah bahasa yang dibangun di sekitar sistem tipe linear yang memungkinkan kita untuk memastikan secara statis bahwa dalam setiap program Cairo, sebuah nilai digunakan tepat satu kali. Sistem tipe linear ini membantu mencegah kesalahan saat runtime dengan memastikan bahwa operasi yang dapat menyebabkan kesalahan tersebut, seperti menulis dua kali ke sel memori, terdeteksi pada waktu kompilasi. Hal ini dicapai dengan mengimplementasikan sistem kepemilikan dan melarang penyalinan serta penghapusan nilai secara default. Dalam bab ini, kita akan membahas sistem kepemilikan Cairo serta referensi dan snapshot.

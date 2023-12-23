@@ -1,4 +1,4 @@
-## Halo, Dunia
+## Hello, World!
 
 Sekarang setelah Anda telah menginstal Cairo melalui Scarb, saatnya untuk menulis program Cairo pertama Anda.
 Saat belajar bahasa pemrograman baru, adalah tradisi untuk menulis program kecil yang mencetak teks `Hello, world!` ke layar, jadi kita akan melakukan hal yang sama di sini!

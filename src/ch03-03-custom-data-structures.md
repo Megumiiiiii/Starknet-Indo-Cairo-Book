@@ -1,152 +1,110 @@
-# Custom Data Structures
+# Struktur Data Kustom
 
-When you first start programming in Cairo, you'll likely want to use arrays
-(`Array<T>`) to store collections of data. However, you will quickly realize
-that arrays have one big limitation - the data stored in them is immutable. Once
-you append a value to an array, you can't modify it.
+Ketika Anda pertama kali mulai memprogram di Cairo, kemungkinan besar Anda ingin menggunakan array (`Array<T>`) untuk menyimpan kumpulan data. Namun, Anda akan segera menyadari bahwa array memiliki satu keterbatasan besar - data yang disimpan di dalamnya bersifat tidak dapat diubah. Begitu Anda menambahkan nilai ke dalam array, Anda tidak dapat memodifikasinya.
 
-This can be frustrating when you want to use a mutable data structure. For
-example, say you're making a game where the players have a level, and they can
-level up. You might try to store the level of the players in an array:
+Hal ini dapat menjadi frustrasi ketika Anda ingin menggunakan struktur data yang dapat diubah. Misalnya, katakanlah Anda membuat sebuah game di mana para pemain memiliki level, dan mereka dapat naik level. Anda mungkin mencoba menyimpan level pemain dalam sebuah array:
 
 ```rust,noplayground
-let mut level_players = Array::new();
-level_players.append(5);
-level_players.append(1);
-level_players.append(10);
+let mut level_pemain = Array::new();
+level_pemain.append(5);
+level_pemain.append(1);
+level_pemain.append(10);
 ```
 
-But then you realize you can't increase the level at a specific index once it's
-set. If a player dies, you cannot remove it from the array unless he happens to
-be in the first position.
+Namun, kemudian Anda menyadari bahwa Anda tidak dapat meningkatkan level di indeks tertentu setelah diatur. Jika seorang pemain mati, Anda tidak dapat menghapusnya dari array kecuali dia kebetulan berada di posisi pertama.
 
-Fortunately, Cairo provides a handy built-in [dictionary
-type](./ch03-02-dictionaries.md) called `Felt252Dict<T>` that allows us to
-simulate the behavior of mutable data structures. Let's first explore how to use
-it to create a dynamic array implementation.
+Untungnya, Cairo menyediakan tipe [kamus bawaan](./ch03-02-dictionaries.md) yang praktis disebut `Felt252Dict<T>` yang memungkinkan kita mensimulasikan perilaku struktur data yang dapat diubah. Mari pertama-tama jelajahi cara menggunakannya untuk membuat implementasi array dinamis.
 
-Note: Several concepts used in this chapter are presented in later parts of the
-book. We recommend you to check out the following chapter first:
-[Structs](ch05-00-using-structs-to-structure-related-data),
-[Methods](./ch05-03-method-syntax.md), [Generic
-types](./ch08-00-generic-types-and-traits.md),
+Catatan: Beberapa konsep yang digunakan dalam bab ini disajikan di bagian-bagian berikutnya dari buku ini. Kami menyarankan Anda untuk membaca bab berikut terlebih dahulu:
+[Strukt](ch05-00-using-structs-to-structure-related-data),
+[Metode](./ch05-03-method-syntax.md), [Tipe Generik](./ch08-00-generic-types-and-traits.md),
 [Traits](./ch08-02-traits-in-cairo.md)
 
-## Simulating a dynamic array with dicts
+## Mensimulasikan array dinamis dengan kamus
 
-First, let's think about how we want our mutable dynamic array to behave. What
-operations should it support?
+Pertama, mari pikirkan bagaimana kita ingin array dinamis kita bersikap. Operasi apa yang harus didukung?
 
-It should:
+Array dinamis kita harus:
 
-- Allow us to append items at the end
-- Let us access any item by index
-- Allow setting the value of an item at a specific index
-- Return the current length
+- Memungkinkan kita untuk menambahkan item di akhir
+- Memungkinkan kita mengakses item apa pun berdasarkan indeks
+- Memungkinkan menetapkan nilai item di indeks tertentu
+- Mengembalikan panjang saat ini
 
-We can define this interface in Cairo like:
+Kita dapat mendefinisikan antarmuka ini di Cairo seperti:
 
 ```rust
 {{#include ../listings/ch03-common-collections/no_listing_13_cust_struct_vect/src/lib.cairo:trait}}
 ```
 
-This provides a blueprint for the implementation of our dynamic array. We named
-it Vec as it is similar to the `Vec<T>` data structure in Rust.
+Ini memberikan blueprint untuk implementasi array dinamis kita. Kami menamainya Vec karena mirip dengan struktur data `Vec<T>` di Rust.
 
-### Implementing a dynamic array in Cairo
+### Mengimplementasikan array dinamis di Cairo
 
-To store our data, we'll use a `Felt252Dict<T>` which maps index numbers (felts)
-to values. We'll also store a separate `len` field to track the length.
+Untuk menyimpan data kita, kita akan menggunakan `Felt252Dict<T>` yang memetakan nomor indeks (felts) ke nilai. Kita juga akan menyimpan bidang `len` terpisah untuk melacak panjang.
 
-Here is what our struct looks like. We wrap the type `T` inside `Nullable`
-pointer to allow using any type `T` in our data structure, as explained in the
-[Dictionaries](./ch03-02-dictionaries.md#dictionaries-of-types-not-supported-natively)
-section:
+Inilah tampilan struct kita. Kami membungkus tipe `T` di dalam pointer `Nullable` untuk memungkinkan penggunaan setiap tipe `T` dalam struktur data kita, sebagaimana dijelaskan dalam bagian [Kamus](./ch03-02-dictionaries.md#dictionaries-of-types-not-supported-natively):
 
 ```rust
 {{#include ../listings/ch03-common-collections/no_listing_13_cust_struct_vect/src/lib.cairo:struct}}
 ```
 
-The key thing that makes this vector mutable is that we can insert values into
-the dictionary to set or update values in our data structure. For example, to
-update a value at a specific index, we do:
+Hal utama yang membuat vektor ini dapat diubah adalah kita dapat menyisipkan nilai ke dalam kamus untuk menetapkan atau memperbarui nilai dalam struktur data kita. Misalnya, untuk memperbarui nilai di indeks tertentu, kita melakukan:
 
 ```rust,noplayground
 {{#include ../listings/ch03-common-collections/no_listing_13_cust_struct_vect/src/lib.cairo:set}}
 ```
 
-This overwrites the previously existing value at that index in the dictionary.
+Ini mengganti nilai yang sudah ada sebelumnya di indeks tersebut dalam kamus.
 
-While arrays are immutable, dictionaries provide the flexibility we need for
-modifiable data structures like vectors.
+Sementara array bersifat tidak dapat diubah, kamus memberikan fleksibilitas yang kita butuhkan untuk struktur data yang dapat dimodifikasi seperti vektor.
 
-The implementation of the rest of the interface is straightforward. The
-implementation of all the methods defined in our interface can be done as follow
-:
+Implementasi sisa antarmuka ini mudah dimengerti. Implementasi semua metode yang didefinisikan dalam antarmuka kami dapat dilakukan sebagai berikut:
 
 ```rust
 {{#include ../listings/ch03-common-collections/no_listing_13_cust_struct_vect/src/lib.cairo:implem}}
 ```
 
-The full implementation of the `Vec` structure can be found in the
-community-maintained library
-[Alexandria](https://github.com/keep-starknet-strange/alexandria/tree/main/src/data_structures).
+Implementasi lengkap struktur `Vec` dapat ditemukan dalam perpustakaan yang dijaga oleh komunitas [Alexandria](https://github.com/keep-starknet-strange/alexandria/tree/main/src/data_structures).
 
-## Simulating a Stack with dicts
+## Mensimulasikan Stack dengan kamus
 
-We will now look at a second example and its implementation details: a Stack.
+Sekarang kita akan melihat contoh kedua dan detail implementasinya: sebuah Stack.
 
-A Stack is a LIFO (Last-In, First-Out) collection. The insertion of a new
-element and removal of an existing element takes place at the same end,
-represented as the top of the stack.
+Stack adalah koleksi LIFO (Last-In, First-Out). Penyisipan elemen baru dan penghapusan elemen yang ada terjadi di ujung yang sama, yang diwakili sebagai puncak tumpukan.
 
-Let us define what operations we need to create a stack :
+Mari kita tentukan operasi apa yang kita perlukan untuk membuat stack:
 
-- Push an item to the top of the stack
-- Pop an item from the top of the stack
-- Check whether there are still any elements in the stack.
+- Dorong item ke bagian atas tumpukan
+- Pop item dari bagian atas tumpukan
+- Periksa apakah masih ada elemen di tumpukan.
 
-From these specifications we can define the following interface :
+Dari spesifikasi ini, kita dapat menentukan antarmuka berikut:
 
 ```rust
 {{#include ../listings/ch03-common-collections/no_listing_14_cust_struct_stack/src/lib.cairo:trait}}
 ```
 
-### Implementing a Mutable Stack in Cairo
+### Mengimplementasikan Stack yang Dapat Diubah di Cairo
 
-To create a stack data structure in Cairo, we can again use a `Felt252Dict<T>`
-to store the values of the stack along with a `usize` field to keep track of the
-length of the stack to iterate over it.
+Untuk membuat struktur data tumpukan di Cairo, kita bisa lagi menggunakan `Felt252Dict<T>` untuk menyimpan nilai-nilai tumpukan bersama dengan bidang `usize` untuk melacak panjang tumpukan agar bisa diiterasi.
 
-The Stack struct is defined as:
+Struktur Stack didefinisikan sebagai berikut:
 
 ```rust
 {{#include ../listings/ch03-common-collections/no_listing_14_cust_struct_stack/src/lib.cairo:struct}}
 ```
 
-Next, let's see how our main functions `push` and `pop` are implemented.
+Selanjutnya, mari lihat bagaimana fungsi utama kami `push` dan `pop` diimplementasikan.
 
 ```rust
 {{#include ../listings/ch03-common-collections/no_listing_14_cust_struct_stack/src/lib.cairo:implem}}
 ```
 
-The code uses the `insert` and `get` methods to access the values in the
-`Felt252Dict<T>`. To push an element at the top of the stack, the `push`
-function inserts the element in the dict at index `len` - and increases the
-`len` field of the stack to keep track of the position of the stack top. To
-remove a value, the `pop` function retrieves the last value at position `len-1`
-and then decreases the value of `len` to update the position of the stack top
-accordingly.
+Kode menggunakan metode `insert` dan `get` untuk mengakses nilai-nilai dalam `Felt252Dict<T>`. Untuk mendorong elemen di bagian atas tumpukan, fungsi `push` menyisipkan elemen ke dalam kamus di indeks `len` - dan meningkatkan bidang `len` dari tumpukan untuk melacak posisi puncak tumpukan. Untuk menghapus sebuah nilai, fungsi `pop` mengambil nilai terakhir di posisi `len-1` kemudian mengurangi nilai `len` untuk memperbarui posisi puncak tumpukan sesuai.
 
-The full implementation of the Stack, along with more data structures that you
-can use in your code, can be found in the community-maintained
-[Alexandria](https://github.com/keep-starknet-strange/alexandria/tree/main/src/data_structures)
-library, in the "data_structures" crate.
+Implementasi lengkap dari Stack, bersama dengan struktur data lain yang dapat Anda gunakan dalam kode Anda, dapat ditemukan dalam perpustakaan yang dijaga oleh komunitas [Alexandria](https://github.com/keep-starknet-strange/alexandria/tree/main/src/data_structures), di dalam crate "data_structures".
 
-## Summary
+## Ringkasan
 
-While Cairo's memory model is immutable and can make it difficult to implement
-mutable data structures, we can fortunately use the `Felt252Dict<T>` type to
-simulate mutable data structures. This allows us to implement a wide range of
-data structures that are useful for many applications, effectively hiding the
-complexity of the underlying memory model.
+Meskipun model memori Cairo bersifat tidak dapat diubah dan dapat membuat sulit untuk mengimplementasikan struktur data yang dapat diubah, kita untungnya dapat menggunakan tipe `Felt252Dict<T>` untuk mensimulasikan struktur data yang dapat diubah. Ini memungkinkan kita untuk mengimplementasikan berbagai struktur data yang berguna untuk banyak aplikasi, efektif menyembunyikan kompleksitas model memori yang mendasarinya.
