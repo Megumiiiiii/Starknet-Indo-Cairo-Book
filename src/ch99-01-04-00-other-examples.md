@@ -1,3 +1,3 @@
-# Other examples 
+# Contoh Lainnya
 
-This section contains additional examples of Starknet smart contracts, utilizing various features of the Cairo programming language. Your contributions are welcome and encouraged, as we aim to gather as many diverse examples as possible.
+Bagian ini berisi contoh tambahan dari kontrak pintar Starknet, yang memanfaatkan berbagai fitur dari bahasa pemrograman Cairo. Kontribusi Anda sangat kami harapkan dan dihargai, karena kami bertujuan untuk mengumpulkan sebanyak mungkin contoh yang beragam.

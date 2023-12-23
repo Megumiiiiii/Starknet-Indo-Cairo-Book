@@ -1,6 +1,6 @@
 # Bahasa Pemrograman Cairo
 
-[The Cairo Programming Language](title-page.md)
+[Bahasa Pemrograman Cairo](title-page.md)
 [Pendahuluan](ch00-00-introduction.md)
 
 ## Memulai
