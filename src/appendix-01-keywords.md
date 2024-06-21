@@ -5,6 +5,7 @@ Daftar berikut berisi kata kunci yang diperuntukkan bagi penggunaan bahasa Kairo
 Ada dua kategori kata kunci:
 
 - ketat
+- longgar
 - disimpan
 
 Ada kategori ketiga, yaitu fungsi dari perpustakaan inti. Meskipun namanya tidak dicadangkan, namun tidak disarankan untuk digunakan sebagai nama item apa pun untuk mengikuti praktik yang baik.
@@ -43,6 +44,13 @@ Kata kunci ini hanya dapat digunakan dalam konteks yang benar. Mereka tidak dapa
 - `use` - Membawa simbol ke dalam ruang lingkup
 
 ---
+
+### Kata Kunci Longgar
+
+Kata kunci ini dikaitkan dengan perilaku tertentu, namun juga dapat digunakan untuk mendefinisikan item.
+
+- `self` - Subjek metode
+- `super` - Modul induk dari modul saat ini
 
 ### Kata kunci yang dipesan
 
